@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  rasa:
+    image: rasa/rasa:3.2.10
+    ports:
+      - "5005:5005"
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: >
+      run --enable-api --cors "*" --debug
+    restart: unless-stopped
+
+  action_server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - "5055:5055"
+    working_dir: /app
+    command: python -m rasa_sdk --actions actions
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: unless-stopped

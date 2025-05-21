@@ -1,0 +1,52 @@
+[
+  {
+    "tag_name": "entity",
+    "ids_to_tags": {
+      "1": "B-cdcarm_owner",
+      "2": "I-cdcarm_owner",
+      "3": "L-cdcarm_owner",
+      "4": "U-cdcarm_owner",
+      "5": "B-platform_id",
+      "6": "I-platform_id",
+      "7": "L-platform_id",
+      "8": "U-platform_id",
+      "9": "B-release_id",
+      "10": "I-release_id",
+      "11": "L-release_id",
+      "12": "U-release_id",
+      "13": "B-test_id",
+      "14": "I-test_id",
+      "15": "L-test_id",
+      "16": "U-test_id",
+      "17": "B-username",
+      "18": "I-username",
+      "19": "L-username",
+      "20": "U-username",
+      "0": "O"
+    },
+    "tags_to_ids": {
+      "B-cdcarm_owner": 1,
+      "I-cdcarm_owner": 2,
+      "L-cdcarm_owner": 3,
+      "U-cdcarm_owner": 4,
+      "B-platform_id": 5,
+      "I-platform_id": 6,
+      "L-platform_id": 7,
+      "U-platform_id": 8,
+      "B-release_id": 9,
+      "I-release_id": 10,
+      "L-release_id": 11,
+      "U-release_id": 12,
+      "B-test_id": 13,
+      "I-test_id": 14,
+      "L-test_id": 15,
+      "U-test_id": 16,
+      "B-username": 17,
+      "I-username": 18,
+      "L-username": 19,
+      "U-username": 20,
+      "O": 0
+    },
+    "num_tags": 21
+  }
+]

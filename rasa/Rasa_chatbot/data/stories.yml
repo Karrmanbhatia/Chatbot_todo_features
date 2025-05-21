@@ -1,0 +1,91 @@
+version: "3.1"
+
+stories:
+- story: greet
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- story: say goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: ask name
+  steps:
+  - intent: ask_name
+  - action: utter_my_name
+
+- story: ask purpose
+  steps:
+  - intent: ask_purpose
+  - action: utter_my_purpose
+  - action: utter_how_to_use
+
+- story: analyze failure
+  steps:
+  - intent: analyze_failure
+  - action: action_analyze_failure
+
+- story: explain prediction
+  steps:
+  - intent: explain_prediction
+  - action: action_explain_prediction
+
+- story: analyze test failures
+  steps:
+  - intent: analyze_test_failures
+  - action: action_analyze_test_failures
+
+- story: explain prediction methodology
+  steps:
+  - intent: explain_prediction
+  - action: action_explain_prediction
+
+- story: sign in
+  steps:
+  - intent: sign_in
+  - action: action_sign_in
+
+- story: generate CDCARM URL (generic)
+  steps:
+  - intent: generate_cdcarm_url
+  - action: action_generate_cdcarm_url
+
+- story: generate CDCARM URL with report
+  steps:
+  - intent: request_cdcarm_url_with_report
+  - action: action_get_cdcarm_url_with_report
+
+- story: generate CDCARM URL without report
+  steps:
+  - intent: request_cdcarm_url_without_report
+  - action: action_get_cdcarm_url_without_report
+
+- story: help with opening CDCARM URL
+  steps:
+  - intent: open_cdcarm_url
+  - action: action_open_cdcarm_url
+
+- story: greet, sign in and request CDCARM URL
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: sign_in
+  - action: action_sign_in
+  - intent: generate_cdcarm_url
+  - action: action_generate_cdcarm_url
+
+- story: sign in and generate URL with report
+  steps:
+  - intent: sign_in
+  - action: action_sign_in
+  - intent: request_cdcarm_url_with_report  
+  - action: action_get_cdcarm_url_with_report
+
+- story: sign in and generate URL without report
+  steps:
+  - intent: sign_in
+  - action: action_sign_in
+  - intent: request_cdcarm_url_without_report
+  - action: action_get_cdcarm_url_without_report

@@ -1,0 +1,22 @@
+version: "3.1"
+
+rules:
+- rule: Say goodbye anytime the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Generate CDCARM URL directly
+  steps:
+  - intent: generate_cdcarm_url
+  - action: action_generate_cdcarm_url
+
+- rule: Respond to greeting
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- rule: Help user when no specific intent is matched
+  steps:
+  - intent: nlu_fallback
+  - action: utter_how_to_use

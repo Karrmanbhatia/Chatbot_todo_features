@@ -1,0 +1,24 @@
+{
+  "lookup": {
+    "rules": {
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"nlu_fallback\"}}]": "utter_how_to_use",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"nlu_fallback\"}}, {\"prev_action\": {\"action_name\": \"utter_how_to_use\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"nlu_fallback\"}}]": "action_listen",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"generate_cdcarm_url\"}}]": "action_generate_cdcarm_url",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"generate_cdcarm_url\"}}, {\"prev_action\": {\"action_name\": \"action_generate_cdcarm_url\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"generate_cdcarm_url\"}}]": "action_listen",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"greet\"}}]": "utter_greet",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"greet\"}}, {\"prev_action\": {\"action_name\": \"utter_greet\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"greet\"}}]": "action_listen",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"goodbye\"}}]": "utter_goodbye",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"goodbye\"}}, {\"prev_action\": {\"action_name\": \"utter_goodbye\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"goodbye\"}}]": "action_listen"
+    },
+    "rule_only_slots": [],
+    "rule_only_loops": [],
+    "rules_for_loop_unhappy_path": {},
+    "rules_not_in_stories": [
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"nlu_fallback\"}}]",
+      "predicting default action with intent back",
+      "predicting default action with intent restart",
+      "predicting default action with intent session_start",
+      "[{\"prev_action\": {\"action_name\": \"action_listen\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"nlu_fallback\"}}, {\"prev_action\": {\"action_name\": \"utter_how_to_use\"}, \"slots\": {\"signed_in\": [1.0, 0.0]}, \"user\": {\"intent\": \"nlu_fallback\"}}]"
+    ]
+  }
+}

@@ -1,0 +1,124 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - ask_name
+  - ask_purpose
+  - analyze_failure
+  - explain_prediction
+  - analyze_test_failures
+  - generate_cdcarm_url
+  - request_cdcarm_url_with_report
+  - request_cdcarm_url_without_report
+  - open_cdcarm_url
+  - sign_in
+
+responses:
+  utter_greet:
+    - text: "Hello! I'm the TFIA Assistant. How can I help you today?"
+  
+  utter_goodbye:
+    - text: "Goodbye! Feel free to come back if you have more questions."
+  
+  utter_my_name:
+    - text: "I am the TFIA Assistant, designed to help with Test Failure Investigation Analysis."
+  
+  utter_my_purpose:
+    - text: "I am an AI assistant designed to help with Test Failure Investigation Analysis."
+  
+  utter_how_to_use:
+    - text: "You can ask me to analyze test failures by providing a test ID. For example, try saying: 'Analyze test T-1234' or 'Why did test T-5678 fail?'"
+
+slots:
+  cdcarm_owner:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: cdcarm_owner
+  
+  platform_id:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: platform_id
+  
+  release_id:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: release_id
+  
+  application_id:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+  
+  with_investigation_report:
+    type: bool
+    influence_conversation: false
+    mappings:
+      - type: custom
+  
+  generated_url:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+  
+  uploaded_file_path:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: custom
+
+  analysis_results:
+    type: any
+    influence_conversation: false
+    mappings:
+      - type: custom
+  
+  username:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: username
+  
+  signed_in:
+    type: bool
+    influence_conversation: true
+    mappings:
+      - type: custom
+    initial_value: false
+
+entities:
+  - test_id
+  - username
+  - report_type
+  - platform_id
+  - release_id
+  - cdcarm_owner
+  - platform
+  - release
+
+actions:
+  - action_analyze_failure
+  - action_explain_prediction
+  - action_fetch_test_data
+  - action_analyze_test_failures
+  - action_generate_cdcarm_url
+  - action_get_cdcarm_url_with_report
+  - action_get_cdcarm_url_without_report
+  - action_open_cdcarm_url
+  - action_sign_in
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

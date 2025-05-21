@@ -1,0 +1,142 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hello
+    - hi
+    - hey
+    - good morning
+    - good evening
+    - hey there
+
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+    - see you around
+    - see you later
+
+- intent: affirm
+  examples: |
+    - yes
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+
+- intent: deny
+  examples: |
+    - no
+    - never
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
+
+- intent: ask_name
+  examples: |
+    - what is your name
+    - who are you
+    - what should I call you
+    - what's your name
+    - tell me who you are
+
+- intent: ask_purpose
+  examples: |
+    - what can you do
+    - what is your purpose
+    - how can you help me
+    - what are you for
+    - what are your capabilities
+
+- intent: analyze_failure
+  examples: |
+    - why did test [T-1234](test_id) fail
+    - analyze test [T-5678](test_id)
+    - what's wrong with test [T-2468](test_id)
+    - explain failure for [T-1357](test_id)
+    - investigate test [T-8642](test_id) failure
+    - why is test [T-9753](test_id) failing
+
+- intent: explain_prediction
+  examples: |
+    - explain your reasoning
+    - how did you reach that conclusion
+    - what's your analysis based on
+    - explain your analysis
+    - how did you determine that
+    - explain your prediction
+
+- intent: analyze_test_failures
+  examples: |
+    - analyze my test failures
+    - check my test data
+    - analyze the uploaded file
+    - process my test results
+    - check the CSV I uploaded
+    - analyze failure patterns
+    - find patterns in test failures
+    - group similar test failures
+    - what are the common failure reasons
+    - who has the most failing tests
+
+- intent: generate_cdcarm_url
+  examples: |
+    - generate CDCARM URL
+    - create CDCARM link
+    - I need a CDCARM URL
+    - give me a CDCARM URL
+    - CDCARM URL please
+    - generate a link for CDCARM
+    - URL for CDCARM
+    - create a CDCARM URL for owner [John](cdcarm_owner)
+    - generate CDCARM URL for [Sarah](cdcarm_owner)
+    - CDCARM URL for [platform](platform_id) [1](platform_id)
+    - CDCARM URL for [release](release_id) [217](release_id)
+
+- intent: request_cdcarm_url_with_report
+  examples: |
+    - generate CDCARM URL with investigation report
+    - I need a CDCARM URL with report
+    - CDCARM URL with investigation
+    - give me a CDCARM URL with report
+    - with investigation report
+    - URL with report
+    - CDCARM with report for [John](cdcarm_owner)
+    - URL with investigation for owner [Jane](cdcarm_owner)
+
+- intent: request_cdcarm_url_without_report
+  examples: |
+    - generate CDCARM URL without investigation report
+    - I need a CDCARM URL without report
+    - CDCARM URL without investigation
+    - give me a CDCARM URL without report
+    - without investigation report
+    - URL without report
+    - CDCARM without report for [John](cdcarm_owner)
+    - URL without investigation for owner [Jane](cdcarm_owner)
+
+- intent: open_cdcarm_url
+  examples: |
+    - open the CDCARM URL
+    - how do I open the URL
+    - open URL in browser
+    - help me access the URL
+    - how to use the URL
+    - open the generated URL
+    - view the CDCARM URL
+
+- intent: sign_in
+  examples: |
+    - sign in
+    - login
+    - log in
+    - authenticate
+    - sign me in
+    - I want to sign in
+    - my username is [john_doe](username)
+    - login as [jane_smith](username)
+    - sign in as [test_user](username)
+    - log me in as [admin](username)
+    - I am [developer](username)

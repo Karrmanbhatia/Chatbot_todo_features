@@ -1,0 +1,52 @@
+version: "3.1"
+
+rules:
+- rule: Say goodbye anytime the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Generate CDCARM URL directly
+  steps:
+  - intent: generate_cdcarm_url
+  - action: action_generate_cdcarm_url
+
+- rule: Respond to greeting
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- rule: Help user when no specific intent is matched
+  steps:
+  - intent: nlu_fallback
+  - action: utter_how_to_use
+
+- rule: Fetch CDCARM JSON directly
+  steps:
+  - intent: fetch_cdcarm_json
+  - action: action_fetch_cdcarm_json
+
+  - rule: Fetch CDCARM data when requested
+    steps:
+      - intent: fetch_cdcarm_data
+      - action: action_fetch_cdcarm_json
+
+  - rule: Handle CDCARM query when asked
+    steps:
+      - intent: analyze_failure
+      - action: action_analyze_failure
+
+  - rule: Explain prediction when asked
+    steps:
+      - intent: explain_prediction
+      - action: action_explain_prediction
+
+  - rule: Fetch test data when asked
+    steps:
+      - intent: fetch_test_data
+      - action: action_fetch_test_data
+
+  - rule: Analyze test failures when asked
+    steps:
+      - intent: analyze_test_failures
+      - action: action_analyze_test_failures

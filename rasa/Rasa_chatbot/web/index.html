@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ANSYS Test Failure Analyzer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --ansys-blue: #1e40af;
+            --ansys-gold: #FFB71B;
+            --ansys-gray: #333333;
+            --ansys-light-gray: #f0f2f5;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--ansys-light-gray);
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        .header {
+            background-color: var(--ansys-blue);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .logo {
+            height: 40px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--ansys-blue);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .chat-window {
+            display: none;
+            width: 350px;
+            height: 500px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            flex-direction: column;
+        }
+        
+        .chat-window.expanded {
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-radius: 0;
+        }
+        
+        .chat-header {
+            background-color: var(--ansys-blue);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .chat-controls button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .auth-panel, .option-panel, .chat-body, .chat-footer {
+            display: none;
+        }
+        
+        .auth-panel, .option-panel {
+            padding: 20px;
+            flex-direction: column;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .sign-in-button {
+            background-color: var(--ansys-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        
+        .option-button {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .option-button:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background-color: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 15px 15px 0 15px;
+            margin-left: auto;
+        }
+        
+        .bot-message {
+            background-color: #f5f5f5;
+            padding: 10px 15px;
+            border-radius: 15px 15px 15px 0;
+        }
+        
+        .chat-footer {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+            outline: none;
+        }
+        
+        .send-button {
+            background-color: var(--ansys-gold);
+            color: black;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        /* File Upload Styling */
+        .file-upload {
+            display: none;
+            margin: 15px 0;
+            padding: 15px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .file-upload.active {
+            display: block;
+        }
+
+        .upload-btn {
+            background-color: var(--ansys-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .upload-icon {
+            font-size: 36px;
+            color: var(--ansys-blue);
+            margin-bottom: 10px;
+        }
+
+        .file-name {
+            font-size: 14px;
+            margin-top: 8px;
+            color: #666;
+        }
+
+        /* URL Link Styling */
+        .url-link {
+            word-break: break-all;
+            color: var(--ansys-blue);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .url-options {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .url-options.active {
+            display: block;
+        }
+
+        .option-label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .option-radio {
+            margin-right: 5px;
+        }
+
+        .owner-input {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .generate-btn {
+            background-color: var(--ansys-gold);
+            color: black;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        /* Back to Menu Button */
+        .back-to-menu {
+            display: inline-block;
+            background-color: var(--ansys-gray);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin-top: 15px;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .back-to-menu:hover {
+            background-color: #444;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <h1>ANSYS Test Failure Analyzer</h1>
+        <img src="https://www.ansys.com/-/media/ansys/corporate/resources/ansys-logo.svg" alt="ANSYS Logo" class="logo">
+    </header>
+    
+    <div class="container">
+        <h2>Welcome to the Test Failure Analyzer</h2>
+        <p>This tool helps you analyze test failure patterns and generate CDCARM URLs. Use the chat assistant in the bottom right corner to get started.</p>
+    </div>
+    
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-icon" id="chatIcon">
+            <i class="fas fa-comment"></i>
+        </div>
+        
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                <h3>Test Assistant</h3>
+                <div class="chat-controls">
+                    <button id="minimizeBtn" title="Minimize"><i class="fas fa-window-minimize"></i></button>
+                    <button id="expandBtn" title="Expand"><i class="fas fa-expand"></i></button>
+                    <button id="closeBtn" title="Close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            
+            <div class="auth-panel" id="authPanel">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" placeholder="Enter your password">
+                </div>
+                <button class="sign-in-button" id="signInBtn">Sign In</button>
+            </div>
+            
+            <div class="option-panel" id="optionPanel">
+                <button class="option-button" id="cdcarmUrlBtn"><i class="fas fa-link"></i> Generate CDCARM URL</button>
+                <button class="option-button" id="uploadAnalyzeBtn"><i class="fas fa-file-upload"></i> Upload & Analyze Test Failures</button>
+                <button class="option-button" id="helpBtn"><i class="fas fa-question-circle"></i> Help & Information</button>
+            </div>
+            
+            <div class="chat-body" id="chatBody"></div>
+            <div class="chat-footer" id="chatFooter">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type your message...">
+                <button class="send-button" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatWidget = document.getElementById('chatWidget');
+        const chatIcon = document.getElementById('chatIcon');
+        const chatWindow = document.getElementById('chatWindow');
+        const minimizeBtn = document.getElementById('minimizeBtn');
+        const expandBtn = document.getElementById('expandBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const authPanel = document.getElementById('authPanel');
+        const optionPanel = document.getElementById('optionPanel');
+        const chatBody = document.getElementById('chatBody');
+        const chatFooter = document.getElementById('chatFooter');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const signInBtn = document.getElementById('signInBtn');
+
+        let isExpanded = false;
+        let currentContext = null;
+        let selectedFile = null;
+
+        chatIcon.addEventListener('click', () => {
+            chatWindow.style.display = 'flex';
+            authPanel.style.display = 'flex';
+            chatIcon.style.display = 'none';
+        });
+
+        minimizeBtn.addEventListener('click', () => {
+            chatWindow.style.display = 'none';
+            chatIcon.style.display = 'flex';
+            if (isExpanded) {
+                chatWindow.classList.remove('expanded');
+                expandBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                isExpanded = false;
+            }
+        });
+
+        expandBtn.addEventListener('click', () => {
+            isExpanded = !isExpanded;
+            chatWindow.classList.toggle('expanded');
+            expandBtn.innerHTML = isExpanded
+                ? '<i class="fas fa-compress"></i>'
+                : '<i class="fas fa-expand"></i>';
+        });
+
+        closeBtn.addEventListener('click', () => {
+            chatWindow.style.display = 'none';
+            chatIcon.style.display = 'flex';
+        });
+
+        signInBtn.addEventListener('click', () => {
+            // Simulate authentication
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username && password) {
+                authPanel.style.display = 'none';
+                optionPanel.style.display = 'flex';
+            } else {
+                alert("Please enter both username and password.");
+            }
+        });
+
+        document.getElementById('cdcarmUrlBtn').addEventListener('click', () => {
+            showCDCARMOptions();
+        });
+
+        document.getElementById('uploadAnalyzeBtn').addEventListener('click', () => {
+            showFileUploadInterface();
+        });
+
+        document.getElementById('helpBtn').addEventListener('click', () => {
+            showHelpInformation();
+        });
+
+        function showCDCARMOptions() {
+            optionPanel.style.display = 'none';
+            chatBody.style.display = 'block';
+            chatFooter.style.display = 'flex';
+            currentContext = 'cdcarm';
+            
+            // Display URL options interface
+            const message = createBotMessage();
+            message.innerHTML = `
+                <p>Please select options for your CDCARM URL:</p>
+                <div class="url-options active">
+                    <label class="option-label">
+                        <input type="radio" name="report_type" value="with" class="option-radio" checked> With Investigation Report
+                    </label>
+                    <label class="option-label">
+                        <input type="radio" name="report_type" value="without" class="option-radio"> Without Investigation Report
+                    </label>
+                    <label class="option-label">
+                        Owner (optional):
+                        <input type="text" class="owner-input" id="ownerInput" placeholder="Enter owner name">
+                    </label>
+                    <button class="generate-btn" id="generateUrlBtn">Generate URL</button>
+                </div>
+            `;
+            chatBody.appendChild(message);
+            
+            // Add event listener to the generate button
+            setTimeout(() => {
+                document.getElementById('generateUrlBtn').addEventListener('click', generateCDCARMUrl);
+            }, 0);
+        }
+
+        function showFileUploadInterface() {
+            optionPanel.style.display = 'none';
+            chatBody.style.display = 'block';
+            chatFooter.style.display = 'flex';
+            currentContext = 'upload';
+            
+            // Display file upload interface
+            const message = createBotMessage();
+            message.innerHTML = `
+                <p>Please upload a CSV or Excel file with test failure data:</p>
+                <div class="file-upload active">
+                    <div class="upload-icon"><i class="fas fa-file-upload"></i></div>
+                    <input type="file" id="fileInput" style="display:none;" accept=".csv,.xlsx,.xls">
+                    <button class="upload-btn" id="browseBtn">Browse Files</button>
+                    <div class="file-name" id="fileName"></div>
+                </div>
+            `;
+            chatBody.appendChild(message);
+            
+            // Add event listeners for file upload
+            setTimeout(() => {
+                document.getElementById('browseBtn').addEventListener('click', () => {
+                    document.getElementById('fileInput').click();
+                });
+                
+                document.getElementById('fileInput').addEventListener('change', (e) => {
+                    selectedFile = e.target.files[0];
+                    if (selectedFile) {
+                        document.getElementById('fileName').textContent = selectedFile.name;
+                        
+                        // Add analyze button after file is selected
+                        const fileUpload = document.querySelector('.file-upload');
+                        
+                        // Remove any existing analyze button first
+                        const existingBtn = fileUpload.querySelector('#analyzeBtn');
+                        if (existingBtn) {
+                            fileUpload.removeChild(existingBtn);
+                        }
+                        
+                        const analyzeBtn = document.createElement('button');
+                        analyzeBtn.id = 'analyzeBtn';
+                        analyzeBtn.className = 'upload-btn';
+                        analyzeBtn.style.marginLeft = '10px';
+                        analyzeBtn.textContent = 'Analyze';
+                        analyzeBtn.addEventListener('click', analyzeFile);
+                        fileUpload.appendChild(analyzeBtn);
+                    }
+                });
+            }, 0);
+        }
+
+        function showHelpInformation() {
+            optionPanel.style.display = 'none';
+            chatBody.style.display = 'block';
+            chatFooter.style.display = 'flex';
+            currentContext = 'help';
+            
+            const helpMessage = createBotMessage();
+            helpMessage.innerHTML = `
+                <p><strong>ANSYS Test Failure Analyzer Help</strong></p>
+                <p>This assistant can help you with:</p>
+                <ul style="margin-left: 20px; padding-left: 0;">
+                    <li><strong>Generate CDCARM URLs</strong> - Create URLs with or without investigation reports for specific owners</li>
+                    <li><strong>Analyze Test Failures</strong> - Upload CSV or Excel files with test data to identify patterns and issues</li>
+                </ul>
+                <p>To get started, select an option from the menu or type your question below.</p>
+                <button class="back-to-menu" id="backToMenuHelp">Back to Main Menu</button>
+            `;
+            chatBody.appendChild(helpMessage);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            
+            // Add event listener for the back button
+            setTimeout(() => {
+                document.getElementById('backToMenuHelp').addEventListener('click', showMainMenu);
+            }, 0);
+        }
+
+        function showMainMenu() {
+            // Clear chat body
+            chatBody.style.display = 'none';
+            chatFooter.style.display = 'none';
+            chatBody.innerHTML = '';
+            
+            // Show options panel
+            optionPanel.style.display = 'flex';
+            currentContext = null;
+            selectedFile = null;
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (message) {
+                const userMsg = createUserMessage(message);
+                chatBody.appendChild(userMsg);
+                chatInput.value = '';
+                chatBody.scrollTop = chatBody.scrollHeight;
+
+                // Process the message based on context
+                processMessage(message);
+            }
+        }
+
+        function processMessage(message) {
+            const lowerMsg = message.toLowerCase();
+            
+            setTimeout(() => {
+                // Check for menu requests
+                if (lowerMsg.includes('menu') || lowerMsg.includes('back') || lowerMsg.includes('options')) {
+                    showMainMenu();
+                    return;
+                }
+                
+                // Handle context-specific replies
+                if (currentContext === 'cdcarm') {
+                    if (lowerMsg.includes('url') || lowerMsg.includes('generate') || lowerMsg.includes('link')) {
+                        handleCDCARMRequest(lowerMsg);
+                    } else {
+                        replyWithBotMessage("You can generate a CDCARM URL by specifying if you want it with or without an investigation report, and optionally provide an owner name.");
+                    }
+                } else if (currentContext === 'upload') {
+                    replyWithBotMessage("Please use the file upload interface to upload your test data file.");
+                } else if (currentContext === 'help') {
+                    if (lowerMsg.includes('cdcarm') || lowerMsg.includes('url')) {
+                        replyWithBotMessage("To generate a CDCARM URL, select the 'Generate CDCARM URL' option from the main menu. You can specify whether you want a URL with or without investigation reports, and optionally provide an owner name.");
+                    } else if (lowerMsg.includes('upload') || lowerMsg.includes('analyze') || lowerMsg.includes('file')) {
+                        replyWithBotMessage("To analyze test failures, select the 'Upload & Analyze Test Failures' option from the main menu. You can upload CSV or Excel files with test data, and I'll help identify patterns and issues.");
+                    } else {
+                        replyWithBotMessage("Is there something specific you'd like to know about CDCARM URLs or test failure analysis?");
+                    }
+                } else {
+                    // General responses
+                    if (lowerMsg.includes('hello') || lowerMsg.includes('hi')) {
+                        replyWithBotMessage("Hello! How can I help you today?");
+                    } else if (lowerMsg.includes('cdcarm') || lowerMsg.includes('url')) {
+                        handleCDCARMRequest(lowerMsg);
+                    } else if (lowerMsg.includes('upload') || lowerMsg.includes('analyze')) {
+                        replyWithBotMessage("To analyze test failures, please select the 'Upload & Analyze Test Failures' option from the main menu.");
+                    } else {
+                        replyWithBotMessage("I'm here to help you generate CDCARM URLs and analyze test failures. How can I assist you today?");
+                    }
+                }
+            }, 500);
+        }
+
+        function handleCDCARMRequest(message) {
+            let withReport = !message.includes('without');
+            let owner = null;
+            
+            // Try to extract owner name
+            const ownerMatch = message.match(/(?:owner|for)\s+(\w+)/i);
+            if (ownerMatch && ownerMatch[1]) {
+                owner = ownerMatch[1];
+            }
+            
+            generateCDCARMUrlFromParams(withReport, owner);
+        }
+
+        function generateCDCARMUrl() {
+            const reportType = document.querySelector('input[name="report_type"]:checked').value;
+            const owner = document.getElementById('ownerInput').value.trim();
+            
+            generateCDCARMUrlFromParams(reportType === 'with', owner || null);
+        }
+
+        function generateCDCARMUrlFromParams(withReport, owner) {
+            const baseUrl = "https://cdcarm.win.ansys.com/Reports/Unified/ErrorReport/Product/90";
+            const status = withReport ? "NOT%20NULL" : "NULL";
+            let url = `${baseUrl}?applicationId=-1&platformId=1&releaseId=217&allPackages=True&filterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Filters.InvestigationStatusFilter%2COperator%3AEQUAL%2CValue%3A${status}`;
+            
+            if (owner) {
+                url += `%26Filter1%3DType%3AARM.WebFilters.TestResults.Filters.OwnerFilter%2COperator%3AEQUAL%2CValue%3A${owner}`;
+            }
+            
+            url += "&highlighterCollection=MatchType%3DAll&officialOnly=False&chronicFailureThreshold=0&noCache=False&showNonChronicFailures=true";
+            
+            const reportStatus = withReport ? "with" : "without";
+            const ownerText = owner ? ` for owner ${owner}` : "";
+            
+            const message = createBotMessage();
+            message.innerHTML = `
+                <p>Here's your CDCARM URL ${reportStatus} investigation report${ownerText}:</p>
+                <p><a href="${url}" target="_blank" class="url-link">${url}</a></p>
+                <button class="back-to-menu" id="backToMenuURL">Back to Main Menu</button>
+            `;
+            chatBody.appendChild(message);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            
+            // Add event listener for the back button
+            setTimeout(() => {
+                document.getElementById('backToMenuURL').addEventListener('click', showMainMenu);
+            }, 0);
+        }
+
+        function analyzeFile() {
+            if (!selectedFile) {
+                replyWithBotMessage("Please select a file first.");
+                return;
+            }
+            
+            replyWithBotMessage(`Analyzing file: ${selectedFile.name}...`);
+            
+            // Simulate file analysis (in a real app, you would send to server here)
+            setTimeout(() => {
+                const fileType = selectedFile.name.split('.').pop().toLowerCase();
+                
+                if (fileType === 'csv' || fileType === 'xlsx' || fileType === 'xls') {
+                    const analysisResult = createBotMessage();
+                    analysisResult.innerHTML = `
+                        <p><strong>Analysis Results for ${selectedFile.name}</strong></p>
+                        <p>Total Tests: 127<br>
+                        Failed Tests: 42 (33%)</p>
+                        <p><strong>Top Failure Patterns:</strong></p>
+                        <ol>
+                            <li>Wall label mismatch: 15 tests (36%)</li>
+                            <li>Validation error: 12 tests (29%)</li>
+                            <li>Expected/Actual mismatch: 8 tests (19%)</li>
+                        </ol>
+                        <p><strong>Most Affected Owners:</strong></p>
+                        <ol>
+                            <li>JohnDoe: 18 tests (43%)</li>
+                            <li>JaneSmith: 13 tests (31%)</li>
+                            <li>RobertJohnson: 7 tests (17%)</li>
+                        </ol>
+                        <button class="back-to-menu" id="backToMenuAnalysis">Back to Main Menu</button>
+                    `;
+                    chatBody.appendChild(analysisResult);
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                    
+                    // Add event listener for the back button
+                    setTimeout(() => {
+                        document.getElementById('backToMenuAnalysis').addEventListener('click', showMainMenu);
+                    }, 0);
+                } else {
+                    replyWithBotMessage("Unsupported file format. Please upload a CSV or Excel file.");
+                }
+            }, 2000);
+        }
+
+        function createUserMessage(text) {
+            const message = document.createElement('div');
+            message.className = 'message user-message';
+            message.textContent = text;
+            return message;
+        }
+
+        function createBotMessage() {
+            const message = document.createElement('div');
+            message.className = 'message bot-message';
+            return message;
+        }
+
+        function replyWithBotMessage(text) {
+            const botReply = createBotMessage();
+            botReply.textContent = text;
+            chatBody.appendChild(botReply);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    </script>
+</body>
+</html>

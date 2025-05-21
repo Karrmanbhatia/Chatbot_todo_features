@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Failure Analyzer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .result-container {
+            white-space: pre-wrap;
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .chart-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .chart {
+            flex: 1;
+            min-width: 400px;
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Test Failure Analyzer</h1>
+            <p>Upload an Excel file or CSV with test failure data</p>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Upload Test Data</h5>
+                <div class="custom-file mb-3">
+                    <input type="file" class="custom-file-input" id="fileInput" accept=".xlsx,.xls,.csv,.txt">
+                    <label class="custom-file-label" for="fileInput">Choose file</label>
+                </div>
+                <button class="btn btn-primary" id="analyzeButton">Analyze Test Failures</button>
+                <div class="mt-2" id="status"></div>
+            </div>
+        </div>
+
+        <div class="chart-container" id="chartContainer" style="display: none;">
+            <div class="chart">
+                <canvas id="patternChart"></canvas>
+            </div>
+            <div class="chart">
+                <canvas id="ownerChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Analysis Results</h5>
+            </div>
+            <div class="card-body">
+                <div class="result-container" id="results">
+                    Upload a file to see analysis results.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show filename when a file is selected
+        document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+            const fileName = e.target.files[0].name;
+            document.querySelector('.custom-file-label').textContent = fileName;
+        });
+
+        // Handle analyze button click
+        document.getElementById('analyzeButton').addEventListener('click', function() {
+            const fileInput = document.getElementById('fileInput');
+            const statusElement = document.getElementById('status');
+            
+            if (!fileInput.files.length) {
+                statusElement.textContent = 'Please select a file first.';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            statusElement.textContent = 'Analyzing...';
+            
+            analyzeFile(file);
+        });
+
+        function analyzeFile(file) {
+            const reader = new FileReader();
+            const fileName = file.name.toLowerCase();
+            
+            reader.onload = function(e) {
+                try {
+                    let data = [];
+                    
+                    // Process based on file type
+                    if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                        // Excel file
+                        const workbook = XLSX.read(e.target.result, { type: 'array' });
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        data = XLSX.utils.sheet_to_json(worksheet);
+                    } else {
+                        // Assume it's a CSV or TXT file
+                        const csvContent = e.target.result;
+                        const lines = csvContent.split(/\r\n|\n/);
+                        
+                        // Detect delimiter (tab or comma)
+                        const firstLine = lines[0];
+                        const delimiter = firstLine.includes('\t') ? '\t' : ',';
+                        
+                        // Parse header
+                        const headers = firstLine.split(delimiter).map(header => header.trim());
+                        
+                        // Parse data rows
+                        for (let i = 1; i < lines.length; i++) {
+                            const line = lines[i].trim();
+                            if (!line) continue;
+                            
+                            const values = line.split(delimiter);
+                            const row = {};
+                            
+                            for (let j = 0; j < Math.min(headers.length, values.length); j++) {
+                                row[headers[j]] = values[j].trim();
+                            }
+                            
+                            data.push(row);
+                        }
+                    }
+                    
+                    document.getElementById('status').textContent = `Analyzed ${data.length} test entries.`;
+                    
+                    // Process and display results
+                    const analysis = processTestData(data);
+                    displayResults(analysis);
+                    createCharts(analysis);
+                    
+                    // Show charts
+                    document.getElementById('chartContainer').style.display = 'flex';
+                } catch (error) {
+                    console.error('Analysis error:', error);
+                    document.getElementById('status').textContent = `Error: ${error.message}`;
+                    document.getElementById('results').textContent = `Failed to analyze file: ${error.message}`;
+                }
+            };
+            
+            reader.onerror = function() {
+                document.getElementById('status').textContent = 'Error reading file.';
+                document.getElementById('results').textContent = 'Failed to read the file.';
+            };
+            
+            if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                reader.readAsArrayBuffer(file);
+            } else {
+                reader.readAsText(file);
+            }
+        }
+
+        function processTestData(data) {
+            // Identify column names
+            let testColumn = 'Test';
+            let errorColumn = 'Test Failure Message';
+            let ownerColumn = 'Owner';
+            let resultColumn = 'Result';
+            
+            // Check for alternative column names
+            const firstRow = data[0] || {};
+            const columns = Object.keys(firstRow);
+            
+            if (!columns.includes(testColumn)) {
+                const alternatives = ['TestName', 'TestCase', 'Test Name', 'Name'];
+                for (const alt of alternatives) {
+                    if (columns.includes(alt)) {
+                        testColumn = alt;
+                        break;
+                    }
+                }
+            }
+            
+            if (!columns.includes(errorColumn)) {
+                const alternatives = ['Error', 'ErrorMessage', 'Failure Message', 'Details'];
+                for (const alt of alternatives) {
+                    if (columns.includes(alt)) {
+                        errorColumn = alt;
+                        break;
+                    }
+                }
+            }
+            
+            if (!columns.includes(ownerColumn)) {
+                const alternatives = ['Assignee', 'User', 'Responsible'];
+                for (const alt of alternatives) {
+                    if (columns.includes(alt)) {
+                        ownerColumn = alt;
+                        break;
+                    }
+                }
+            }
+            
+            // Display column mappings
+            console.log('Column mappings:');
+            console.log('Test column:', testColumn);
+            console.log('Error column:', errorColumn);
+            console.log('Owner column:', ownerColumn);
+            
+            // Process data and count patterns
+            const patterns = {};
+            const ownerStats = {};
+            
+            data.forEach(row => {
+                const test = row[testColumn] || 'Unknown';
+                const error = row[errorColumn] || '';
+                const owner = row[ownerColumn] || 'Unknown';
+                
+                // Identify pattern
+                let pattern = identifyPattern(error);
+                
+                // Count by pattern
+                if (!patterns[pattern]) {
+                    patterns[pattern] = {
+                        count: 0,
+                        tests: []
+                    };
+                }
+                
+                patterns[pattern].count++;
+                patterns[pattern].tests.push({
+                    test,
+                    owner,
+                    error: error.substring(0, 150) + (error.length > 150 ? '...' : '')
+                });
+                
+                // Count by owner
+                if (!ownerStats[owner]) {
+                    ownerStats[owner] = 0;
+                }
+                ownerStats[owner]++;
+            });
+            
+            // Sort patterns and owners
+            const sortedPatterns = Object.entries(patterns)
+                .sort((a, b) => b[1].count - a[1].count);
+            
+            const sortedOwners = Object.entries(ownerStats)
+                .sort((a, b) => b[1] - a[1]);
+            
+            return {
+                totalTests: data.length,
+                patterns: sortedPatterns,
+                owners: sortedOwners
+            };
+        }
+
+        function identifyPattern(error) {
+            if (typeof error !== 'string') {
+                return "Unknown error";
+            }
+            
+            // Common failure patterns
+            if (error.includes('Non-Slip Wall (default)') && error.includes('Stationary Wall (default)')) {
+                return "Wall label mismatch: Stationary vs Non-Slip";
+            } else if (error.includes('Condition label is invalid')) {
+                return "Condition label is invalid";
+            } else if (error.includes('ValidationError') && error.includes('NumNodes')) {
+                return "Node count validation error";
+            } else if (error.includes('Validation error') && error.includes('step#')) {
+                return "Step validation error";
+            } else if (error.includes('Image') && error.includes('differ')) {
+                return "Image validation error";
+            } else if (error.includes('Count validation error')) {
+                return "Count validation error";
+            } else if (error.includes('tree node label')) {
+                return "Tree node label mismatch";
+            } else if (error.includes('ParameterValue') || error.includes('ResultsValue')) {
+                return "Parameter value mismatch";
+            } else if (error.includes('Expected') && error.includes('Actual')) {
+                return "Expected vs Actual mismatch";
+            }
+            
+            // If no specific pattern matched, return first part of error
+            if (error) {
+                const firstPart = error.split('.')[0];
+                return firstPart.length > 50 ? firstPart.substring(0, 50) + '...' : firstPart;
+            }
+            
+            return "Unknown error";
+        }
+
+        function displayResults(analysis) {
+            const { totalTests, patterns, owners } = analysis;
+            let output = '';
+            
+            // Summary
+            output += `===== TEST FAILURE ANALYSIS =====\n\n`;
+            output += `Total tests analyzed: ${totalTests}\n`;
+            output += `Number of failure patterns identified: ${patterns.length}\n\n`;
+            
+            // Top patterns
+            output += `Top Failure Patterns:\n`;
+            output += `---------------------\n`;
+            patterns.slice(0, 5).forEach((pattern, i) => {
+                const percentage = Math.round(pattern[1].count / totalTests * 100);
+                output += `${i+1}. ${pattern[0]}: ${pattern[1].count} tests (${percentage}%)\n`;
+            });
+            
+            // Top owners
+            output += `\nOwners with Most Failures:\n`;
+            output += `-------------------------\n`;
+            owners.slice(0, 5).forEach((owner, i) => {
+                const percentage = Math.round(owner[1] / totalTests * 100);
+                output += `${i+1}. ${owner[0]}: ${owner[1]} tests (${percentage}%)\n`;
+            });
+            
+            // Detailed pattern analysis
+            output += `\nDetailed Pattern Analysis:\n`;
+            output += `------------------------\n`;
+            patterns.forEach(([pattern, data]) => {
+                output += `\n>> Pattern: ${pattern} (${data.count} tests)\n`;
+                
+                // Count by owner for this pattern
+                const ownerCounts = {};
+                data.tests.forEach(test => {
+                    if (!ownerCounts[test.owner]) {
+                        ownerCounts[test.owner] = 0;
+                    }
+                    ownerCounts[test.owner]++;
+                });
+                
+                // Sort owners by count
+                const sortedOwners = Object.entries(ownerCounts)
+                    .sort((a, b) => b[1] - a[1]);
+                
+                output += `   Tests by owner:\n`;
+                sortedOwners.forEach(([owner, count]) => {
+                    const percentage = Math.round(count / data.count * 100);
+                    output += `   - ${owner}: ${count} tests (${percentage}%)\n`;
+                });
+                
+                output += `   Sample tests:\n`;
+                data.tests.slice(0, 3).forEach((test, i) => {
+                    output += `   ${i+1}. ${test.test} (Owner: ${test.owner})\n`;
+                    output += `      Error: ${test.error}\n`;
+                });
+                
+                if (data.tests.length > 3) {
+                    output += `      ... and ${data.tests.length - 3} more\n`;
+                }
+            });
+            
+            document.getElementById('results').textContent = output;
+        }
+
+        function createCharts(analysis) {
+            const { totalTests, patterns, owners } = analysis;
+            
+            // Prepare data for pattern chart
+            const patternLabels = patterns.slice(0, 5).map(p => p[0]);
+            const patternData = patterns.slice(0, 5).map(p => p[1].count);
+            let otherCount = 0;
+            
+            if (patterns.length > 5) {
+                otherCount = patterns.slice(5).reduce((sum, p) => sum + p[1].count, 0);
+                patternLabels.push('Other');
+                patternData.push(otherCount);
+            }
+            
+            // Create pattern chart
+            const patternCtx = document.getElementById('patternChart').getContext('2d');
+            if (window.patternChart) {
+                window.patternChart.destroy();
+            }
+            
+            window.patternChart = new Chart(patternCtx, {
+                type: 'pie',
+                data: {
+                    labels: patternLabels,
+                    datasets: [{
+                        data: patternData,
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(201, 203, 207, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Failure Patterns',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Prepare data for owner chart
+            const ownerLabels = owners.slice(0, 10).map(o => o[0]);
+            const ownerData = owners.slice(0, 10).map(o => o[1]);
+            
+            // Create owner chart
+            const ownerCtx = document.getElementById('ownerChart').getContext('2d');
+            if (window.ownerChart) {
+                window.ownerChart.destroy();
+            }
+            
+            window.ownerChart = new Chart(ownerCtx, {
+                type: 'bar',
+                data: {
+                    labels: ownerLabels,
+                    datasets: [{
+                        label: 'Failed Tests',
+                        data: ownerData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Failed Tests by Owner',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Failed Tests'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
