@@ -138,4 +138,4 @@ Analyze the test failure above and provide:
             prediction["suggestion"] = suggestion_match.group(1).strip()
         
         # Extract similar cases
-        cases_match = re.search(r"4\.\s*Similar previous cases.*?:(.*?)(?=$)", response, re.
+        cases_match = re.search(r"4\.\s*Similar previous cases.*?:(.*?)(?=$)", response, re.MULTILINE)

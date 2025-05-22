@@ -556,15 +556,15 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
     };
 
 	fetch("http://localhost:5000/fetch_cdcarm", {
-	method: "POST",
-	headers: { "Content-Type": "application/json" },
-	body: JSON.stringify({
-		products: "DISCO",
-		releases: "25.2",
-		platforms: "Windows",
-		min_failing_builds: 2,
-		owner: "all"
-	})
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({
+			products,
+			releases,
+			platforms,
+			min_failing_builds: minFailingBuilds,
+			owner
+		})
 	})
 
 	.then(response => {

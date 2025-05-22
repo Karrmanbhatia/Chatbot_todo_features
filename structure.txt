@@ -3,6 +3,8 @@
         [FILE] global.yml
 [FILE] .env
 [DIR] .git/
+    [FILE] COMMITMESSAGE
+    [FILE] COMMIT_EDITMSG
     [FILE] HEAD
     [FILE] config
     [FILE] description
@@ -32,7 +34,53 @@
             [DIR] remotes/
                 [DIR] origin/
                     [FILE] HEAD
+                    [FILE] main
     [DIR] objects/
+        [DIR] 13/
+            [FILE] ba55ae4503df3898b018943792fbd53dd36d53
+            [FILE] fa32fbd7b4a6fb68831b6f49e50eafeffc70ba
+        [DIR] 21/
+            [FILE] 7f073bdcfde7b6e6ef5bd8842d228601b2e7fb
+        [DIR] 23/
+            [FILE] 2b0ba8479418935e38b1fcb1491cc03779f0c1
+        [DIR] 33/
+            [FILE] ab2516e52fb0ea6272e2234d36587d90cf57c5
+        [DIR] 3b/
+            [FILE] 9e1d113fb440e8573a6d3fc5562028331601d7
+        [DIR] 58/
+            [FILE] 61d016e9195aa5afcd0241f9d3570863c2bbcf
+        [DIR] 6b/
+            [FILE] 166d6ad8ef821fedd74d350caa3d8b10978b8d
+        [DIR] 74/
+            [FILE] 73bd1327f7c3de9c6a84f46e555ef0bfceabbc
+        [DIR] 77/
+            [FILE] 6aa4cc19b3de07df90f4bf45adcac7c2a4d464
+        [DIR] 7e/
+            [FILE] 63d8e4152422519b9ab0073704c61c6ff37e8f
+        [DIR] 86/
+            [FILE] 0ab848f462f6d9f24fbfa4ee195b76a3b4eefe
+        [DIR] 8c/
+            [FILE] 6763cb640b8fa92f1e6fb9990f738ffb1d6b01
+        [DIR] 8e/
+            [FILE] a13d5e5b4fbf25f6d33a4b939cb7392a7e7a32
+        [DIR] 8f/
+            [FILE] 19d2fc1ff8b3061575cb2076f701d646985571
+        [DIR] 9d/
+            [FILE] 426f75b8f9573258df923a05f5d9f7538cc1f7
+        [DIR] b6/
+            [FILE] 25efcd61f6ec65c234b5b9457ebdf38e146934
+        [DIR] d4/
+            [FILE] 182155d54420c242f068699bc4c7b4b34a2acf
+        [DIR] ea/
+            [FILE] f656743e72aa5bc434bbe1574d9b50438ba4fd
+        [DIR] f4/
+            [FILE] a58a8b5c47f0ff4cdb93bad07e331d0193742c
+        [DIR] f7/
+            [FILE] a330a7f7899ce532bac2c2e4ba9d1c4a85043f
+        [DIR] f9/
+            [FILE] 620916c24d1499702e678c2a4289bb1ba84641
+        [DIR] fe/
+            [FILE] 5ebf6a69d282d15df66dfe4e6b8d4543374411
         [DIR] info/
         [DIR] pack/
             [FILE] pack-aaf5c912f6035096ce88c6b3248294cf6e411bff.idx
@@ -45,6 +93,7 @@
         [DIR] remotes/
             [DIR] origin/
                 [FILE] HEAD
+                [FILE] main
         [DIR] tags/
 [DIR] .keras/
     [FILE] keras.json
@@ -210,18 +259,22 @@
 [DIR] actions/
     [DIR] __pycache__/
         [FILE] __init__.cpython-38.pyc
+        [FILE] actions.cpython-312.pyc
         [FILE] actions.cpython-38.pyc
         [FILE] cdcarm_actions.cpython-38.pyc
         [FILE] cdcarm_fetch_actions.cpython-38.pyc
         [FILE] cdcarm_fetch_json.cpython-38.pyc
         [FILE] cdcarm_url_actions.cpython-38.pyc
+        [FILE] fetch_core.cpython-312.pyc
         [FILE] test_cdcarm_function.cpython-38.pyc
         [FILE] test_failure_analyzer.cpython-38.pyc
-    [FILE] actions.py
+    [FILE] actions_rasa.py
     [FILE] cdcarm_fetch_actions.py
     [FILE] cdcarm_url_actions.py
+    [FILE] fetch_core.py
     [FILE] filtered_errors.json
     [FILE] flask_app.py
+    [FILE] test_output.json
 [FILE] cdcarm_fetch_json.py
 [FILE] config.yml
 [DIR] data/
@@ -495,6 +548,7 @@
 [FILE] requirements.txt
 [FILE] run_script_directly.py
 [FILE] setup.sh
+[FILE] start_tfia_servers.bat
 [FILE] structure.txt
 [FILE] test_cdcarm_function.py
 [DIR] tests/
