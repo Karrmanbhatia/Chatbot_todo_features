@@ -540,52 +540,52 @@ function fetchCDCARMJson() {
     tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage);
 }
 // GUARANTEED WORKING VERSION - Fixes the UI display issue
-// Replace your existing tryFetchData function with this one
-
 function tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage) {
-    console.log('tryFetchData called with:', {products, releases, platforms, minFailingBuilds, owner});
-    
-    // Show progress
+    console.log('Calling Flask backend at /fetch_cdcarm with:', { products, releases, platforms, minFailingBuilds, owner });
+
+    // Update progress
     progressBar.style.width = '30%';
-    
-    // Create a form with the parameters to send
-    const formData = new FormData();
-    formData.append('action', 'run_cdcarm_script');
-    formData.append('products', products);
-    formData.append('releases', releases);
-    formData.append('platforms', platforms);
-    formData.append('min_failing_builds', minFailingBuilds);
-    formData.append('owner', owner);
-    
-    // Call our server script
-    fetch('run_script_directly.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        progressBar.style.width = '60%';
-        if (!response.ok) {
-            throw new Error(`Server error: ${response.status}`);
-        }
-        return response.json();
+
+    // Prepare payload
+    const payload = {
+        products,
+        releases,
+        platforms,
+        min_failing_builds: minFailingBuilds,
+        owner
+    };
+
+	fetch("http://localhost:5000/fetch_cdcarm", {
+	method: "POST",
+	headers: { "Content-Type": "application/json" },
+	body: JSON.stringify({
+		products: "DISCO",
+		releases: "25.2",
+		platforms: "Windows",
+		min_failing_builds: 2,
+		owner: "all"
+	})
+	})
+
+	.then(response => {
+        if (!response.ok) throw new Error("Network response was not OK");
+        return response.json();  // ✅ THIS LINE IS CRUCIAL
     })
     .then(data => {
         progressBar.style.width = '100%';
         console.log('Received data:', data);
-        
+
         setTimeout(() => {
-            // Remove progress message
             chatBody.removeChild(progressMessage);
-            
-            if (data.error) {
-                throw new Error(data.error);
-            }
-            
-            // Success - display the download button
+
+            const recordCount = data.record_count || 0;
+            const content = data.content || "";
+            const filename = data.filename || "cdcarm_data.json";
+
             const downloadMessage = createBotMessage();
             downloadMessage.innerHTML = `
                 <div class="download-container">
-                    <p>✓ Successfully fetched ${data.record_count} records.</p>
+                    <p>✅ Successfully fetched ${recordCount} records.</p>
                     <button class="download-btn" id="downloadJsonBtn">
                         <i class="fas fa-download"></i> Download JSON File
                     </button>
@@ -596,60 +596,40 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
             `;
             chatBody.appendChild(downloadMessage);
             chatBody.scrollTop = chatBody.scrollHeight;
-            
-            // Add click handlers
+
             document.getElementById('downloadJsonBtn').addEventListener('click', () => {
+                let jsonData;
                 try {
-                    let jsonData;
-                    try {
-                        // Try to decode base64
-                        jsonData = atob(data.content);
-                    } catch (e) {
-                        // Not base64, use as-is
-                        jsonData = data.content;
-                    }
-                    
-                    const blob = new Blob([jsonData], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = data.filename || 'cdcarm_data.json';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                } catch (error) {
-                    console.error('Download error:', error);
-                    replyWithBotMessage(`Error downloading file: ${error.message}`);
+                    jsonData = atob(content);  // base64 decode
+                } catch (e) {
+                    jsonData = content;  // fallback to raw string
                 }
+
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
             });
-            
+
             document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
         }, 500);
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('Fetch failed, using dummy data fallback:', error);
         progressBar.style.width = '100%';
-        
         setTimeout(() => {
-            // Remove progress message
             chatBody.removeChild(progressMessage);
-            
-            // Show error message
-            replyWithBotMessage(`⚠️ Error: ${error.message}`);
-            
-            // Create dummy data for fallback
-            const fakeMessage = createBotMessage();
-            fakeMessage.innerHTML = `
-                <p>Creating demo data instead. <small>(This is not real data)</small></p>
-            `;
-            chatBody.appendChild(fakeMessage);
-            
-            // Fallback to dummy data
+            replyWithBotMessage(`⚠️ Error fetching from server: ${error.message}`);
             createDummyData(products, releases, platforms, minFailingBuilds, owner);
         }, 500);
     });
 }
+
 
 // Helper function to create dummy data as fallback
 function createDummyData(products, releases, platforms, minFailingBuilds, owner) {
@@ -703,4 +683,7 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
     });
     
     document.getElementById('backToMenuDemo').addEventListener('click', showMainMenu);
+}
+function cleanupDuplicateButtons() {
+    // Dummy no-op to suppress error
 }

@@ -2,9 +2,9 @@
 # This fixes the issue where action shows dummy data instead of real data
 
 from typing import Any, Text, Dict, List
-from rasa_sdk import Action, Tracker
-from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.events import SlotSet
+#from rasa_sdk import Action, Tracker
+#from rasa_sdk.executor import CollectingDispatcher
+#from rasa_sdk.events import SlotSet
 import os
 import json
 import base64
