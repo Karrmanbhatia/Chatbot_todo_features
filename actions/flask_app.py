@@ -43,7 +43,7 @@ def fetch_cdcarm():
             json_data = f.read()
 
         base64_data = base64.b64encode(json_data.encode('utf-8')).decode('utf-8')
-
+        print(f"✔️ Returning {len(results)} records to frontend.")
         return jsonify({
             "data_type": "json_download",
             "filename": "web_cdcarm_results.json",
