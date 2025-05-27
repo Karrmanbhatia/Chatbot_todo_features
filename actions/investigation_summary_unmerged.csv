@@ -1,0 +1,215 @@
+ClusterId,TestName,Owner,InvestigationReport,WorkItemId
+0,Axis_Symmetric_Meshing_048,Vishal,Mesh failure on few parts,927500
+0,Axis_Symmetric_Meshing_048,Vishal,Mesh failure on few parts,927500
+0,Feature_detection_D20,Vaibhav S,None,None
+0,Feature_detection_D20,Vaibhav S,None,None
+0,DROP_TEST_TET_MESHING_CUSTOMER_124,Vishal,None,None
+0,DROP_TEST_TET_MESHING_CUSTOMER_124,Vishal,None,None
+0,DSMESH_DEFECTS_067,Shyam,DSMesher_Cases_Mesh_Generation_Failure,887452
+0,DSMESH_DEFECTS_067,Shyam,DSMesher_Cases_Mesh_Generation_Failure,887452
+0,Mesh_Copy_065,Shyam,None,None
+0,MSH_Add_33_002,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_Add_33_002,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_Add_45_007,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_Add_45_007,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,LNG_TGLIB_ONYX_058,Sameer,Regression : Skewness went from 0.849 to 0.991,1238783
+0,LNG_TGLIB_ONYX_058,Sameer,Regression : Skewness went from 0.849 to 0.991,1238783
+0,MSH_Add_45_008,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_Add_45_008,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_Add_45_003,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_Add_45_003,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_ENGLONG_NOSOLVE_016,Amal,MSH_ENGLONG_NOSOLVE_016: WB: Geometry Attach Failure When Starting Mechanical with Parasolid Geometry File,1143468
+0,MSH_ENGLONG_NOSOLVE_016,Amal,MSH_ENGLONG_NOSOLVE_016: WB: Geometry Attach Failure When Starting Mechanical with Parasolid Geometry File,1143468
+0,MSH_Add_45_001,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_Add_45_001,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_Add_45_005,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_Add_45_005,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,Mesh_Copy_057,Sameer,MZ mesh failures started after 2025-03-25,1247135
+0,MSH_Add_45_002,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_Add_45_002,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_CUSTOMER_015,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+0,MSH_CUSTOMER_015,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+0,MSH_CUSTOMER_CONFIDENTIAL_R182_002,Shyam,Verified Manually and it working fine(Mesh is successful),832772
+0,MSH_CUSTOMER_CONFIDENTIAL_R182_002,Shyam,Verified Manually and it working fine(Mesh is successful),832772
+0,MSH_CUSTOMER_012,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+0,MSH_CUSTOMER_012,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+0,MSH_CONNECTIONS_031,Amal,Mesh Edit: Mesh Connections: Regression failure caused by Quality Failure.,899080
+0,MSH_CONNECTIONS_031,Amal,Mesh Edit: Mesh Connections: Regression failure caused by Quality Failure.,899080
+0,MSH_CUSTOMER_CONFIDENTIAL_R182_001,Shyam,Enhancement - Windows Mesh Time and Memory Increase with R21.2 TGLIB,385185
+0,MSH_CUSTOMER_CONFIDENTIAL_R182_001,Shyam,Enhancement - Windows Mesh Time and Memory Increase with R21.2 TGLIB,385185
+0,MSH_WELD_RESUME_038,Ashish,Failures arising from geometry projection,1242033
+0,MSH_WELD_RESUME_038,Ashish,Failures arising from geometry projection,1242033
+0,MSH_WF_08_003,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_WF_08_003,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_WF_17_002,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_WF_17_002,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_WF_08_004,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSH_WF_08_004,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+0,MSHLNG_CUSTOMER_012,Shyam,Regressions Failure with GS Nurbs.,779506
+0,MSHLNG_CUSTOMER_012,Shyam,Regressions Failure with GS Nurbs.,779506
+0,MSH_WELD_CUSTOMER_062,Ashish,Weld failure,819838
+0,MSH_WELD_CUSTOMER_062,Ashish,Weld failure,819838
+0,mz_mig_miscset2_018,Rajesh,Some MZ mesh failures started after 2025-03-25 (Axis Sweep). ,1247135
+0,mz_mig_miscset2_018,Rajesh,Some MZ mesh failures started after 2025-03-25 (Axis Sweep). ,1247135
+0,mz_mig_MSH_ENGLONG_NOSOLVE020,Rajesh,Mesh failure due to Hoops changes.,978175
+0,mz_mig_MSH_ENGLONG_NOSOLVE020,Rajesh,Mesh failure due to Hoops changes.,978175
+0,MSH_WELD_CUSTOMER_061,Ashish,Failures arising from geometry projection,1242033
+0,MSH_WELD_CUSTOMER_061,Ashish,Failures arising from geometry projection,1242033
+0,mz_mig_MSH_ENGLONG_NOSOLVE021,Rajesh,PS_RD - ENGLONG_WB2_073 using parasolid assembly failing with error unable to attach geometry,1141130
+0,mz_mig_MSH_ENGLONG_NOSOLVE021,Rajesh,PS_RD - ENGLONG_WB2_073 using parasolid assembly failing with error unable to attach geometry,1141130
+0,NEW_DEFEATURING_CONFIDENTIAL011,Shyam,mesh generation fails due to one or more surfaces cannot be meshed with acceptable quality,1236087
+0,NEW_DEFEATURING_CONFIDENTIAL011,Shyam,mesh generation fails due to one or more surfaces cannot be meshed with acceptable quality,1236087
+0,QUAD_LAYER_CANONICAL_004,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+0,QUAD_LAYER_CANONICAL_004,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+0,QUAD_LAYER_CANONICAL_004,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+0,QUAD_LAYER_CANONICAL_004,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+0,QUAD_LAYER_CUSTOMER_001,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+0,QUAD_LAYER_CUSTOMER_001,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+0,RunQMorph_GPAD_ET187_001,Vishal,None,None
+0,RunQMorph_GPAD_ET187_001,Vishal,None,None
+0,RunQMorph_GPAD_ET187_002,Vishal,None,None
+0,RunQMorph_GPAD_ET187_002,Vishal,None,None
+0,RunQMorph_GPAD_ET187_003,Vishal,None,None
+0,RunQMorph_GPAD_ET187_003,Vishal,None,None
+0,RunQMorph_GPAD_ET187_007,Vishal,None,None
+0,RunQMorph_GPAD_ET187_007,Vishal,None,None
+0,RunQMorph_GPAD_ET187_008,Vishal,Solver failure.,818117
+0,RunQMorph_GPAD_ET187_008,Vishal,Solver failure.,818117
+0,RunQMorph_GPAD_ET187_005,Vishal,Solver failure.,818117
+0,RunQMorph_GPAD_ET187_005,Vishal,Solver failure.,818117
+0,RunQMorph_GPAD_ET187_017,Vishal,None,None
+0,RunQMorph_GPAD_ET187_017,Vishal,None,None
+0,RunQMorph_GPAD_ET187_021,Vishal,None,None
+0,RunQMorph_GPAD_ET187_021,Vishal,None,None
+0,RunQMorph_GPAD_ET187_004,Vishal,None,None
+0,RunQMorph_GPAD_ET187_004,Vishal,None,None
+0,RunQMorph_GPAD_ET285_001,Vishal,None,None
+0,RunQMorph_GPAD_ET285_001,Vishal,None,None
+0,RunQMorph_GPAD_ET187_009,Vishal,None,None
+0,RunQMorph_GPAD_ET187_009,Vishal,None,None
+0,RunQMorph_GPAD_ET285_002,Vishal,None,None
+0,RunQMorph_GPAD_ET285_002,Vishal,None,None
+0,RunQMorph_GPAD_ET187_023,Vishal,None,None
+0,RunQMorph_GPAD_ET187_023,Vishal,None,None
+0,RunQMorph_GPAD_ET285_003,Vishal,None,None
+0,RunQMorph_GPAD_ET285_003,Vishal,None,None
+0,RunQMorph_GPAD_ET187_027,Vishal,None,None
+0,RunQMorph_GPAD_ET187_027,Vishal,None,None
+0,RunQMorph_GPAD_ET285_004,Vishal,None,None
+0,RunQMorph_GPAD_ET285_004,Vishal,None,None
+0,RunQMorph_GPAD_ET187_010,Vishal,None,None
+0,RunQMorph_GPAD_ET187_010,Vishal,None,None
+0,RunQMorph_GPAD_ET285_005,Vishal,None,None
+0,RunQMorph_GPAD_ET285_005,Vishal,None,None
+0,RunQMorph_GPAD_ET285_007,Vishal,None,None
+0,RunQMorph_GPAD_ET285_007,Vishal,None,None
+0,SCIM_CUSTOMER_CONFIDENTIAL_006,Rajesh,MSH:SCIM/SCIM_CUSTOMER_CONFIDENTIAL/SCIM_CUSTOMER_CONFIDENTIAL_006 fails with parasolid kernel to open database.,1090470
+0,SCIM_CUSTOMER_CONFIDENTIAL_006,Rajesh,MSH:SCIM/SCIM_CUSTOMER_CONFIDENTIAL/SCIM_CUSTOMER_CONFIDENTIAL_006 fails with parasolid kernel to open database.,1090470
+0,RunQMorph_GPAD_ET285_011,Vishal,None,None
+0,RunQMorph_GPAD_ET285_011,Vishal,None,None
+0,SCIM_US_91028_ASSEMBLY_EXTERNAL_002,Suriya,None,None
+0,SCIM_US_91028_ASSEMBLY_EXTERNAL_002,Suriya,None,None
+1,Axis_Symmetric_Meshing_048,Vishal,Mesh failure on few parts,927500
+1,Axis_Symmetric_Meshing_048,Vishal,Mesh failure on few parts,927500
+1,Axis_Symmetric_Meshing_048,Vishal,Mesh failure on few parts,927500
+1,Axis_Symmetric_Meshing_048,Vishal,Mesh failure on few parts,927500
+1,Feature_detection_D20,Vaibhav S,None,None
+1,DROP_TEST_TET_MESHING_CUSTOMER_124,Vishal,None,None
+1,DROP_TEST_TET_MESHING_CUSTOMER_124,Vishal,None,None
+1,DROP_TEST_TET_MESHING_CUSTOMER_124,Vishal,None,None
+1,DROP_TEST_TET_MESHING_CUSTOMER_124,Vishal,None,None
+1,DSMESH_DEFECTS_067,Shyam,DSMesher_Cases_Mesh_Generation_Failure,887452
+1,LNG_TGLIB_ONYX_058,Sameer,Regression : Skewness went from 0.849 to 0.991,1238783
+1,MSH_ENGLONG_NOSOLVE_016,Amal,MSH_ENGLONG_NOSOLVE_016: WB: Geometry Attach Failure When Starting Mechanical with Parasolid Geometry File,1143468
+1,MSH_CUSTOMER_015,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+1,MSH_CUSTOMER_015,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+1,MSH_CUSTOMER_015,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+1,MSH_CUSTOMER_015,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+1,MSH_CUSTOMER_012,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+1,MSH_CUSTOMER_012,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+1,MSH_CUSTOMER_012,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+1,MSH_CUSTOMER_012,Shyam,"DSMesher- Regression failure, A software execution error occurred inside the mesher",1046701
+1,MSH_CONNECTIONS_031,Amal,Mesh Edit: Mesh Connections: Regression failure caused by Quality Failure.,899080
+1,MSH_CONNECTIONS_031,Amal,Mesh Edit: Mesh Connections: Regression failure caused by Quality Failure.,899080
+1,MSH_CONNECTIONS_031,Amal,Mesh Edit: Mesh Connections: Regression failure caused by Quality Failure.,899080
+1,MSH_CONNECTIONS_031,Amal,Mesh Edit: Mesh Connections: Regression failure caused by Quality Failure.,899080
+1,MSH_CUSTOMER_CONFIDENTIAL_R182_001,Shyam,Enhancement - Windows Mesh Time and Memory Increase with R21.2 TGLIB,385185
+1,MSH_CUSTOMER_CONFIDENTIAL_R182_001,Shyam,Enhancement - Windows Mesh Time and Memory Increase with R21.2 TGLIB,385185
+1,MSH_CUSTOMER_CONFIDENTIAL_R182_001,Shyam,Enhancement - Windows Mesh Time and Memory Increase with R21.2 TGLIB,385185
+1,MSH_CUSTOMER_CONFIDENTIAL_R182_001,Shyam,Enhancement - Windows Mesh Time and Memory Increase with R21.2 TGLIB,385185
+1,MSH_WELD_CUSTOMER_062,Ashish,Weld failure,819838
+1,MSH_WELD_CUSTOMER_062,Ashish,Weld failure,819838
+1,MSH_WELD_CUSTOMER_062,Ashish,Weld failure,819838
+1,MSH_WELD_CUSTOMER_062,Ashish,Weld failure,819838
+1,mz_mig_miscset2_018,Rajesh,Some MZ mesh failures started after 2025-03-25 (Axis Sweep). ,1247135
+1,mz_mig_miscset2_018,Rajesh,Some MZ mesh failures started after 2025-03-25 (Axis Sweep). ,1247135
+1,mz_mig_MSH_ENGLONG_NOSOLVE020,Rajesh,Mesh failure due to Hoops changes.,978175
+1,mz_mig_MSH_ENGLONG_NOSOLVE020,Rajesh,Mesh failure due to Hoops changes.,978175
+1,mz_mig_MSH_ENGLONG_NOSOLVE020,Rajesh,Mesh failure due to Hoops changes.,978175
+1,mz_mig_MSH_ENGLONG_NOSOLVE020,Rajesh,Mesh failure due to Hoops changes.,978175
+1,MSH_WELD_CUSTOMER_061,Ashish,Failures arising from geometry projection,1242033
+1,MSH_WELD_CUSTOMER_061,Ashish,Failures arising from geometry projection,1242033
+1,MSH_WELD_CUSTOMER_061,Ashish,Failures arising from geometry projection,1242033
+1,MSH_WELD_CUSTOMER_061,Ashish,Failures arising from geometry projection,1242033
+1,mz_mig_MSH_ENGLONG_NOSOLVE021,Rajesh,PS_RD - ENGLONG_WB2_073 using parasolid assembly failing with error unable to attach geometry,1141130
+1,NEW_DEFEATURING_CONFIDENTIAL011,Shyam,mesh generation fails due to one or more surfaces cannot be meshed with acceptable quality,1236087
+1,SCIM_CUSTOMER_CONFIDENTIAL_006,Rajesh,MSH:SCIM/SCIM_CUSTOMER_CONFIDENTIAL/SCIM_CUSTOMER_CONFIDENTIAL_006 fails with parasolid kernel to open database.,1090470
+1,SCIM_US_91028_ASSEMBLY_EXTERNAL_002,Suriya,None,None
+1,SCIM_US_91028_ASSEMBLY_EXTERNAL_002,Suriya,None,None
+1,SCIM_US_91028_ASSEMBLY_EXTERNAL_002,Suriya,None,None
+1,SCIM_US_91028_ASSEMBLY_EXTERNAL_002,Suriya,None,None
+-1,Feature_detection_D20,Vaibhav S,None,None
+-1,DSMESH_DEFECTS_067,Shyam,DSMesher_Cases_Mesh_Generation_Failure,887452
+-1,LNG_TGLIB_ONYX_058,Sameer,Regression : Skewness went from 0.849 to 0.991,1238783
+-1,MSH_CUSTOMER_CONFIDENTIAL_R182_002,Shyam,Verified Manually and it working fine(Mesh is successful),832772
+-1,MSH_WELD_RESUME_038,Ashish,Failures arising from geometry projection,1242033
+-1,MSH_WELD_RESUME_038,Ashish,Failures arising from geometry projection,1242033
+-1,MSHLNG_CUSTOMER_012,Shyam,Regressions Failure with GS Nurbs.,779506
+-1,Multizone_Sweeping_PAVER_ASF042,Rajesh,Some MZ mesh failures started after 2025-03-25 (Axis Sweep). ,1247135
+-1,Multizone_Sweeping_PAVER_ASF042,Rajesh,Some MZ mesh failures started after 2025-03-25 (Axis Sweep). ,1247135
+-1,MZ_PC_Enclosure_033,Rajesh,Some MZ mesh failures started after 2025-03-25 (Axis Sweep). ,1247135
+2,Feature_detection_D20,Vaibhav S,None,None
+2,LNG_TGLIB_ONYX_058,Sameer,Regression : Skewness went from 0.849 to 0.991,1238783
+3,Mesh_Copy_065,Shyam,None,None
+3,Mesh_Copy_057,Sameer,MZ mesh failures started after 2025-03-25,1247135
+4,MSH_Add_33_002,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+4,MSH_Add_45_007,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+4,MSH_Add_45_008,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+4,MSH_Add_45_003,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+4,MSH_Add_45_001,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+4,MSH_Add_45_005,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+4,MSH_Add_45_002,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+4,MSH_WF_08_003,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+4,MSH_WF_17_002,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+4,MSH_WF_08_004,Vaibhav S,AutoDyn missing on Specific run machines posting Error Reports,
+5,MSH_ENGLONG_NOSOLVE_016,Amal,MSH_ENGLONG_NOSOLVE_016: WB: Geometry Attach Failure When Starting Mechanical with Parasolid Geometry File,1143468
+5,MSH_CUSTOMER_CONFIDENTIAL_R182_002,Shyam,Verified Manually and it working fine(Mesh is successful),832772
+5,mz_mig_MSH_ENGLONG_NOSOLVE021,Rajesh,PS_RD - ENGLONG_WB2_073 using parasolid assembly failing with error unable to attach geometry,1141130
+5,NEW_DEFEATURING_CONFIDENTIAL011,Shyam,mesh generation fails due to one or more surfaces cannot be meshed with acceptable quality,1236087
+6,MSH_WELD_RESUME_038,Ashish,Failures arising from geometry projection,1242033
+6,QUAD_LAYER_CANONICAL_004,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+6,QUAD_LAYER_CANONICAL_004,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+6,QUAD_LAYER_CUSTOMER_001,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+7,QUAD_LAYER_CANONICAL_004,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+7,QUAD_LAYER_CANONICAL_004,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+7,QUAD_LAYER_CUSTOMER_001,Amal,ACT: Scripting: Mechanical Crashes During Script Execution (Script Specific Issue),1052130
+8,RunQMorph_GPAD_ET187_001,Vishal,None,None
+8,RunQMorph_GPAD_ET187_002,Vishal,None,None
+8,RunQMorph_GPAD_ET187_003,Vishal,None,None
+8,RunQMorph_GPAD_ET187_007,Vishal,None,None
+8,RunQMorph_GPAD_ET187_008,Vishal,Solver failure.,818117
+8,RunQMorph_GPAD_ET187_005,Vishal,Solver failure.,818117
+8,RunQMorph_GPAD_ET187_017,Vishal,None,None
+8,RunQMorph_GPAD_ET187_021,Vishal,None,None
+8,RunQMorph_GPAD_ET187_004,Vishal,None,None
+8,RunQMorph_GPAD_ET285_001,Vishal,None,None
+8,RunQMorph_GPAD_ET187_009,Vishal,None,None
+8,RunQMorph_GPAD_ET285_002,Vishal,None,None
+8,RunQMorph_GPAD_ET187_023,Vishal,None,None
+8,RunQMorph_GPAD_ET285_003,Vishal,None,None
+8,RunQMorph_GPAD_ET187_027,Vishal,None,None
+8,RunQMorph_GPAD_ET285_004,Vishal,None,None
+8,RunQMorph_GPAD_ET187_010,Vishal,None,None
+8,RunQMorph_GPAD_ET285_005,Vishal,None,None
+8,RunQMorph_GPAD_ET285_007,Vishal,None,None
+8,RunQMorph_GPAD_ET285_011,Vishal,None,None
