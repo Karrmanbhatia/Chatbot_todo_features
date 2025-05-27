@@ -280,20 +280,21 @@ function handleJsonDownload(payload) {
 function enableDebugLogging() {
     // Create a debug panel in the UI
     const debugPanel = document.createElement('div');
-    debugPanel.style.position = 'fixed';
-    debugPanel.style.bottom = '10px';
-    debugPanel.style.right = '10px';
-    debugPanel.style.width = '300px';
-    debugPanel.style.maxHeight = '200px';
-    debugPanel.style.overflowY = 'auto';
-    debugPanel.style.backgroundColor = 'rgba(0,0,0,0.7)';
-    debugPanel.style.color = '#00ff00';
-    debugPanel.style.fontFamily = 'monospace';
-    debugPanel.style.fontSize = '10px';
-    debugPanel.style.padding = '5px';
-    debugPanel.style.zIndex = '9999';
-    debugPanel.style.border = '1px solid #00ff00';
-    debugPanel.id = 'debugPanel';
+	debugPanel.style.position = 'fixed';
+	debugPanel.style.top = '10px';
+	debugPanel.style.left = '10px';
+	debugPanel.style.width = '300px';
+	debugPanel.style.maxHeight = '200px';
+	debugPanel.style.overflowY = 'auto';
+	debugPanel.style.backgroundColor = 'rgba(0,0,0,0.7)';
+	debugPanel.style.color = '#00ff00';
+	debugPanel.style.fontFamily = 'monospace';
+	debugPanel.style.fontSize = '10px';
+	debugPanel.style.padding = '5px';
+	debugPanel.style.zIndex = '9999';
+	debugPanel.style.border = '1px solid #00ff00';
+	debugPanel.id = 'debugPanel';
+
     document.body.appendChild(debugPanel);
     
     // Override console.log to also display in our debug panel
@@ -341,9 +342,51 @@ function enableDebugLogging() {
     console.log('Debug logging enabled');
 }
 
+// Fetch dynamic data for products, releases, platforms
+async function populateDynamicDatalists() {
+    try {
+        // Fetch products
+        const productRes = await fetch("http://localhost:5000/api/products");
+        const products = await productRes.json();
+        const productList = document.getElementById("productsList");
+        products.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p.Name;
+            productList.appendChild(opt);
+        });
+        console.log(`✅ Products fetched: ${products.length}`);
+
+        // Fetch releases
+        const releaseRes = await fetch("http://localhost:5000/api/releases");
+        const releases = await releaseRes.json();
+        const releaseList = document.getElementById("releasesList");
+        releases.forEach(r => {
+            const opt = document.createElement("option");
+            opt.value = r.Name;
+            releaseList.appendChild(opt);
+        });
+        console.log(`✅ Releases fetched: ${releases.length}`);
+
+        // Fetch platforms
+        const platformRes = await fetch("http://localhost:5000/api/platforms");
+        const platforms = await platformRes.json();
+        const platformList = document.getElementById("platformsList");
+        platforms.forEach(pl => {
+            const opt = document.createElement("option");
+            opt.value = pl.Name;
+            platformList.appendChild(opt);
+        });
+        console.log(`✅ Platforms fetched: ${platforms.length}`);
+    } catch (error) {
+        console.error("⚠️ Error loading datalists:", error);
+    }
+}
+
+
 // Run this function when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     enableDebugLogging();
+	populateDynamicDatalists();
 });
 function handleCDCARMRequest(message) {
     let withReport = !message.includes('without');
@@ -464,17 +507,17 @@ function showCDCARMJsonOptions() {
             <div class="cdcarm-json-options active">
                 <div class="option-group">
                     <label class="option-label">Products:</label>
-                    <input type="text" class="option-input" id="productsInput" placeholder="DISCO" value="DISCO">
+                    <input type="text" class="option-input" id="productsInput" list="productsList" placeholder="DISCO" value="DISCO">
                 </div>
                 
                 <div class="option-group">
                     <label class="option-label">Releases:</label>
-                    <input type="text" class="option-input" id="releasesInput" placeholder="25.2" value="25.2">
+                    <input type="text" class="option-input" id="releasesInput" list="releasesList" placeholder="25.2" value="25.2">
                 </div>
                 
                 <div class="option-group">
                     <label class="option-label">Platforms:</label>
-                    <input type="text" class="option-input" id="platformsInput" placeholder="Windows" value="Windows">
+                    <input type="text" class="option-input" id="platformsInput" list="platformsList" placeholder="Windows" value="Windows">
                 </div>
                 
                 <div class="option-group">
@@ -484,7 +527,7 @@ function showCDCARMJsonOptions() {
                 
                 <div class="option-group">
                     <label class="option-label">Owner (optional):</label>
-                    <input type="text" class="option-input" id="ownerJsonInput" placeholder="all" value="all">
+                    <input type="text" class="option-input" id="ownerJsonInput" list="ownersList" placeholder="all" value="all">
                 </div>
                 
                 <button class="fetch-json-btn" id="fetchJsonBtn">
@@ -496,11 +539,14 @@ function showCDCARMJsonOptions() {
         chatBody.scrollTop = chatBody.scrollHeight;
 
         document.getElementById('fetchJsonBtn').addEventListener('click', fetchCDCARMJson);
+
+        // ✅ Show logs to confirm the datalists are working!
+        console.log("✅ Dynamic input fields with global datalists loaded.");
         
-        // Clean up any duplicate buttons
         cleanupDuplicateButtons();
     });
 }
+
 
 function fetchCDCARMJson() {
     const products = document.getElementById('productsInput').value.trim() || "DISCO";
@@ -539,6 +585,8 @@ function fetchCDCARMJson() {
     // Try direct API method first, then fall back to alternative method if it fails
     tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage);
 }
+
+
 // GUARANTEED WORKING VERSION - Fixes the UI display issue
 function tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage) {
     console.log('Calling Flask backend at /fetch_cdcarm with:', { products, releases, platforms, minFailingBuilds, owner });

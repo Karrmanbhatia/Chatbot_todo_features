@@ -6,6 +6,7 @@ import base64
 import json
 import uuid
 from datetime import datetime
+import requests  # 🔥 Add requests to fetch data from remote APIs
 
 from fetch_core import fetch_arm_json
 
@@ -68,6 +69,56 @@ def fetch_cdcarm():
     except Exception as e:
         print(f"❌ Error occurred: {e}")
         return jsonify({"error": str(e)}), 500
+
+# 🔥 Proxy endpoints for dynamic data lists
+@app.route("/api/products", methods=["GET"])
+def get_products():
+    try:
+        response = requests.get("https://cdcarm.win.ansys.com/api/Product")
+        response.raise_for_status()
+        products = response.json()
+        print(f"✅ Products fetched: {len(products)}")  # 🔥 Log count
+        return jsonify(products)
+    except Exception as e:
+        print(f"❌ Error fetching products: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/releases", methods=["GET"])
+def get_releases():
+    try:
+        response = requests.get("https://cdcarm.win.ansys.com/api/Release")
+        response.raise_for_status()
+        releases = response.json()
+        print(f"✅ Releases fetched: {len(releases)}")  # 🔥 Log count
+        return jsonify(releases)
+    except Exception as e:
+        print(f"❌ Error fetching releases: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/platforms", methods=["GET"])
+def get_platforms():
+    try:
+        response = requests.get("https://cdcarm.win.ansys.com/api/Platform")
+        response.raise_for_status()
+        platforms = response.json()
+        print(f"✅ Platforms fetched: {len(platforms)}")  # 🔥 Log count
+        return jsonify(platforms)
+    except Exception as e:
+        print(f"❌ Error fetching platforms: {e}")
+        return jsonify({"error": str(e)}), 500
+
+# Example for owners if needed
+# @app.route("/api/owners", methods=["GET"])
+# def get_owners():
+#     try:
+#         response = requests.get("https://cdcarm.win.ansys.com/api/Owners")
+#         response.raise_for_status()
+#         owners = response.json()
+#         print(f"✅ Owners fetched: {len(owners)}")  # 🔥 Log count
+#         return jsonify(owners)
+#     except Exception as e:
+#         print(f"❌ Error fetching owners: {e}")
+#         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
