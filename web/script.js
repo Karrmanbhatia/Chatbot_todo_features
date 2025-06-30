@@ -20,7 +20,20 @@ let selectedFile = null;
 chatIcon.addEventListener('click', () => {
     chatWindow.style.display = 'flex';
     chatIcon.style.display = 'none';
-    showWelcomeMessage();
+    
+    // Bot directly starts with welcome message
+    const welcomeMessage = createBotMessage();
+welcomeMessage.innerHTML = `
+    <div class="welcome-message">
+        <p>👋 Welcome to Test Failure Analyzer! How can I help you today?</p>
+        <p>You can select an option below or type your question here.</p>
+        <p><strong>Here are quick suggestions to get you started:</strong></p>
+    </div>
+`;
+chatBody.appendChild(welcomeMessage);
+
+// Now call showWelcomeMessage to append the buttons AFTER the message
+showWelcomeMessage();
 });
 
 minimizeBtn.addEventListener('click', () => {
@@ -57,16 +70,6 @@ function showWelcomeMessage() {
     chatBody.style.display = 'block';
     optionPanel.style.display = 'flex';
     optionPanel.innerHTML = ''; // Clear previous content
-
-    // Add welcome message
-    const welcomeMessage = createBotMessage();
-    welcomeMessage.innerHTML = `
-        <div class="welcome-message">
-            <p>👋 Welcome to Test Failure Analyzer! How can I help you today?</p>
-            <p>You can select an option below or type your question here.</p>
-        </div>
-    `;
-    chatBody.appendChild(welcomeMessage);
     
     // Create option buttons
     optionPanel.innerHTML = `
@@ -147,7 +150,7 @@ function showHelpInformation() {
                 <li><strong>Fetch CDCARM JSON</strong> - Download test failure data as JSON for offline analysis</li>
             </ul>
             <p>To get started, select an option from the menu or type your question below.</p>
-            <button class="back-to-menu" id="backToMenuHelp"><i class="fas fa-arrow-left"></i> Back to Main Menu</button>
+            <button class="back-to-menu" id="backToMenuHelp"><i class="fas fa-home"></i> Home</button>
         `;
         chatBody.appendChild(helpMessage);
         chatBody.scrollTop = chatBody.scrollHeight;
@@ -235,7 +238,7 @@ function handleJsonDownload(payload) {
                 <i class="fas fa-download"></i> Download JSON File
             </button>
             <button class="back-to-menu" id="backToMenuJson">
-                <i class="fas fa-arrow-left"></i> Back
+                <i class="fas fa-home"></i> Home
             </button>
         </div>
     `;
@@ -276,70 +279,6 @@ function handleJsonDownload(payload) {
     });
     
     document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
-}
-function enableDebugLogging() {
-    // Create a debug panel in the UI
-    const debugPanel = document.createElement('div');
-	debugPanel.style.position = 'fixed';
-	debugPanel.style.top = '10px';
-	debugPanel.style.left = '10px';
-	debugPanel.style.width = '300px';
-	debugPanel.style.maxHeight = '200px';
-	debugPanel.style.overflowY = 'auto';
-	debugPanel.style.backgroundColor = 'rgba(0,0,0,0.7)';
-	debugPanel.style.color = '#00ff00';
-	debugPanel.style.fontFamily = 'monospace';
-	debugPanel.style.fontSize = '10px';
-	debugPanel.style.padding = '5px';
-	debugPanel.style.zIndex = '9999';
-	debugPanel.style.border = '1px solid #00ff00';
-	debugPanel.id = 'debugPanel';
-
-    document.body.appendChild(debugPanel);
-    
-    // Override console.log to also display in our debug panel
-    const originalLog = console.log;
-    console.log = function() {
-        // Call original console.log
-        originalLog.apply(console, arguments);
-        
-        // Add to our debug panel
-        const debugMsg = document.createElement('div');
-        debugMsg.style.borderBottom = '1px solid #333';
-        debugMsg.style.paddingBottom = '2px';
-        debugMsg.style.marginBottom = '2px';
-        
-        // Convert all arguments to string
-        let msgText = '';
-        for (let i = 0; i < arguments.length; i++) {
-            try {
-                if (typeof arguments[i] === 'object') {
-                    msgText += JSON.stringify(arguments[i]).substring(0, 100) + '... ';
-                } else {
-                    msgText += arguments[i] + ' ';
-                }
-            } catch (e) {
-                msgText += '[Object] ';
-            }
-        }
-        
-        debugMsg.textContent = new Date().toISOString().substring(11, 19) + ': ' + msgText;
-        debugPanel.appendChild(debugMsg);
-        debugPanel.scrollTop = debugPanel.scrollHeight;
-        
-        // Limit to last 50 messages
-        while (debugPanel.children.length > 50) {
-            debugPanel.removeChild(debugPanel.firstChild);
-        }
-    };
-    
-    // Also capture errors
-    window.onerror = function(message, source, lineno, colno, error) {
-        console.log('ERROR:', message, 'at', source, lineno + ':' + colno);
-        return false;
-    };
-    
-    console.log('Debug logging enabled');
 }
 
 // Fetch dynamic data for products, releases, platforms
@@ -382,12 +321,11 @@ async function populateDynamicDatalists() {
     }
 }
 
-
-// Run this function when the page loads
+// Run this function when the page loads (debug logging removed)
 document.addEventListener('DOMContentLoaded', function() {
-    enableDebugLogging();
-	populateDynamicDatalists();
+    populateDynamicDatalists();
 });
+
 function handleCDCARMRequest(message) {
     let withReport = !message.includes('without');
     let owner = null;
@@ -447,7 +385,7 @@ function generateCDCARMUrlFromParams(withReport, owner) {
             message.innerHTML = `
                 <p><i class="fas fa-check-circle" style="color: #10b981;"></i> Here's your CDCARM URL ${reportStatus} investigation report${ownerText}:</p>
                 <p><a href="${url}" target="_blank" class="url-link">${displayText}</a></p>
-                <button class="back-to-menu" id="backToMenuURL"><i class="fas fa-arrow-left"></i> Back to Main Menu</button>
+                <button class="back-to-menu" id="backToMenuURL"><i class="fas fa-home"></i> Home</button>
             `;
             chatBody.appendChild(message);
             chatBody.scrollTop = chatBody.scrollHeight;
@@ -503,7 +441,7 @@ function showCDCARMJsonOptions() {
     showTypingIndicator().then(() => {
         const message = createBotMessage();
         message.innerHTML = `
-            <p>Let's fetch CDCARM data and save it as JSON. Please provide the following information:</p>
+            <p>Let's fetch CDCARM Error report data for investigation. Please provide the following information:</p>
             <div class="cdcarm-json-options active">
                 <div class="option-group">
                     <label class="option-label">Products:</label>
@@ -525,14 +463,14 @@ function showCDCARMJsonOptions() {
                     <input type="number" class="option-input" id="minFailingInput" placeholder="2" value="2" min="1">
                 </div>
                 
+                <button class="fetch-json-btn" id="fetchJsonBtn">
+                    <i class="fas fa-download"></i> Fetch Data
+                </button>
+                
                 <div class="option-group">
                     <label class="option-label">Owner (optional):</label>
                     <input type="text" class="option-input" id="ownerJsonInput" list="ownersList" placeholder="all" value="all">
                 </div>
-                
-                <button class="fetch-json-btn" id="fetchJsonBtn">
-                    <i class="fas fa-download"></i> Fetch JSON
-                </button>
             </div>
         `;
         chatBody.appendChild(message);
@@ -546,7 +484,6 @@ function showCDCARMJsonOptions() {
         cleanupDuplicateButtons();
     });
 }
-
 
 function fetchCDCARMJson() {
     const products = document.getElementById('productsInput').value.trim() || "DISCO";
@@ -585,7 +522,6 @@ function fetchCDCARMJson() {
     // Try direct API method first, then fall back to alternative method if it fails
     tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage);
 }
-
 
 // GUARANTEED WORKING VERSION - Fixes the UI display issue
 function tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage) {
@@ -638,7 +574,7 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
                         <i class="fas fa-download"></i> Download JSON File
                     </button>
                     <button class="back-to-menu" id="backToMenuJson">
-                        <i class="fas fa-arrow-left"></i> Back
+                        <i class="fas fa-home"></i> Home
                     </button>
                 </div>
             `;
@@ -678,7 +614,6 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
     });
 }
 
-
 // Helper function to create dummy data as fallback
 function createDummyData(products, releases, platforms, minFailingBuilds, owner) {
     const dummyData = [];
@@ -710,7 +645,7 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
                 <i class="fas fa-download"></i> Download Demo JSON
             </button>
             <button class="back-to-menu" id="backToMenuDemo">
-                <i class="fas fa-arrow-left"></i> Back
+                <i class="fas fa-home"></i> Home
             </button>
         </div>
     `;
@@ -732,6 +667,7 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
     
     document.getElementById('backToMenuDemo').addEventListener('click', showMainMenu);
 }
+
 function cleanupDuplicateButtons() {
     // Dummy no-op to suppress error
 }

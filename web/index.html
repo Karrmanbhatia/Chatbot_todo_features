@@ -1,71 +1,204 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Test Failure Analyzer</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investigation Assistant</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #4f46e5;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .welcome-message {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-text {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+            color: #374151;
+        }
+
+        .welcome-subtext {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .action-buttons {
+            margin-bottom: 1.5rem;
+        }
+
+        .action-button {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .action-button:hover {
+            background-color: #f9fafb;
+        }
+
+        .action-button:last-child {
+            margin-bottom: 0;
+        }
+
+        .button-icon {
+            font-size: 1.1rem;
+        }
+
+        .suggestions-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .suggestions-title {
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .input-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .message-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .message-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .send-button {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+    </style>
 </head>
-
 <body>
-  <header class="header">
-    <h1>Test Failure Analyzer</h1>
-  </header>
-
-  <div class="container">
-    <h2>Welcome to the Test Failure Analyzer</h2>
-    <p>This tool helps you analyze test failure patterns and generate CDCARM URLs. Use the chat assistant in the bottom right corner to get started.</p>
-  </div>
-
-  <div class="chat-widget" id="chatWidget">
-    <div class="chat-icon" id="chatIcon">
-      <i class="fas fa-comment"></i>
-    </div>
-
-    <div class="chat-window" id="chatWindow">
-      <div class="chat-header">
-        <h3>Test Assistant</h3>
-        <div class="chat-controls">
-          <button id="minimizeBtn" title="Minimize"><i class="fas fa-window-minimize"></i></button>
-          <button id="expandBtn" title="Expand"><i class="fas fa-expand"></i></button>
-          <button id="closeBtn" title="Close"><i class="fas fa-times"></i></button>
+    <div class="header">
+        <h1>
+            <span class="status-indicator"></span>
+            Investigation Assistant
+        </h1>
+        <div class="header-controls">
+            <span>—</span>
+            <span>⚏</span>
+            <span>×</span>
         </div>
-      </div>
-
-      <div class="option-panel" id="optionPanel">
-        <button class="option-button" id="cdcarmUrlBtn"><i class="fas fa-link"></i> Generate CDCARM URL</button>
-        <button class="option-button" id="uploadAnalyzeBtn"><i class="fas fa-file-upload"></i> Upload & Analyze Test Failures</button>
-        <button class="option-button" id="helpBtn"><i class="fas fa-question-circle"></i> Help & Information</button>
-        <button class="option-button" id="fetchCdcarmJsonBtn"><i class="fas fa-download"></i> Fetch CDCARM Data as JSON</button>
-        <button class="option-button" id="nlQueryBtn"><i class="fas fa-question-circle"></i> Ask Questions About Test Failures</button>
-      </div>
-
-      <div class="chat-body" id="chatBody"></div>
-
-      <div class="chat-footer" id="chatFooter">
-        <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." />
-        <button class="send-button" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
-      </div>
     </div>
-  </div>
 
-  <!-- Auto-complete DATALISTS (not hidden!) -->
-  <datalist id="productsList"></datalist>
-  <datalist id="releasesList"></datalist>
-  <datalist id="platformsList"></datalist>
-  <datalist id="ownersList"></datalist>
+    <div class="chat-container">
+        <!-- Message First -->
+        <div class="welcome-message">
+            <p class="welcome-text">🔍 Welcome to Test Failure Analyzer! How can I help you today?</p>
+            <p class="welcome-subtext">You can select an option below or type your question here.</p>
+        </div>
 
-  <!-- Dynamic Input Fields - hidden, just for template if needed -->
-  <div id="hidden-dynamic-fields" style="display: none;">
-    <input type="text" id="productsInput" list="productsList" placeholder="DISCO" value="DISCO">
-    <input type="text" id="releasesInput" list="releasesList" placeholder="25.2" value="25.2">
-    <input type="text" id="platformsInput" list="platformsList" placeholder="Windows" value="Windows">
-    <input type="text" id="ownerJsonInput" list="ownersList" placeholder="all" value="all">
-  </div>
+        <!-- Buttons Second -->
+        <div class="action-buttons">
+            <button class="action-button">
+                <span class="button-icon">🔗</span>
+                <span>Generate CDCARM URL</span>
+            </button>
+            
+            <button class="action-button">
+                <span class="button-icon">ℹ️</span>
+                <span>Help & Information</span>
+            </button>
+            
+            <button class="action-button">
+                <span class="button-icon">📊</span>
+                <span>Fetch CDCARM Data as JSON</span>
+            </button>
+        </div>
 
-  <script src="script.js"></script>
+        <!-- Quick Suggestions Third -->
+        <div class="suggestions-section">
+            <div class="suggestions-title">Here are quick suggestions for bot:</div>
+        </div>
+
+        <div class="input-container">
+            <input type="text" class="message-input" placeholder="Type your message...">
+            <button class="send-button">➤</button>
+        </div>
+    </div>
 </body>
-
 </html>
