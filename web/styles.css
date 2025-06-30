@@ -671,3 +671,36 @@ body {
     }
     .message { max-width: 90%; }
 }
+.option-panel-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.option-panel-inline .option-btn {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #f3f4f6;
+    color: #374151;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+}
+
+.option-panel-inline .option-btn:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
+
+.option-panel-inline .option-btn i {
+    font-size: 16px;
+}
+
+.option-panel-inline .option-btn span {
+    font-weight: 500;
+}

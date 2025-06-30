@@ -1,3 +1,29 @@
+// Ensure chat starts closed, then auto-popup
+document.addEventListener('DOMContentLoaded', function() {
+    // Force chat to be closed on page load
+    const chatWindow = document.getElementById('chatWindow');
+    const chatIcon = document.getElementById('chatIcon');
+    
+    if (chatWindow) chatWindow.style.display = 'none';
+    if (chatIcon) chatIcon.style.display = 'flex';
+    
+    // Clear any existing chat content
+    const chatBody = document.getElementById('chatBody');
+    if (chatBody) chatBody.innerHTML = '';
+    
+    // Then load your datalists
+    populateDynamicDatalists();
+    
+    // AUTO-POPUP: Open chat automatically after 1 second
+    setTimeout(() => {
+        if (chatIcon && chatWindow) {
+            chatWindow.style.display = 'flex';
+            chatIcon.style.display = 'none';
+            clearAndShowWelcome();
+        }
+    }, 1000);
+});
+
 // DOM Elements
 const chatWidget = document.getElementById('chatWidget');
 const chatIcon = document.getElementById('chatIcon');
@@ -16,24 +42,14 @@ let isExpanded = false;
 let currentContext = null;
 let selectedFile = null;
 
-// Event listeners for chat controls
+// Chat icon click handler - FIXED
 chatIcon.addEventListener('click', () => {
+    console.log('Chat icon clicked - opening chat');
     chatWindow.style.display = 'flex';
     chatIcon.style.display = 'none';
     
-    // Bot directly starts with welcome message
-    const welcomeMessage = createBotMessage();
-welcomeMessage.innerHTML = `
-    <div class="welcome-message">
-        <p>👋 Welcome to Test Failure Analyzer! How can I help you today?</p>
-        <p>You can select an option below or type your question here.</p>
-        <p><strong>Here are quick suggestions to get you started:</strong></p>
-    </div>
-`;
-chatBody.appendChild(welcomeMessage);
-
-// Now call showWelcomeMessage to append the buttons AFTER the message
-showWelcomeMessage();
+    // Clear everything first, then show welcome
+    clearAndShowWelcome();
 });
 
 minimizeBtn.addEventListener('click', () => {
@@ -65,41 +81,73 @@ chatInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
 
-// Helper Functions
-function showWelcomeMessage() {
-    chatBody.style.display = 'block';
-    optionPanel.style.display = 'flex';
-    optionPanel.innerHTML = ''; // Clear previous content
+// FIXED: Clear everything and show welcome message only once
+function clearAndShowWelcome() {
+    // Clear all content first
+    chatBody.innerHTML = '';
+    optionPanel.innerHTML = '';
+    optionPanel.style.display = 'none';
+    chatFooter.style.display = 'none';
     
-    // Create option buttons
-    optionPanel.innerHTML = `
-        <button id="cdcarmUrlBtn" class="option-btn">
-            <i class="fas fa-link"></i>
-            <span>Generate CDCARM URL</span>
-        </button>
-        <button id="helpBtn" class="option-btn">
-            <i class="fas fa-question-circle"></i>
-            <span>Help & Information</span>
-        </button>
-        <button id="cdcarmJsonBtn" class="option-btn">
-            <i class="fas fa-file-download"></i>
-            <span>Fetch CDCARM Data as JSON</span>
-        </button>
+    // Show chat body
+    chatBody.style.display = 'block';
+    
+    // Create welcome message
+    const welcomeMessage = createBotMessage();
+    welcomeMessage.innerHTML = `
+        <div class="welcome-message">
+            <p>👋 Welcome to Test Failure Analyzer! How can I help you today?</p>
+            <p>You can select an option below or type your question here.</p>
+            <p><strong>Here are quick suggestions to get you started:</strong></p>
+        </div>
+    `;
+    chatBody.appendChild(welcomeMessage);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    
+    // Wait a bit, then show buttons
+    setTimeout(() => {
+        showWelcomeButtons();
+    }, 500);
+}
+
+// FIXED: Show buttons without creating another welcome message
+function showWelcomeButtons() {
+    // Put buttons in chatBody (same container as welcome message) instead of optionPanel
+    const buttonMessage = createBotMessage();
+    buttonMessage.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+            <button id="cdcarmUrlBtn" class="option-btn">
+                <i class="fas fa-link"></i>
+                <span>Generate CDCARM URL</span>
+            </button>
+            <button id="helpBtn" class="option-btn">
+                <i class="fas fa-question-circle"></i>
+                <span>Help & Information</span>
+            </button>
+            <button id="cdcarmJsonBtn" class="option-btn">
+                <i class="fas fa-file-download"></i>
+                <span>Fetch ARM Error Reports </span>
+            </button>
+        </div>
     `;
     
-    // Add event listeners to buttons (corrected to only use buttons that exist)
+    chatBody.appendChild(buttonMessage); // Add to chatBody, not optionPanel
+    
+    // Add event listeners
     document.getElementById('cdcarmUrlBtn').addEventListener('click', showCDCARMOptions);
     document.getElementById('helpBtn').addEventListener('click', showHelpInformation);
     document.getElementById('cdcarmJsonBtn').addEventListener('click', showCDCARMJsonOptions);
     
     chatFooter.style.display = 'flex';
-    
-    // Clean up any duplicate buttons
-    cleanupDuplicateButtons();
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// Keep the old function for compatibility but make it use the new one
+function showWelcomeMessage() {
+    clearAndShowWelcome();
 }
 
 function showUploadOptions() {
-    // Placeholder for future upload implementation
     replyWithBotMessage("Upload & Analysis feature coming soon.");
 }
 
@@ -160,8 +208,7 @@ function showHelpInformation() {
 }
 
 function showMainMenu() {
-    chatBody.innerHTML = '';
-    showWelcomeMessage();
+    clearAndShowWelcome();
     currentContext = null;
     selectedFile = null;
 }
@@ -183,19 +230,16 @@ function sendMessage() {
 function processMessage(message) {
     const lowerMsg = message.toLowerCase();
 
-    // Check for menu requests
     if (lowerMsg.includes('menu') || lowerMsg.includes('back') || lowerMsg.includes('options')) {
         showMainMenu();
         return;
     }
 
-    // Context-specific handling
     if (currentContext === 'cdcarm') {
         // Your existing cdcarm context code
     } else if (currentContext === 'help') {
         // Your existing help context code
     } else {
-        // General responses
         if (lowerMsg.includes('hello') || lowerMsg.includes('hi')) {
             replyWithBotMessage("Hello! 👋 How can I help you today?");
         } else if (lowerMsg.includes('cdcarm') || lowerMsg.includes('url')) {
@@ -207,6 +251,7 @@ function processMessage(message) {
         }
     }
 }
+
 function handleJsonDownload(payload) {
     console.log('Handling JSON download payload:', payload);
     
@@ -215,7 +260,6 @@ function handleJsonDownload(payload) {
         return;
     }
     
-    // Determine if this is a valid download payload
     const isValidPayload = payload.data_type === "json_download" || 
                           (payload.content && payload.filename);
     
@@ -225,7 +269,6 @@ function handleJsonDownload(payload) {
         return;
     }
     
-    // Find the content, filename and record count regardless of structure
     const content = payload.content;
     const filename = payload.filename || 'cdcarm_data.json';
     const recordCount = payload.record_count || 'unknown number of';
@@ -235,7 +278,8 @@ function handleJsonDownload(payload) {
         <div class="download-container">
             <p>✅ Successfully fetched ${recordCount} records.</p>
             <button class="download-btn" id="downloadJsonBtn">
-                <i class="fas fa-download"></i> Download JSON File
+                <i class="fas fa-download"></i> Download results
+
             </button>
             <button class="back-to-menu" id="backToMenuJson">
                 <i class="fas fa-home"></i> Home
@@ -247,12 +291,10 @@ function handleJsonDownload(payload) {
     
     document.getElementById('downloadJsonBtn').addEventListener('click', () => {
         try {
-            // Create a data URL from the base64-encoded JSON
             let jsonData;
             try {
                 jsonData = atob(content);
             } catch (e) {
-                // If content isn't valid base64, use it directly
                 jsonData = content;
             }
             
@@ -262,7 +304,6 @@ function handleJsonDownload(payload) {
             const blob = new Blob([jsonData], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             
-            // Create a temporary link element and trigger download
             const a = document.createElement('a');
             a.href = url;
             a.download = filename;
@@ -281,10 +322,8 @@ function handleJsonDownload(payload) {
     document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
 }
 
-// Fetch dynamic data for products, releases, platforms
 async function populateDynamicDatalists() {
     try {
-        // Fetch products
         const productRes = await fetch("http://localhost:5000/api/products");
         const products = await productRes.json();
         const productList = document.getElementById("productsList");
@@ -295,7 +334,6 @@ async function populateDynamicDatalists() {
         });
         console.log(`✅ Products fetched: ${products.length}`);
 
-        // Fetch releases
         const releaseRes = await fetch("http://localhost:5000/api/releases");
         const releases = await releaseRes.json();
         const releaseList = document.getElementById("releasesList");
@@ -306,7 +344,6 @@ async function populateDynamicDatalists() {
         });
         console.log(`✅ Releases fetched: ${releases.length}`);
 
-        // Fetch platforms
         const platformRes = await fetch("http://localhost:5000/api/platforms");
         const platforms = await platformRes.json();
         const platformList = document.getElementById("platformsList");
@@ -321,16 +358,10 @@ async function populateDynamicDatalists() {
     }
 }
 
-// Run this function when the page loads (debug logging removed)
-document.addEventListener('DOMContentLoaded', function() {
-    populateDynamicDatalists();
-});
-
 function handleCDCARMRequest(message) {
     let withReport = !message.includes('without');
     let owner = null;
 
-    // Try to extract owner name
     const ownerMatch = message.match(/(?:owner|for)\s+(\w+)/i);
     if (ownerMatch && ownerMatch[1]) {
         owner = ownerMatch[1];
@@ -361,7 +392,6 @@ function generateCDCARMUrlFromParams(withReport, owner) {
     const reportStatus = withReport ? "with" : "without";
     const ownerText = owner ? ` for owner ${owner}` : "";
 
-    // Show progress bar
     const progressMessage = createBotMessage();
     progressMessage.innerHTML = `
         <p>Generating CDCARM URL ${reportStatus} investigation report${ownerText}...</p>
@@ -372,7 +402,6 @@ function generateCDCARMUrlFromParams(withReport, owner) {
     chatBody.appendChild(progressMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
 
-    // Animate progress bar
     setTimeout(() => {
         const progressBar = document.getElementById('urlProgressBar');
         progressBar.style.width = '100%';
@@ -380,7 +409,6 @@ function generateCDCARMUrlFromParams(withReport, owner) {
         setTimeout(() => {
             chatBody.removeChild(progressMessage);
 
-            // Show result
             const message = createBotMessage();
             message.innerHTML = `
                 <p><i class="fas fa-check-circle" style="color: #10b981;"></i> Here's your CDCARM URL ${reportStatus} investigation report${ownerText}:</p>
@@ -390,13 +418,11 @@ function generateCDCARMUrlFromParams(withReport, owner) {
             chatBody.appendChild(message);
             chatBody.scrollTop = chatBody.scrollHeight;
 
-            // Add event listener for the back button
             document.getElementById('backToMenuURL').addEventListener('click', showMainMenu);
         }, 1000);
     }, 100);
 }
 
-// Utility to show typing indicator with promise
 function showTypingIndicator() {
     return new Promise(resolve => {
         const typingIndicator = document.createElement('div');
@@ -441,7 +467,7 @@ function showCDCARMJsonOptions() {
     showTypingIndicator().then(() => {
         const message = createBotMessage();
         message.innerHTML = `
-            <p>Let's fetch CDCARM Error report data for investigation. Please provide the following information:</p>
+            <p>Let's fetch ARM Error report data for investigation. Please provide the following information:</p>
             <div class="cdcarm-json-options active">
                 <div class="option-group">
                     <label class="option-label">Products:</label>
@@ -462,25 +488,21 @@ function showCDCARMJsonOptions() {
                     <label class="option-label">Min Failing Builds:</label>
                     <input type="number" class="option-input" id="minFailingInput" placeholder="2" value="2" min="1">
                 </div>
-                
-                <button class="fetch-json-btn" id="fetchJsonBtn">
-                    <i class="fas fa-download"></i> Fetch Data
-                </button>
-                
+				
                 <div class="option-group">
-                    <label class="option-label">Owner (optional):</label>
+                    <label class="option-label">Owner (Case Sensitive):</label>
                     <input type="text" class="option-input" id="ownerJsonInput" list="ownersList" placeholder="all" value="all">
                 </div>
+                <button class="fetch-json-btn" id="fetchJsonBtn">
+                    <i class="fas fa-download"></i> Run Predictions
+                </button>
             </div>
         `;
         chatBody.appendChild(message);
         chatBody.scrollTop = chatBody.scrollHeight;
 
         document.getElementById('fetchJsonBtn').addEventListener('click', fetchCDCARMJson);
-
-        // ✅ Show logs to confirm the datalists are working!
         console.log("✅ Dynamic input fields with global datalists loaded.");
-        
         cleanupDuplicateButtons();
     });
 }
@@ -492,12 +514,10 @@ function fetchCDCARMJson() {
     const minFailingBuilds = document.getElementById('minFailingInput').value.trim() || "2";
     const owner = document.getElementById('ownerJsonInput').value.trim() || "all";
     
-    // Create user message showing what's being fetched
     const userMsg = createUserMessage(`Fetch CDCARM JSON for products: ${products}, releases: ${releases}, platforms: ${platforms}, min failing: ${minFailingBuilds}, owner: ${owner}`);
     chatBody.appendChild(userMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
     
-    // Show progress indicator
     const progressMessage = createBotMessage();
     progressMessage.innerHTML = `
         <p>Fetching CDCARM data with these parameters:</p>
@@ -515,45 +535,31 @@ function fetchCDCARMJson() {
     chatBody.appendChild(progressMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
     
-    // Animate progress bar
     const progressBar = document.getElementById('jsonProgressBar');
     progressBar.style.width = '30%';
     
-    // Try direct API method first, then fall back to alternative method if it fails
     tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage);
 }
 
-// GUARANTEED WORKING VERSION - Fixes the UI display issue
 function tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage) {
     console.log('Calling Flask backend at /fetch_cdcarm with:', { products, releases, platforms, minFailingBuilds, owner });
 
-    // Update progress
     progressBar.style.width = '30%';
 
-    // Prepare payload
-    const payload = {
-        products,
-        releases,
-        platforms,
-        min_failing_builds: minFailingBuilds,
-        owner
-    };
-
-	fetch("http://localhost:5000/fetch_cdcarm", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({
-			products,
-			releases,
-			platforms,
-			min_failing_builds: minFailingBuilds,
-			owner
-		})
-	})
-
-	.then(response => {
+    fetch("http://localhost:5000/fetch_cdcarm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            products,
+            releases,
+            platforms,
+            min_failing_builds: minFailingBuilds,
+            owner
+        })
+    })
+    .then(response => {
         if (!response.ok) throw new Error("Network response was not OK");
-        return response.json();  // ✅ THIS LINE IS CRUCIAL
+        return response.json();
     })
     .then(data => {
         progressBar.style.width = '100%';
@@ -584,9 +590,9 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
             document.getElementById('downloadJsonBtn').addEventListener('click', () => {
                 let jsonData;
                 try {
-                    jsonData = atob(content);  // base64 decode
+                    jsonData = atob(content);
                 } catch (e) {
-                    jsonData = content;  // fallback to raw string
+                    jsonData = content;
                 }
 
                 const blob = new Blob([jsonData], { type: 'application/json' });
@@ -614,7 +620,6 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
     });
 }
 
-// Helper function to create dummy data as fallback
 function createDummyData(products, releases, platforms, minFailingBuilds, owner) {
     const dummyData = [];
     for (let i = 1; i <= 5; i++) {
@@ -632,11 +637,8 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
         });
     }
     
-    // Convert to JSON and base64
     const jsonString = JSON.stringify(dummyData, null, 2);
-    const base64Data = btoa(jsonString);
     
-    // Create download message
     const downloadMessage = createBotMessage();
     downloadMessage.innerHTML = `
         <div class="download-container">
@@ -652,7 +654,6 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
     chatBody.appendChild(downloadMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
     
-    // Add click handlers
     document.getElementById('downloadDemoBtn').addEventListener('click', () => {
         const blob = new Blob([jsonString], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
