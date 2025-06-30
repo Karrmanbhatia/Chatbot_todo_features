@@ -512,34 +512,178 @@ function fetchCDCARMJson() {
     const releases = document.getElementById('releasesInput').value.trim() || "25.2";
     const platforms = document.getElementById('platformsInput').value.trim() || "Windows";
     const minFailingBuilds = document.getElementById('minFailingInput').value.trim() || "2";
-    const owner = document.getElementById('ownerJsonInput').value.trim() || "all";
-    
-    const userMsg = createUserMessage(`Fetch CDCARM JSON for products: ${products}, releases: ${releases}, platforms: ${platforms}, min failing: ${minFailingBuilds}, owner: ${owner}`);
+    const ownerFilter = document.getElementById('ownerJsonInput').value.trim() || "all";
+
+    const userMsg = createUserMessage(`Running prediction for products: ${products}, releases: ${releases}, platforms: ${platforms}, min failing: ${minFailingBuilds}, owner filter: ${ownerFilter}`);
     chatBody.appendChild(userMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
-    
+
     const progressMessage = createBotMessage();
     progressMessage.innerHTML = `
-        <p>Fetching CDCARM data with these parameters:</p>
-        <ul style="margin-left: 20px; padding-left: 0;">
-            <li><strong>Products:</strong> ${products}</li>
-            <li><strong>Releases:</strong> ${releases}</li>
-            <li><strong>Platforms:</strong> ${platforms}</li>
-            <li><strong>Min Failing Builds:</strong> ${minFailingBuilds}</li>
-            <li><strong>Owner:</strong> ${owner}</li>
-        </ul>
-        <div class="progress-container">
-            <div class="progress-bar" id="jsonProgressBar"></div>
-        </div>
+        <p>Fetching and analyzing data...</p>
+        <div class="progress-container"><div class="progress-bar" id="jsonProgressBar"></div></div>
     `;
     chatBody.appendChild(progressMessage);
-    chatBody.scrollTop = chatBody.scrollHeight;
-    
     const progressBar = document.getElementById('jsonProgressBar');
     progressBar.style.width = '30%';
-    
-    tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage);
+
+    fetch("http://localhost:5000/fetch_cdcarm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            products,
+            releases,
+            platforms,
+            min_failing_builds: minFailingBuilds
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        progressBar.style.width = '100%';
+        if (data.data_type === "prediction_table") {
+            // filter on owner if required
+            let filtered = data.merged_summary;
+            if (ownerFilter !== "all") {
+                filtered = filtered.filter(x => x.Owner.toLowerCase() === ownerFilter.toLowerCase());
+            }
+            displayPredictionResults(filtered);
+            chatBody.removeChild(progressMessage);
+        } else {
+            throw new Error("Unexpected response type");
+        }
+    })
+    .catch(error => {
+        console.error("Prediction flow error:", error);
+        progressBar.style.width = '100%';
+        setTimeout(() => {
+            chatBody.removeChild(progressMessage);
+            replyWithBotMessage(`⚠️ Error during prediction: ${error.message}`);
+        }, 500);
+    });
 }
+
+// put this global at top of your JS file
+let allPredictions = [];
+
+function displayPredictionResults(predictions, ownerFilter = "") {
+    if (!predictions.length) {
+        const botMsg = createBotMessage();
+        botMsg.innerHTML = `<p>No matching tests found for the selected owner.</p>`;
+        chatBody.appendChild(botMsg);
+        chatBody.scrollTop = chatBody.scrollHeight;
+        return;
+    }
+
+    if (!allPredictions.length) allPredictions = predictions;
+
+    const owners = [...new Set(allPredictions.map(p => p.Owner))];
+    const ownerOptions = owners.map(owner => 
+        `<option value="${owner}" ${owner.toLowerCase() === ownerFilter.toLowerCase() ? 'selected' : ''}>${owner}</option>`
+    ).join('');
+
+    const filtered = ownerFilter
+      ? predictions.filter(p => p.Owner.trim().toLowerCase() === ownerFilter.toLowerCase())
+      : predictions;
+
+    // group by TestName
+    const grouped = {};
+    filtered.forEach(p => {
+        const test = p.TestName;
+        if (!grouped[test]) {
+            grouped[test] = {
+                Owner: p.Owner,
+                WorkItems: new Set()
+            };
+        }
+        if (p.PredictedWorkItemId && p.PredictedWorkItemId !== "-") {
+            p.PredictedWorkItemId.split(";").forEach(wi => grouped[test].WorkItems.add(wi.trim()));
+        }
+    });
+
+    const botMsg = createBotMessage();
+    botMsg.innerHTML = `
+      <h4>🔎 Prediction Results:</h4>
+      <div class="owner-filter-container" style="margin-bottom:10px;">
+        <label for="ownerFilterSelect"><strong>Owner Filter:</strong></label>
+        <select id="ownerFilterSelect" class="option-input" style="width:200px;">
+            <option value="">All</option>
+            ${ownerOptions}
+        </select>
+        <button id="applyOwnerFilterBtn" class="fetch-json-btn">
+            <i class="fas fa-filter"></i> Apply
+        </button>
+        <button id="exportCSV" class="fetch-json-btn" style="margin-left:10px;">
+            <i class="fas fa-download"></i> Export CSV
+        </button>
+      </div>
+      <div style="max-height:300px; overflow:auto;">
+        <table class="prediction-table" id="predictionResultTable">
+          <thead>
+            <tr>
+              <th>Test Name</th>
+              <th>Owner</th>
+              <th>Predicted Work Item IDs</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${Object.entries(grouped).map(([testName, info]) => `
+              <tr>
+                <td>${testName}</td>
+                <td>${info.Owner}</td>
+                <td>${[...info.WorkItems].join(", ") || "-"}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      <button class="back-to-menu" id="backToMenuPred" style="margin-top:10px;">
+        <i class="fas fa-home"></i> Home
+      </button>
+    `;
+    chatBody.appendChild(botMsg);
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    document.getElementById('applyOwnerFilterBtn').addEventListener('click', () => {
+        const owner = document.getElementById('ownerFilterSelect').value.trim();
+        chatBody.removeChild(botMsg);
+        displayPredictionResults(allPredictions, owner);
+    });
+
+    document.getElementById('exportCSV').addEventListener('click', () => {
+        exportTableToCSV("#predictionResultTable");
+    });
+
+    document.getElementById('backToMenuPred').addEventListener('click', () => {
+        allPredictions = [];
+        showMainMenu();
+    });
+}
+
+function exportTableToCSV(tableSelector, filename = "prediction_results.csv") {
+    const rows = document.querySelectorAll(`${tableSelector} tr`);
+    let csv = [];
+
+    rows.forEach(row => {
+        const cols = row.querySelectorAll('td, th');
+        const rowData = [];
+        cols.forEach(col => {
+            rowData.push(`"${col.textContent.trim().replace(/"/g, '""')}"`);
+        });
+        csv.push(rowData.join(","));
+    });
+
+    const csvString = csv.join("\n");
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
 
 function tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage) {
     console.log('Calling Flask backend at /fetch_cdcarm with:', { products, releases, platforms, minFailingBuilds, owner });
