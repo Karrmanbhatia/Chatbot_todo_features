@@ -150,34 +150,40 @@ function showUploadOptions() {
     replyWithBotMessage("Upload & Analysis feature coming soon.");
 }
 
-// function showCDCARMOptions() {
-//     optionPanel.style.display = 'none';
-//     chatBody.style.display = 'block';
-//     chatFooter.style.display = 'flex';
-//     currentContext = 'cdcarm';
-//     showTypingIndicator().then(() => {
-//         const message = createBotMessage();
-//         message.innerHTML = `
-//             <p>Please select options for your CDCARM URL:</p>
-//             <div class="url-options active">
-//                 <label class="option-label">
-//                     <input type="radio" name="report_type" value="with" class="option-radio" checked> With Investigation Report
-//                 </label>
-//                 <label class="option-label">
-//                     <input type="radio" name="report_type" value="without" class="option-radio"> Without Investigation Report
-//                 </label>
-//                 <label class="option-label">
-//                     Owner (optional):
-//                     <input type="text" class="owner-input" id="ownerInput" placeholder="Enter owner name">
-//                 </label>
-//                 <button class="generate-btn" id="generateUrlBtn"><i class="fas fa-link"></i> Generate URL</button>
-//             </div>
-//         `;
-//         chatBody.appendChild(message);
-//         chatBody.scrollTop = chatBody.scrollHeight;
-//         document.getElementById('generateUrlBtn').addEventListener('click', generateCDCARMUrl);
-//     });
-// }
+<<<<<<< origin/Rohhan/Prediction_export
+function showCDCARMOptions() {
+    optionPanel.style.display = 'none';
+    chatBody.style.display = 'block';
+    chatFooter.style.display = 'flex';
+    currentContext = 'cdcarm';
+
+    showTypingIndicator().then(() => {
+        const message = createBotMessage();
+        message.innerHTML = `
+            <p>Please select options for your CDCARM URL:</p>
+            <div class="url-options active">
+                <label class="option-label">
+                    <input type="radio" name="report_type" value="with" class="option-radio" checked> With Investigation Report
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="report_type" value="without" class="option-radio"> Without Investigation Report
+                </label>
+                <label class="option-label">
+                    Owner (optional):
+                    <input type="text" class="owner-input" id="ownerInput" placeholder="Enter owner name">
+                </label>
+                <button class="generate-btn" id="generateUrlBtn"><i class="fas fa-link"></i> Generate URL</button>
+            </div>
+        `;
+        chatBody.appendChild(message);
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        document.getElementById('generateUrlBtn').addEventListener('click', generateCDCARMUrl);
+    });
+}
+
+=======
+>>>>>>> local
 function showHelpInformation() {
     optionPanel.style.display = 'none';
     chatBody.style.display = 'block';
@@ -187,11 +193,21 @@ function showHelpInformation() {
     showTypingIndicator().then(() => {
         const helpMessage = createBotMessage();
         helpMessage.innerHTML = `
+<<<<<<< origin/Rohhan/Prediction_export
+            <p><strong>Test Failure Analyzer Help</strong></p>
+            <p>This assistant can help you with:</p>
+            <ul style="margin-left: 20px; padding-left: 0;">
+                <li><strong>Generate CDCARM URLs</strong> - Create URLs with or without investigation reports for specific owners</li>
+                <li><strong>Fetch CDCARM JSON</strong> - Download test failure data as JSON for offline analysis</li>
+            </ul>
+            <p>To get started, select an option from the menu or type your question below.</p>
+            <button class="back-to-menu" id="backToMenuHelp"><i class="fas fa-home"></i> Home</button>
+=======
             <div class="help-container" style="line-height: 1.6;">
                 <h3 style="color: #2563eb; margin-bottom: 15px;">
                     <i class="fas fa-info-circle"></i> Test Failure Analyzer Help
                 </h3>
-                <li><strong>Fetch CDCARM JSON</strong> - Download test failure data as JSON for offline analysis</li>
+                
                 <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
                     <h4 style="color: #1e40af; margin-bottom: 10px;">🎯 What I Can Help You With:</h4>
                     <ul style="margin-left: 15px; color: #374151;">
@@ -237,6 +253,7 @@ function showHelpInformation() {
                     <i class="fas fa-home"></i> Back to Home
                 </button>
             </div>
+>>>>>>> local
         `;
         chatBody.appendChild(helpMessage);
         chatBody.scrollTop = chatBody.scrollHeight;
