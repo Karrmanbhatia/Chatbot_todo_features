@@ -23,7 +23,7 @@ def fetch_cdcarm():
         releases = data.get("releases", ["25.2"])
         platforms = data.get("platforms", ["Windows"])
         min_failing = int(data.get("min_failing_builds", 2))
-        owner = data.get("owner", "all")
+        owner = "all"  # always fetch ALL owners (detach owner)
 
         # Generate unique output filename
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -39,7 +39,7 @@ def fetch_cdcarm():
         print(f"    Owner: {owner}")
         print(f"    Output Path: {output_path}")
 
-        # Fetch data
+        # Fetch data from ARM
         results = fetch_arm_json(
             server="https://cdcarm.win.ansys.com",
             products=products,
@@ -53,17 +53,15 @@ def fetch_cdcarm():
 
         print(f"✅ Records fetched: {len(results)}")
 
-        # Read the written file
-        with open(output_path, 'r', encoding='utf-8') as f:
-            json_data = f.read()
+        # ⬇️ run prediction directly on saved JSON
+        from pattern_matcher_level_1 import run_prediction
+        merged_summary = run_prediction(output_path)
 
-        base64_data = base64.b64encode(json_data.encode('utf-8')).decode('utf-8')
-
+        # Return JSON directly to frontend
         return jsonify({
-            "data_type": "json_download",
-            "filename": file_name,
-            "content": base64_data,
-            "record_count": len(results)
+            "data_type": "prediction_table",
+            "record_count": len(results),
+            "merged_summary": merged_summary
         })
 
     except Exception as e:
@@ -121,4 +119,5 @@ def get_platforms():
 #         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))  # Default to 5000 for local
+    app.run(host="0.0.0.0", port=port)

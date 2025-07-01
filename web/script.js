@@ -200,13 +200,55 @@ function showHelpInformation() {
     showTypingIndicator().then(() => {
         const helpMessage = createBotMessage();
         helpMessage.innerHTML = `
-            <p><strong>Test Failure Analyzer Help</strong></p>
-            <p>This assistant can help you with:</p>
-            <ul style="margin-left: 20px; padding-left: 0;">
+            <div class="help-container" style="line-height: 1.6;">
+                <h3 style="color: #2563eb; margin-bottom: 15px;">
+                    <i class="fas fa-info-circle"></i> Test Failure Analyzer Help
                
-            </ul>
-            <p>To get started, select an option from the menu or type your question below.</p>
-            <button class="back-to-menu" id="backToMenuHelp"><i class="fas fa-home"></i> Home</button>
+                <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #1e40af; margin-bottom: 10px;">🎯 What I Can Help You With:</h4>
+                    <ul style="margin-left: 15px; color: #374151;">
+                        <li><strong>Fetch ARM Error Reports:</strong> Get test failure data from CDCARM system with custom filters</li>
+                        <li><strong>Analyze Test Failures:</strong> Process and understand test failure patterns</li>
+                        <li><strong>Filter by Parameters:</strong> Search by products (DISCO, Fluent, etc.), releases, platforms, owners</li>
+                        <li><strong>Generate Reports:</strong> Create downloadable JSON reports for further analysis</li>
+                    </ul>
+                </div>
+
+                <div style="background: #ecfdf5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #059669; margin-bottom: 10px;">💡 Quick Tips:</h4>
+                    <ul style="margin-left: 15px; color: #374151;">
+                        <li>Use <strong>"Fetch ARM Error Reports"</strong> to get the latest test failure data</li>
+                        <li>Specify owner names (case-sensitive) to filter results by specific team members</li>
+                        <li>Set minimum failing builds threshold to focus on chronic failures</li>
+                        <li>Type natural questions like "get failures for DISCO" or "show me Windows issues"</li>
+                    </ul>
+                </div>
+
+                <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #d97706; margin-bottom: 10px;">🚀 Getting Started:</h4>
+                    <p style="color: #374151; margin-bottom: 10px;">
+                        1. Click <strong>"Fetch ARM Error Reports"</strong> from the main menu<br>
+                        2. Fill in your search criteria (Products, Releases, Platforms)<br>
+                        3. Set filtering options (Owner, Min Failing Builds)<br>
+                        4. Click "Run Predictions" to fetch the data
+                    </p>
+                </div>
+
+                <div style="background: #e0e7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="color: #4338ca; margin-bottom: 10px;">💬 Natural Language Support:</h4>
+                    <p style="color: #374151;">
+                        You can also type commands like:<br>
+                        • "Get DISCO failures for Windows"<br>
+                        • "Show me release 25.2 issues"<br>
+                        • "Fetch data for owner John"<br>
+                        • "Back to menu" or "Home"
+                    </p>
+                </div>
+
+                <button class="back-to-menu" id="backToMenuHelp">
+                    <i class="fas fa-home"></i> Back to Home
+                </button>
+            </div>
         `;
         chatBody.appendChild(helpMessage);
         chatBody.scrollTop = chatBody.scrollHeight;
