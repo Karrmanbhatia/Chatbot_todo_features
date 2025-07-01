@@ -116,15 +116,12 @@ function showWelcomeButtons() {
     const buttonMessage = createBotMessage();
     buttonMessage.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
-            <button id="cdcarmUrlBtn" class="option-btn">
-                <i class="fas fa-link"></i>
-                <span>Generate CDCARM URL</span>
-            </button>
-            <button id="helpBtn" class="option-btn">
+          
+            <button id="helpBtn" class="option-btn animated-btn">
                 <i class="fas fa-question-circle"></i>
                 <span>Help & Information</span>
             </button>
-            <button id="cdcarmJsonBtn" class="option-btn">
+            <button id="cdcarmJsonBtn" class="option-btn animated-btn">
                 <i class="fas fa-file-download"></i>
                 <span>Fetch ARM Error Reports </span>
             </button>
@@ -133,8 +130,20 @@ function showWelcomeButtons() {
     
     chatBody.appendChild(buttonMessage); // Add to chatBody, not optionPanel
     
+    // Add staggered animation to buttons
+    const buttons = buttonMessage.querySelectorAll('.animated-btn');
+    buttons.forEach((btn, index) => {
+        btn.style.opacity = '0';
+        btn.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            btn.style.transition = 'all 0.3s ease';
+            btn.style.opacity = '1';
+            btn.style.transform = 'translateY(0)';
+        }, index * 100 + 200);
+    });
+    
     // Add event listeners
-    document.getElementById('cdcarmUrlBtn').addEventListener('click', showCDCARMOptions);
+    //document.getElementById('cdcarmUrlBtn').addEventListener('click', showCDCARMOptions);
     document.getElementById('helpBtn').addEventListener('click', showHelpInformation);
     document.getElementById('cdcarmJsonBtn').addEventListener('click', showCDCARMJsonOptions);
     
@@ -151,36 +160,36 @@ function showUploadOptions() {
     replyWithBotMessage("Upload & Analysis feature coming soon.");
 }
 
-function showCDCARMOptions() {
-    optionPanel.style.display = 'none';
-    chatBody.style.display = 'block';
-    chatFooter.style.display = 'flex';
-    currentContext = 'cdcarm';
+// function showCDCARMOptions() {
+//     optionPanel.style.display = 'none';
+//     chatBody.style.display = 'block';
+//     chatFooter.style.display = 'flex';
+//     currentContext = 'cdcarm';
 
-    showTypingIndicator().then(() => {
-        const message = createBotMessage();
-        message.innerHTML = `
-            <p>Please select options for your CDCARM URL:</p>
-            <div class="url-options active">
-                <label class="option-label">
-                    <input type="radio" name="report_type" value="with" class="option-radio" checked> With Investigation Report
-                </label>
-                <label class="option-label">
-                    <input type="radio" name="report_type" value="without" class="option-radio"> Without Investigation Report
-                </label>
-                <label class="option-label">
-                    Owner (optional):
-                    <input type="text" class="owner-input" id="ownerInput" placeholder="Enter owner name">
-                </label>
-                <button class="generate-btn" id="generateUrlBtn"><i class="fas fa-link"></i> Generate URL</button>
-            </div>
-        `;
-        chatBody.appendChild(message);
-        chatBody.scrollTop = chatBody.scrollHeight;
+//     showTypingIndicator().then(() => {
+//         const message = createBotMessage();
+//         message.innerHTML = `
+//             <p>Please select options for your CDCARM URL:</p>
+//             <div class="url-options active">
+//                 <label class="option-label">
+//                     <input type="radio" name="report_type" value="with" class="option-radio" checked> With Investigation Report
+//                 </label>
+//                 <label class="option-label">
+//                     <input type="radio" name="report_type" value="without" class="option-radio"> Without Investigation Report
+//                 </label>
+//                 <label class="option-label">
+//                     Owner (optional):
+//                     <input type="text" class="owner-input" id="ownerInput" placeholder="Enter owner name">
+//                 </label>
+//                 <button class="generate-btn" id="generateUrlBtn"><i class="fas fa-link"></i> Generate URL</button>
+//             </div>
+//         `;
+//         chatBody.appendChild(message);
+//         chatBody.scrollTop = chatBody.scrollHeight;
 
-        document.getElementById('generateUrlBtn').addEventListener('click', generateCDCARMUrl);
-    });
-}
+//         document.getElementById('generateUrlBtn').addEventListener('click', generateCDCARMUrl);
+//     });
+// }
 
 function showHelpInformation() {
     optionPanel.style.display = 'none';
@@ -191,14 +200,55 @@ function showHelpInformation() {
     showTypingIndicator().then(() => {
         const helpMessage = createBotMessage();
         helpMessage.innerHTML = `
-            <p><strong>Test Failure Analyzer Help</strong></p>
-            <p>This assistant can help you with:</p>
-            <ul style="margin-left: 20px; padding-left: 0;">
-                <li><strong>Generate CDCARM URLs</strong> - Create URLs with or without investigation reports for specific owners</li>
-                <li><strong>Fetch CDCARM JSON</strong> - Download test failure data as JSON for offline analysis</li>
-            </ul>
-            <p>To get started, select an option from the menu or type your question below.</p>
-            <button class="back-to-menu" id="backToMenuHelp"><i class="fas fa-home"></i> Home</button>
+            <div class="help-container" style="line-height: 1.6;">
+                <h3 style="color: #2563eb; margin-bottom: 15px;">
+                    <i class="fas fa-info-circle"></i> Test Failure Analyzer Help
+               
+                <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #1e40af; margin-bottom: 10px;">🎯 What I Can Help You With:</h4>
+                    <ul style="margin-left: 15px; color: #374151;">
+                        <li><strong>Fetch ARM Error Reports:</strong> Get test failure data from CDCARM system with custom filters</li>
+                        <li><strong>Analyze Test Failures:</strong> Process and understand test failure patterns</li>
+                        <li><strong>Filter by Parameters:</strong> Search by products (DISCO, Fluent, etc.), releases, platforms, owners</li>
+                        <li><strong>Generate Reports:</strong> Create downloadable JSON reports for further analysis</li>
+                    </ul>
+                </div>
+
+                <div style="background: #ecfdf5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #059669; margin-bottom: 10px;">💡 Quick Tips:</h4>
+                    <ul style="margin-left: 15px; color: #374151;">
+                        <li>Use <strong>"Fetch ARM Error Reports"</strong> to get the latest test failure data</li>
+                        <li>Specify owner names (case-sensitive) to filter results by specific team members</li>
+                        <li>Set minimum failing builds threshold to focus on chronic failures</li>
+                        <li>Type natural questions like "get failures for DISCO" or "show me Windows issues"</li>
+                    </ul>
+                </div>
+
+                <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #d97706; margin-bottom: 10px;">🚀 Getting Started:</h4>
+                    <p style="color: #374151; margin-bottom: 10px;">
+                        1. Click <strong>"Fetch ARM Error Reports"</strong> from the main menu<br>
+                        2. Fill in your search criteria (Products, Releases, Platforms)<br>
+                        3. Set filtering options (Owner, Min Failing Builds)<br>
+                        4. Click "Run Predictions" to fetch the data
+                    </p>
+                </div>
+
+                <div style="background: #e0e7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="color: #4338ca; margin-bottom: 10px;">💬 Natural Language Support:</h4>
+                    <p style="color: #374151;">
+                        You can also type commands like:<br>
+                        • "Get DISCO failures for Windows"<br>
+                        • "Show me release 25.2 issues"<br>
+                        • "Fetch data for owner John"<br>
+                        • "Back to menu" or "Home"
+                    </p>
+                </div>
+
+                <button class="back-to-menu" id="backToMenuHelp">
+                    <i class="fas fa-home"></i> Back to Home
+                </button>
+            </div>
         `;
         chatBody.appendChild(helpMessage);
         chatBody.scrollTop = chatBody.scrollHeight;
@@ -247,7 +297,7 @@ function processMessage(message) {
         } else if (lowerMsg.includes('json') || lowerMsg.includes('download') || lowerMsg.includes('fetch')) {
             showCDCARMJsonOptions();
         } else {
-            replyWithBotMessage("I'm here to help you generate CDCARM URLs and analyze test failures. How can I assist you today?");
+            replyWithBotMessage("I'm here to help you generate ARM Error Report and analyze test failures. How can I assist you today?");
         }
     }
 }
@@ -277,10 +327,11 @@ function handleJsonDownload(payload) {
     downloadMessage.innerHTML = `
         <div class="download-container">
             <p>✅ Successfully fetched ${recordCount} records.</p>
+            <!-- COMMENTED OUT: Download button not required now
             <button class="download-btn" id="downloadJsonBtn">
                 <i class="fas fa-download"></i> Download results
-
             </button>
+            -->
             <button class="back-to-menu" id="backToMenuJson">
                 <i class="fas fa-home"></i> Home
             </button>
@@ -289,6 +340,7 @@ function handleJsonDownload(payload) {
     chatBody.appendChild(downloadMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
     
+    /* COMMENTED OUT: Download functionality not required now
     document.getElementById('downloadJsonBtn').addEventListener('click', () => {
         try {
             let jsonData;
@@ -318,6 +370,7 @@ function handleJsonDownload(payload) {
             replyWithBotMessage(`Error downloading file: ${error.message}. Please try again.`);
         }
     });
+    */
     
     document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
 }
@@ -327,13 +380,11 @@ async function populateDynamicDatalists() {
         const productRes = await fetch("http://localhost:5000/api/products");
         const products = await productRes.json();
         const productList = document.getElementById("productsList");
-		products.forEach(p => {
-			productMap[p.Name] = p.Id;
-			const opt = document.createElement("option");
-			opt.value = p.Name;
-			productList.appendChild(opt);
-		});
-		productMap["DISCO_WB"] = 97;
+        products.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p.Name;
+            productList.appendChild(opt);
+        });
         console.log(`✅ Products fetched: ${products.length}`);
 
         const releaseRes = await fetch("http://localhost:5000/api/releases");
@@ -430,12 +481,29 @@ function showTypingIndicator() {
         const typingIndicator = document.createElement('div');
         typingIndicator.className = 'typing-indicator';
         typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+        typingIndicator.style.opacity = '0';
+        typingIndicator.style.transform = 'translateY(10px)';
         chatBody.appendChild(typingIndicator);
+        
+        // Animate in
+        setTimeout(() => {
+            typingIndicator.style.transition = 'all 0.3s ease';
+            typingIndicator.style.opacity = '1';
+            typingIndicator.style.transform = 'translateY(0)';
+        }, 50);
+        
         chatBody.scrollTop = chatBody.scrollHeight;
 
         setTimeout(() => {
-            chatBody.removeChild(typingIndicator);
-            resolve();
+            // Animate out
+            typingIndicator.style.opacity = '0';
+            typingIndicator.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                if (typingIndicator.parentNode) {
+                    chatBody.removeChild(typingIndicator);
+                }
+                resolve();
+            }, 300);
         }, 800);
     });
 }
@@ -444,12 +512,26 @@ function createUserMessage(text) {
     const message = document.createElement('div');
     message.className = 'message user-message';
     message.textContent = text;
+    message.style.opacity = '0';
+    message.style.transform = 'translateX(20px)';
+    setTimeout(() => {
+        message.style.transition = 'all 0.3s ease';
+        message.style.opacity = '1';
+        message.style.transform = 'translateX(0)';
+    }, 50);
     return message;
 }
 
 function createBotMessage() {
     const message = document.createElement('div');
     message.className = 'message bot-message';
+    message.style.opacity = '0';
+    message.style.transform = 'translateX(-20px)';
+    setTimeout(() => {
+        message.style.transition = 'all 0.3s ease';
+        message.style.opacity = '1';
+        message.style.transform = 'translateX(0)';
+    }, 50);
     return message;
 }
 
@@ -514,198 +596,35 @@ function fetchCDCARMJson() {
     const releases = document.getElementById('releasesInput').value.trim() || "25.2";
     const platforms = document.getElementById('platformsInput').value.trim() || "Windows";
     const minFailingBuilds = document.getElementById('minFailingInput').value.trim() || "2";
-    const ownerFilter = document.getElementById('ownerJsonInput').value.trim() || "all";
-
-    const userMsg = createUserMessage(`Running prediction for products: ${products}, releases: ${releases}, platforms: ${platforms}, min failing: ${minFailingBuilds}, owner filter: ${ownerFilter}`);
+    const owner = document.getElementById('ownerJsonInput').value.trim() || "all";
+    
+   // REMOVED: Blue user message that was showing the fetch parameters
+    const userMsg = createUserMessage(`Fetching ARM Error report data for Products: ${products}, Releases: ${releases}, Platforms: ${platforms}, Min failing builds: ${minFailingBuilds}, Owner: ${owner}`);
     chatBody.appendChild(userMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
-
+    
     const progressMessage = createBotMessage();
     progressMessage.innerHTML = `
-        <p>Fetching and analyzing data...</p>
-        <div class="progress-container"><div class="progress-bar" id="jsonProgressBar"></div></div>
+        <p>Fetching CDCARM data with these parameters:</p>
+        <ul style="margin-left: 20px; padding-left: 0;">
+            <li><strong>Products:</strong> ${products}</li>
+            <li><strong>Releases:</strong> ${releases}</li>
+            <li><strong>Platforms:</strong> ${platforms}</li>
+            <li><strong>Min Failing Builds:</strong> ${minFailingBuilds}</li>
+            <li><strong>Owner:</strong> ${owner}</li>
+        </ul>
+        <div class="progress-container">
+            <div class="progress-bar" id="jsonProgressBar"></div>
+        </div>
     `;
     chatBody.appendChild(progressMessage);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    
     const progressBar = document.getElementById('jsonProgressBar');
     progressBar.style.width = '30%';
-
-    fetch("http://localhost:5000/fetch_cdcarm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            products,
-            releases,
-            platforms,
-            min_failing_builds: minFailingBuilds
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        progressBar.style.width = '100%';
-        if (data.data_type === "prediction_table") {
-            // filter on owner if required
-            let filtered = data.merged_summary;
-            if (ownerFilter !== "all") {
-                filtered = filtered.filter(x => x.Owner.toLowerCase() === ownerFilter.toLowerCase());
-            }
-            displayPredictionResults(filtered);
-            chatBody.removeChild(progressMessage);
-        } else {
-            throw new Error("Unexpected response type");
-        }
-    })
-    .catch(error => {
-        console.error("Prediction flow error:", error);
-        progressBar.style.width = '100%';
-        setTimeout(() => {
-            chatBody.removeChild(progressMessage);
-            replyWithBotMessage(`⚠️ Error during prediction: ${error.message}`);
-        }, 500);
-    });
+    
+    tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage);
 }
-
-// place this globally
-let allPredictions = [];
-let productMap = {}; // name → id
-// helper for test link
-function buildTestLink(testName, productName="DISCO") {
-    const encoded = encodeURIComponent(testName);
-    const productId = productMap[productName] || 72; // fallback to 72
-    return `https://cdcarm.win.ansys.com/Reports/Unified/ErrorReport/Product/${productId}?applicationId=-1&platformId=1&releaseId=289&allPackages=True&filterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Filters.TestNameFilter%2COperator%3ACONTAINS%2CValue%3A${encoded}&highlighterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Highlighters.RunAgeHighlighter%2COperator%3AGREATER_THAN_OR_EQUAL%2CValue%3A7&officialOnly=False&chronicFailureThreshold=0&noCache=False&showNonChronicFailures=true`;
-}
-
-// helper for investigation link
-function buildInvestigationLink(workItemId) {
-    return `https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${workItemId}`;
-}
-
-function displayPredictionResults(predictions, ownerFilter = "") {
-    if (!predictions.length) {
-        const botMsg = createBotMessage();
-        botMsg.innerHTML = `<p>No matching tests found for the selected owner.</p>`;
-        chatBody.appendChild(botMsg);
-        chatBody.scrollTop = chatBody.scrollHeight;
-        return;
-    }
-
-    allPredictions = predictions;
-
-    const owners = [...new Set(allPredictions.map(p => p.Owner))];
-    const ownerOptions = owners.map(owner => 
-        `<option value="${owner}" ${owner.toLowerCase() === ownerFilter.toLowerCase() ? 'selected' : ''}>${owner}</option>`
-    ).join('');
-
-    const filtered = ownerFilter
-        ? predictions.filter(p => p.Owner.trim().toLowerCase() === ownerFilter.toLowerCase())
-        : predictions;
-
-    // group by TestName
-    const grouped = {};
-    filtered.forEach(p => {
-        const test = p.TestName;
-        if (!grouped[test]) {
-            grouped[test] = {
-                Owner: p.Owner,
-                Product: p.Product || "DISCO",
-                WorkItems: new Set()
-            };
-        }
-        if (p.PredictedWorkItemId && p.PredictedWorkItemId !== "-") {
-            p.PredictedWorkItemId.split(";").forEach(wi => grouped[test].WorkItems.add(wi.trim()));
-        }
-    });
-
-    const botMsg = createBotMessage();
-    botMsg.innerHTML = `
-      <h4>🔎 Prediction Results:</h4>
-      <div class="owner-filter-container" style="margin-bottom:10px;">
-        <label for="ownerFilterSelect"><strong>Owner Filter:</strong></label>
-        <select id="ownerFilterSelect" class="option-input" style="width:200px;">
-            <option value="">All</option>
-            ${ownerOptions}
-        </select>
-        <button id="applyOwnerFilterBtn" class="fetch-json-btn">
-            <i class="fas fa-filter"></i> Apply
-        </button>
-        <button id="exportCSV" class="fetch-json-btn" style="margin-left:10px;">
-            <i class="fas fa-download"></i> Export CSV
-        </button>
-      </div>
-      <div style="max-height:300px; overflow:auto;">
-        <table class="prediction-table" id="predictionResultTable">
-          <thead>
-            <tr>
-              <th>Test Name</th>
-              <th>Owner</th>
-              <th>Predicted Work Item IDs</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${Object.entries(grouped).map(([testName, info]) => `
-              <tr>
-                <td>
-                  <a href="${buildTestLink(testName, info.Product)}" target="_blank">${testName}</a>
-                </td>
-                <td>${info.Owner}</td>
-                <td>
-                  ${[...info.WorkItems].map(wi => 
-                    `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
-                  ).join(", ") || "-"}
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-      <button class="back-to-menu" id="backToMenuPred" style="margin-top:10px;">
-        <i class="fas fa-home"></i> Home
-      </button>
-    `;
-    chatBody.appendChild(botMsg);
-    chatBody.scrollTop = chatBody.scrollHeight;
-
-    document.getElementById('applyOwnerFilterBtn').addEventListener('click', () => {
-        const owner = document.getElementById('ownerFilterSelect').value.trim();
-        chatBody.removeChild(botMsg);
-        displayPredictionResults(allPredictions, owner);
-    });
-
-    document.getElementById('exportCSV').addEventListener('click', () => {
-        exportTableToCSV("#predictionResultTable");
-    });
-
-    document.getElementById('backToMenuPred').addEventListener('click', () => {
-        allPredictions = [];
-        showMainMenu();
-    });
-}
-
-
-function exportTableToCSV(tableSelector, filename = "prediction_results.csv") {
-    const rows = document.querySelectorAll(`${tableSelector} tr`);
-    let csv = [];
-
-    rows.forEach(row => {
-        const cols = row.querySelectorAll('td, th');
-        const rowData = [];
-        cols.forEach(col => {
-            rowData.push(`"${col.textContent.trim().replace(/"/g, '""')}"`);
-        });
-        csv.push(rowData.join(","));
-    });
-
-    const csvString = csv.join("\n");
-    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-
 
 function tryFetchData(products, releases, platforms, minFailingBuilds, owner, progressBar, progressMessage) {
     console.log('Calling Flask backend at /fetch_cdcarm with:', { products, releases, platforms, minFailingBuilds, owner });
@@ -742,9 +661,11 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
             downloadMessage.innerHTML = `
                 <div class="download-container">
                     <p>✅ Successfully fetched ${recordCount} records.</p>
+                    <!-- COMMENTED OUT: Download button not required now
                     <button class="download-btn" id="downloadJsonBtn">
                         <i class="fas fa-download"></i> Download JSON File
                     </button>
+                    -->
                     <button class="back-to-menu" id="backToMenuJson">
                         <i class="fas fa-home"></i> Home
                     </button>
@@ -753,6 +674,7 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
             chatBody.appendChild(downloadMessage);
             chatBody.scrollTop = chatBody.scrollHeight;
 
+            /* COMMENTED OUT: Download functionality not required now
             document.getElementById('downloadJsonBtn').addEventListener('click', () => {
                 let jsonData;
                 try {
@@ -771,6 +693,7 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             });
+            */
 
             document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
         }, 500);
@@ -809,9 +732,11 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
     downloadMessage.innerHTML = `
         <div class="download-container">
             <p>Demo data created (${dummyData.length} records).</p>
+            <!-- COMMENTED OUT: Demo download button not required now
             <button class="download-btn" id="downloadDemoBtn">
                 <i class="fas fa-download"></i> Download Demo JSON
             </button>
+            -->
             <button class="back-to-menu" id="backToMenuDemo">
                 <i class="fas fa-home"></i> Home
             </button>
@@ -820,6 +745,7 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
     chatBody.appendChild(downloadMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
     
+    /* COMMENTED OUT: Demo download functionality not required now
     document.getElementById('downloadDemoBtn').addEventListener('click', () => {
         const blob = new Blob([jsonString], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -831,6 +757,7 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     });
+    */
     
     document.getElementById('backToMenuDemo').addEventListener('click', showMainMenu);
 }
