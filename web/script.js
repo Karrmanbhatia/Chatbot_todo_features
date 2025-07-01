@@ -116,10 +116,7 @@ function showWelcomeButtons() {
     const buttonMessage = createBotMessage();
     buttonMessage.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
-            <button id="cdcarmUrlBtn" class="option-btn animated-btn">
-                <i class="fas fa-link"></i>
-                <span>Generate CDCARM URL</span>
-            </button>
+          
             <button id="helpBtn" class="option-btn animated-btn">
                 <i class="fas fa-question-circle"></i>
                 <span>Help & Information</span>
@@ -146,7 +143,7 @@ function showWelcomeButtons() {
     });
     
     // Add event listeners
-    document.getElementById('cdcarmUrlBtn').addEventListener('click', showCDCARMOptions);
+    //document.getElementById('cdcarmUrlBtn').addEventListener('click', showCDCARMOptions);
     document.getElementById('helpBtn').addEventListener('click', showHelpInformation);
     document.getElementById('cdcarmJsonBtn').addEventListener('click', showCDCARMJsonOptions);
     
@@ -163,36 +160,36 @@ function showUploadOptions() {
     replyWithBotMessage("Upload & Analysis feature coming soon.");
 }
 
-function showCDCARMOptions() {
-    optionPanel.style.display = 'none';
-    chatBody.style.display = 'block';
-    chatFooter.style.display = 'flex';
-    currentContext = 'cdcarm';
+// function showCDCARMOptions() {
+//     optionPanel.style.display = 'none';
+//     chatBody.style.display = 'block';
+//     chatFooter.style.display = 'flex';
+//     currentContext = 'cdcarm';
 
-    showTypingIndicator().then(() => {
-        const message = createBotMessage();
-        message.innerHTML = `
-            <p>Please select options for your CDCARM URL:</p>
-            <div class="url-options active">
-                <label class="option-label">
-                    <input type="radio" name="report_type" value="with" class="option-radio" checked> With Investigation Report
-                </label>
-                <label class="option-label">
-                    <input type="radio" name="report_type" value="without" class="option-radio"> Without Investigation Report
-                </label>
-                <label class="option-label">
-                    Owner (optional):
-                    <input type="text" class="owner-input" id="ownerInput" placeholder="Enter owner name">
-                </label>
-                <button class="generate-btn" id="generateUrlBtn"><i class="fas fa-link"></i> Generate URL</button>
-            </div>
-        `;
-        chatBody.appendChild(message);
-        chatBody.scrollTop = chatBody.scrollHeight;
+//     showTypingIndicator().then(() => {
+//         const message = createBotMessage();
+//         message.innerHTML = `
+//             <p>Please select options for your CDCARM URL:</p>
+//             <div class="url-options active">
+//                 <label class="option-label">
+//                     <input type="radio" name="report_type" value="with" class="option-radio" checked> With Investigation Report
+//                 </label>
+//                 <label class="option-label">
+//                     <input type="radio" name="report_type" value="without" class="option-radio"> Without Investigation Report
+//                 </label>
+//                 <label class="option-label">
+//                     Owner (optional):
+//                     <input type="text" class="owner-input" id="ownerInput" placeholder="Enter owner name">
+//                 </label>
+//                 <button class="generate-btn" id="generateUrlBtn"><i class="fas fa-link"></i> Generate URL</button>
+//             </div>
+//         `;
+//         chatBody.appendChild(message);
+//         chatBody.scrollTop = chatBody.scrollHeight;
 
-        document.getElementById('generateUrlBtn').addEventListener('click', generateCDCARMUrl);
-    });
-}
+//         document.getElementById('generateUrlBtn').addEventListener('click', generateCDCARMUrl);
+//     });
+// }
 
 function showHelpInformation() {
     optionPanel.style.display = 'none';
@@ -206,8 +203,7 @@ function showHelpInformation() {
             <p><strong>Test Failure Analyzer Help</strong></p>
             <p>This assistant can help you with:</p>
             <ul style="margin-left: 20px; padding-left: 0;">
-                <li><strong>Generate CDCARM URLs</strong> - Create URLs with or without investigation reports for specific owners</li>
-                <li><strong>Fetch CDCARM JSON</strong> - Download test failure data as JSON for offline analysis</li>
+               
             </ul>
             <p>To get started, select an option from the menu or type your question below.</p>
             <button class="back-to-menu" id="backToMenuHelp"><i class="fas fa-home"></i> Home</button>
@@ -259,7 +255,7 @@ function processMessage(message) {
         } else if (lowerMsg.includes('json') || lowerMsg.includes('download') || lowerMsg.includes('fetch')) {
             showCDCARMJsonOptions();
         } else {
-            replyWithBotMessage("I'm here to help you generate CDCARM URLs and analyze test failures. How can I assist you today?");
+            replyWithBotMessage("I'm here to help you generate ARM Error Report and analyze test failures. How can I assist you today?");
         }
     }
 }
@@ -560,10 +556,10 @@ function fetchCDCARMJson() {
     const minFailingBuilds = document.getElementById('minFailingInput').value.trim() || "2";
     const owner = document.getElementById('ownerJsonInput').value.trim() || "all";
     
-    // REMOVED: Blue user message that was showing the fetch parameters
-    // const userMsg = createUserMessage(`Fetch CDCARM JSON for products: ${products}, releases: ${releases}, platforms: ${platforms}, min failing: ${minFailingBuilds}, owner: ${owner}`);
-    // chatBody.appendChild(userMsg);
-    // chatBody.scrollTop = chatBody.scrollHeight;
+   // REMOVED: Blue user message that was showing the fetch parameters
+    const userMsg = createUserMessage(`Fetching ARM Error report data for Products: ${products}, Releases: ${releases}, Platforms: ${platforms}, Min failing builds: ${minFailingBuilds}, Owner: ${owner}`);
+    chatBody.appendChild(userMsg);
+    chatBody.scrollTop = chatBody.scrollHeight;
     
     const progressMessage = createBotMessage();
     progressMessage.innerHTML = `
