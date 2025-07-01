@@ -327,11 +327,12 @@ async function populateDynamicDatalists() {
         const productRes = await fetch("http://localhost:5000/api/products");
         const products = await productRes.json();
         const productList = document.getElementById("productsList");
-        products.forEach(p => {
-            const opt = document.createElement("option");
-            opt.value = p.Name;
-            productList.appendChild(opt);
-        });
+		products.forEach(p => {
+			productMap[p.Name] = p.Id;
+			const opt = document.createElement("option");
+			opt.value = p.Name;
+			productList.appendChild(opt);
+		});
         console.log(`✅ Products fetched: ${products.length}`);
 
         const releaseRes = await fetch("http://localhost:5000/api/releases");
@@ -562,8 +563,20 @@ function fetchCDCARMJson() {
     });
 }
 
-// put this global at top of your JS file
+// place this globally
 let allPredictions = [];
+let productMap = {}; // name → id
+// helper for test link
+function buildTestLink(testName, productName="DISCO") {
+    const encoded = encodeURIComponent(testName);
+    const productId = productMap[productName] || 72; // fallback to 72
+    return `https://cdcarm.win.ansys.com/Reports/Unified/ErrorReport/Product/${productId}?applicationId=-1&platformId=1&releaseId=289&allPackages=True&filterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Filters.TestNameFilter%2COperator%3ACONTAINS%2CValue%3A${encoded}&highlighterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Highlighters.RunAgeHighlighter%2COperator%3AGREATER_THAN_OR_EQUAL%2CValue%3A7&officialOnly=False&chronicFailureThreshold=0&noCache=False&showNonChronicFailures=true`;
+}
+
+// helper for investigation link
+function buildInvestigationLink(workItemId) {
+    return `https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${workItemId}`;
+}
 
 function displayPredictionResults(predictions, ownerFilter = "") {
     if (!predictions.length) {
@@ -582,8 +595,8 @@ function displayPredictionResults(predictions, ownerFilter = "") {
     ).join('');
 
     const filtered = ownerFilter
-      ? predictions.filter(p => p.Owner.trim().toLowerCase() === ownerFilter.toLowerCase())
-      : predictions;
+        ? predictions.filter(p => p.Owner.trim().toLowerCase() === ownerFilter.toLowerCase())
+        : predictions;
 
     // group by TestName
     const grouped = {};
@@ -592,6 +605,7 @@ function displayPredictionResults(predictions, ownerFilter = "") {
         if (!grouped[test]) {
             grouped[test] = {
                 Owner: p.Owner,
+                Product: p.Product || "DISCO",
                 WorkItems: new Set()
             };
         }
@@ -628,9 +642,15 @@ function displayPredictionResults(predictions, ownerFilter = "") {
           <tbody>
             ${Object.entries(grouped).map(([testName, info]) => `
               <tr>
-                <td>${testName}</td>
+                <td>
+                  <a href="${buildTestLink(testName, info.Product)}" target="_blank">${testName}</a>
+                </td>
                 <td>${info.Owner}</td>
-                <td>${[...info.WorkItems].join(", ") || "-"}</td>
+                <td>
+                  ${[...info.WorkItems].map(wi => 
+                    `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
+                  ).join(", ") || "-"}
+                </td>
               </tr>
             `).join('')}
           </tbody>
@@ -658,6 +678,7 @@ function displayPredictionResults(predictions, ownerFilter = "") {
         showMainMenu();
     });
 }
+
 
 function exportTableToCSV(tableSelector, filename = "prediction_results.csv") {
     const rows = document.querySelectorAll(`${tableSelector} tr`);
