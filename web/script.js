@@ -116,15 +116,15 @@ function showWelcomeButtons() {
     const buttonMessage = createBotMessage();
     buttonMessage.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
-            <button id="cdcarmUrlBtn" class="option-btn">
+            <button id="cdcarmUrlBtn" class="option-btn animated-btn">
                 <i class="fas fa-link"></i>
                 <span>Generate CDCARM URL</span>
             </button>
-            <button id="helpBtn" class="option-btn">
+            <button id="helpBtn" class="option-btn animated-btn">
                 <i class="fas fa-question-circle"></i>
                 <span>Help & Information</span>
             </button>
-            <button id="cdcarmJsonBtn" class="option-btn">
+            <button id="cdcarmJsonBtn" class="option-btn animated-btn">
                 <i class="fas fa-file-download"></i>
                 <span>Fetch ARM Error Reports </span>
             </button>
@@ -132,6 +132,18 @@ function showWelcomeButtons() {
     `;
     
     chatBody.appendChild(buttonMessage); // Add to chatBody, not optionPanel
+    
+    // Add staggered animation to buttons
+    const buttons = buttonMessage.querySelectorAll('.animated-btn');
+    buttons.forEach((btn, index) => {
+        btn.style.opacity = '0';
+        btn.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+            btn.style.transition = 'all 0.3s ease';
+            btn.style.opacity = '1';
+            btn.style.transform = 'translateY(0)';
+        }, index * 100 + 200);
+    });
     
     // Add event listeners
     document.getElementById('cdcarmUrlBtn').addEventListener('click', showCDCARMOptions);
@@ -277,10 +289,11 @@ function handleJsonDownload(payload) {
     downloadMessage.innerHTML = `
         <div class="download-container">
             <p>✅ Successfully fetched ${recordCount} records.</p>
+            <!-- COMMENTED OUT: Download button not required now
             <button class="download-btn" id="downloadJsonBtn">
                 <i class="fas fa-download"></i> Download results
-
             </button>
+            -->
             <button class="back-to-menu" id="backToMenuJson">
                 <i class="fas fa-home"></i> Home
             </button>
@@ -289,6 +302,7 @@ function handleJsonDownload(payload) {
     chatBody.appendChild(downloadMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
     
+    /* COMMENTED OUT: Download functionality not required now
     document.getElementById('downloadJsonBtn').addEventListener('click', () => {
         try {
             let jsonData;
@@ -318,6 +332,7 @@ function handleJsonDownload(payload) {
             replyWithBotMessage(`Error downloading file: ${error.message}. Please try again.`);
         }
     });
+    */
     
     document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
 }
@@ -428,12 +443,29 @@ function showTypingIndicator() {
         const typingIndicator = document.createElement('div');
         typingIndicator.className = 'typing-indicator';
         typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+        typingIndicator.style.opacity = '0';
+        typingIndicator.style.transform = 'translateY(10px)';
         chatBody.appendChild(typingIndicator);
+        
+        // Animate in
+        setTimeout(() => {
+            typingIndicator.style.transition = 'all 0.3s ease';
+            typingIndicator.style.opacity = '1';
+            typingIndicator.style.transform = 'translateY(0)';
+        }, 50);
+        
         chatBody.scrollTop = chatBody.scrollHeight;
 
         setTimeout(() => {
-            chatBody.removeChild(typingIndicator);
-            resolve();
+            // Animate out
+            typingIndicator.style.opacity = '0';
+            typingIndicator.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                if (typingIndicator.parentNode) {
+                    chatBody.removeChild(typingIndicator);
+                }
+                resolve();
+            }, 300);
         }, 800);
     });
 }
@@ -442,12 +474,26 @@ function createUserMessage(text) {
     const message = document.createElement('div');
     message.className = 'message user-message';
     message.textContent = text;
+    message.style.opacity = '0';
+    message.style.transform = 'translateX(20px)';
+    setTimeout(() => {
+        message.style.transition = 'all 0.3s ease';
+        message.style.opacity = '1';
+        message.style.transform = 'translateX(0)';
+    }, 50);
     return message;
 }
 
 function createBotMessage() {
     const message = document.createElement('div');
     message.className = 'message bot-message';
+    message.style.opacity = '0';
+    message.style.transform = 'translateX(-20px)';
+    setTimeout(() => {
+        message.style.transition = 'all 0.3s ease';
+        message.style.opacity = '1';
+        message.style.transform = 'translateX(0)';
+    }, 50);
     return message;
 }
 
@@ -514,9 +560,10 @@ function fetchCDCARMJson() {
     const minFailingBuilds = document.getElementById('minFailingInput').value.trim() || "2";
     const owner = document.getElementById('ownerJsonInput').value.trim() || "all";
     
-    const userMsg = createUserMessage(`Fetch CDCARM JSON for products: ${products}, releases: ${releases}, platforms: ${platforms}, min failing: ${minFailingBuilds}, owner: ${owner}`);
-    chatBody.appendChild(userMsg);
-    chatBody.scrollTop = chatBody.scrollHeight;
+    // REMOVED: Blue user message that was showing the fetch parameters
+    // const userMsg = createUserMessage(`Fetch CDCARM JSON for products: ${products}, releases: ${releases}, platforms: ${platforms}, min failing: ${minFailingBuilds}, owner: ${owner}`);
+    // chatBody.appendChild(userMsg);
+    // chatBody.scrollTop = chatBody.scrollHeight;
     
     const progressMessage = createBotMessage();
     progressMessage.innerHTML = `
@@ -576,9 +623,11 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
             downloadMessage.innerHTML = `
                 <div class="download-container">
                     <p>✅ Successfully fetched ${recordCount} records.</p>
+                    <!-- COMMENTED OUT: Download button not required now
                     <button class="download-btn" id="downloadJsonBtn">
                         <i class="fas fa-download"></i> Download JSON File
                     </button>
+                    -->
                     <button class="back-to-menu" id="backToMenuJson">
                         <i class="fas fa-home"></i> Home
                     </button>
@@ -587,6 +636,7 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
             chatBody.appendChild(downloadMessage);
             chatBody.scrollTop = chatBody.scrollHeight;
 
+            /* COMMENTED OUT: Download functionality not required now
             document.getElementById('downloadJsonBtn').addEventListener('click', () => {
                 let jsonData;
                 try {
@@ -605,6 +655,7 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             });
+            */
 
             document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
         }, 500);
@@ -643,9 +694,11 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
     downloadMessage.innerHTML = `
         <div class="download-container">
             <p>Demo data created (${dummyData.length} records).</p>
+            <!-- COMMENTED OUT: Demo download button not required now
             <button class="download-btn" id="downloadDemoBtn">
                 <i class="fas fa-download"></i> Download Demo JSON
             </button>
+            -->
             <button class="back-to-menu" id="backToMenuDemo">
                 <i class="fas fa-home"></i> Home
             </button>
@@ -654,6 +707,7 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
     chatBody.appendChild(downloadMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
     
+    /* COMMENTED OUT: Demo download functionality not required now
     document.getElementById('downloadDemoBtn').addEventListener('click', () => {
         const blob = new Blob([jsonString], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -665,6 +719,7 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     });
+    */
     
     document.getElementById('backToMenuDemo').addEventListener('click', showMainMenu);
 }
