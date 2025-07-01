@@ -333,6 +333,7 @@ async function populateDynamicDatalists() {
 			opt.value = p.Name;
 			productList.appendChild(opt);
 		});
+		productMap["DISCO_WB"] = 97;
         console.log(`✅ Products fetched: ${products.length}`);
 
         const releaseRes = await fetch("http://localhost:5000/api/releases");
@@ -587,7 +588,7 @@ function displayPredictionResults(predictions, ownerFilter = "") {
         return;
     }
 
-    if (!allPredictions.length) allPredictions = predictions;
+    allPredictions = predictions;
 
     const owners = [...new Set(allPredictions.map(p => p.Owner))];
     const ownerOptions = owners.map(owner => 
