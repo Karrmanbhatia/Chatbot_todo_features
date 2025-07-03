@@ -112,16 +112,12 @@ function clearAndShowWelcome() {
     }, 500);
 }
 
-// FIXED: Show buttons without creating another welcome message
+// FIXED: Show buttons without creating another welcome message - CDCARM URL button removed
 function showWelcomeButtons() {
     // Put buttons in chatBody (same container as welcome message) instead of optionPanel
     const buttonMessage = createBotMessage();
     buttonMessage.innerHTML = `
         <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
-            <button id="cdcarmUrlBtn" class="option-btn">
-                <i class="fas fa-link"></i>
-                <span>Generate CDCARM URL</span>
-            </button>
             <button id="helpBtn" class="option-btn">
                 <i class="fas fa-question-circle"></i>
                 <span>Help & Information</span>
@@ -135,8 +131,7 @@ function showWelcomeButtons() {
     
     chatBody.appendChild(buttonMessage); // Add to chatBody, not optionPanel
     
-    // Add event listeners
-    document.getElementById('cdcarmUrlBtn').addEventListener('click', showCDCARMOptions);
+    // Add event listeners - CDCARM URL button removed
     document.getElementById('helpBtn').addEventListener('click', showHelpInformation);
     document.getElementById('cdcarmJsonBtn').addEventListener('click', showCDCARMJsonOptions);
     
@@ -153,37 +148,6 @@ function showUploadOptions() {
     replyWithBotMessage("Upload & Analysis feature coming soon.");
 }
 
-function showCDCARMOptions() {
-    optionPanel.style.display = 'none';
-    chatBody.style.display = 'block';
-    chatFooter.style.display = 'flex';
-    currentContext = 'cdcarm';
-
-    showTypingIndicator().then(() => {
-        const message = createBotMessage();
-        message.innerHTML = `
-            <p>Please select options for your CDCARM URL:</p>
-            <div class="url-options active">
-                <label class="option-label">
-                    <input type="radio" name="report_type" value="with" class="option-radio" checked> With Investigation Report
-                </label>
-                <label class="option-label">
-                    <input type="radio" name="report_type" value="without" class="option-radio"> Without Investigation Report
-                </label>
-                <label class="option-label">
-                    Owner (optional):
-                    <input type="text" class="owner-input" id="ownerInput" placeholder="Enter owner name">
-                </label>
-                <button class="generate-btn" id="generateUrlBtn"><i class="fas fa-link"></i> Generate URL</button>
-            </div>
-        `;
-        chatBody.appendChild(message);
-        chatBody.scrollTop = chatBody.scrollHeight;
-
-        document.getElementById('generateUrlBtn').addEventListener('click', generateCDCARMUrl);
-    });
-}
-
 function showHelpInformation() {
     optionPanel.style.display = 'none';
     chatBody.style.display = 'block';
@@ -196,7 +160,6 @@ function showHelpInformation() {
             <p><strong>Test Failure Analyzer Help</strong></p>
             <p>This assistant can help you with:</p>
             <ul style="margin-left: 20px; padding-left: 0;">
-                <li><strong>Generate CDCARM URLs</strong> - Create URLs with or without investigation reports for specific owners</li>
                 <li><strong>Fetch CDCARM JSON</strong> - Download test failure data as JSON for offline analysis</li>
             </ul>
             <p>To get started, select an option from the menu or type your question below.</p>
@@ -237,19 +200,15 @@ function processMessage(message) {
         return;
     }
 
-    if (currentContext === 'cdcarm') {
-        // Your existing cdcarm context code
-    } else if (currentContext === 'help') {
+    if (currentContext === 'help') {
         // Your existing help context code
     } else {
         if (lowerMsg.includes('hello') || lowerMsg.includes('hi')) {
             replyWithBotMessage("Hello! 👋 How can I help you today?");
-        } else if (lowerMsg.includes('cdcarm') || lowerMsg.includes('url')) {
-            handleCDCARMRequest(lowerMsg);
         } else if (lowerMsg.includes('json') || lowerMsg.includes('download') || lowerMsg.includes('fetch')) {
             showCDCARMJsonOptions();
         } else {
-            replyWithBotMessage("I'm here to help you generate CDCARM URLs and analyze test failures. How can I assist you today?");
+            replyWithBotMessage("I'm here to help you analyze test failures. How can I assist you today?");
         }
     }
 }
@@ -361,71 +320,6 @@ async function populateDynamicDatalists() {
     }
 }
 
-function handleCDCARMRequest(message) {
-    let withReport = !message.includes('without');
-    let owner = null;
-
-    const ownerMatch = message.match(/(?:owner|for)\s+(\w+)/i);
-    if (ownerMatch && ownerMatch[1]) {
-        owner = ownerMatch[1];
-    }
-
-    generateCDCARMUrlFromParams(withReport, owner);
-}
-
-function generateCDCARMUrl() {
-    const reportType = document.querySelector('input[name="report_type"]:checked').value;
-    const owner = document.getElementById('ownerInput').value.trim();
-
-    generateCDCARMUrlFromParams(reportType === 'with', owner || null);
-}
-
-function generateCDCARMUrlFromParams(withReport, owner) {
-    const baseUrl = "https://cdcarm.win.ansys.com/Reports/Unified/ErrorReport/Product/90";
-    const status = withReport ? "NOT%20NULL" : "NULL";
-    let url = `${baseUrl}?applicationId=-1&platformId=1&releaseId=252&allPackages=True&filterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Filters.InvestigationStatusFilter%2COperator%3AEQUAL%2CValue%3A${status}`;
-
-    if (owner) {
-        url += `%26Filter1%3DType%3AARM.WebFilters.TestResults.Filters.OwnerFilter%2COperator%3AEQUAL%2CValue%3A${owner}`;
-    }
-
-    url += "&highlighterCollection=MatchType%3DAll&officialOnly=False&chronicFailureThreshold=0&noCache=False&showNonChronicFailures=true";
-
-    const displayText = `CDCARM Report ${withReport ? 'with' : 'without'} Investigation${owner ? ` (Owner: ${owner})` : ''}`;
-    const reportStatus = withReport ? "with" : "without";
-    const ownerText = owner ? ` for owner ${owner}` : "";
-
-    const progressMessage = createBotMessage();
-    progressMessage.innerHTML = `
-        <p>Generating CDCARM URL ${reportStatus} investigation report${ownerText}...</p>
-        <div class="progress-container">
-            <div class="progress-bar" id="urlProgressBar"></div>
-        </div>
-    `;
-    chatBody.appendChild(progressMessage);
-    chatBody.scrollTop = chatBody.scrollHeight;
-
-    setTimeout(() => {
-        const progressBar = document.getElementById('urlProgressBar');
-        progressBar.style.width = '100%';
-
-        setTimeout(() => {
-            chatBody.removeChild(progressMessage);
-
-            const message = createBotMessage();
-            message.innerHTML = `
-                <p><i class="fas fa-check-circle" style="color: #10b981;"></i> Here's your CDCARM URL ${reportStatus} investigation report${ownerText}:</p>
-                <p><a href="${url}" target="_blank" class="url-link">${displayText}</a></p>
-                <button class="back-to-menu" id="backToMenuURL"><i class="fas fa-home"></i> Home</button>
-            `;
-            chatBody.appendChild(message);
-            chatBody.scrollTop = chatBody.scrollHeight;
-
-            document.getElementById('backToMenuURL').addEventListener('click', showMainMenu);
-        }, 1000);
-    }, 100);
-}
-
 function showTypingIndicator() {
     return new Promise(resolve => {
         const typingIndicator = document.createElement('div');
@@ -492,15 +386,17 @@ function showCDCARMJsonOptions() {
                     <input type="number" class="option-input" id="minFailingInput" placeholder="2" value="2" min="1">
                 </div>
 				
-                <div class="option-group">
-                    <label class="option-label">Owner (Case Sensitive):</label>
-                    <input type="text" class="option-input" id="ownerJsonInput" list="ownersList" placeholder="all" value="all">
-                </div>
+                
                 <button class="fetch-json-btn" id="fetchJsonBtn">
                     <i class="fas fa-download"></i> Run Predictions
                 </button>
             </div>
+            
         `;
+        // //<div class="option-group">
+        //             <label class="option-label">Owner (Case Sensitive):</label>
+        //             <input type="text" class="option-input" id="ownerJsonInput" list="ownersList" placeholder="all" value="all">
+        //         </div>
         chatBody.appendChild(message);
         chatBody.scrollTop = chatBody.scrollHeight;
 
@@ -517,7 +413,7 @@ function fetchCDCARMJson() {
     const minFailingBuilds = document.getElementById('minFailingInput').value.trim() || "2";
     const ownerFilter = document.getElementById('ownerJsonInput').value.trim() || "all";
 
-    const userMsg = createUserMessage(`Running prediction for products: ${products}, releases: ${releases}, platforms: ${platforms}, min failing: ${minFailingBuilds}, owner filter: ${ownerFilter}`);
+    const userMsg = createUserMessage(`Running prediction for Products: ${products}, Releases: ${releases}, Platforms: ${platforms}, Min Failing Builds: ${minFailingBuilds}`);//Owner Filter: ${ownerFilter}
     chatBody.appendChild(userMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
 
