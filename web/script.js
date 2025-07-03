@@ -41,6 +41,8 @@ const sendBtn = document.getElementById('sendBtn');
 let isExpanded = false;
 let currentContext = null;
 let selectedFile = null;
+let allPredictions = [];
+let productMap = {};
 
 // Chat icon click handler - FIXED
 chatIcon.addEventListener('click', () => {
@@ -563,15 +565,18 @@ function fetchCDCARMJson() {
     });
 }
 
-// place this globally
-let allPredictions = [];
-let productMap = {}; // name → id
+
 // helper for test link
-function buildTestLink(testName, productName="DISCO") {
+function buildTestLink(testName, productName) {
+    if (!productName) {
+        const input = document.getElementById('productsInput');
+        productName = input ? input.value.trim() : "DISCO";
+    }
     const encoded = encodeURIComponent(testName);
-    const productId = productMap[productName] || 72; // fallback to 72
+    const productId = productMap[productName] || 72; // fallback
     return `https://cdcarm.win.ansys.com/Reports/Unified/ErrorReport/Product/${productId}?applicationId=-1&platformId=1&releaseId=289&allPackages=True&filterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Filters.TestNameFilter%2COperator%3ACONTAINS%2CValue%3A${encoded}&highlighterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Highlighters.RunAgeHighlighter%2COperator%3AGREATER_THAN_OR_EQUAL%2CValue%3A7&officialOnly=False&chronicFailureThreshold=0&noCache=False&showNonChronicFailures=true`;
 }
+
 
 // helper for investigation link
 function buildInvestigationLink(workItemId) {
@@ -605,7 +610,7 @@ function displayPredictionResults(predictions, ownerFilter = "") {
         if (!grouped[test]) {
             grouped[test] = {
                 Owner: p.Owner,
-                Product: p.Product || "DISCO",
+                Product: p.Product,
                 WorkItems: new Set()
             };
         }
