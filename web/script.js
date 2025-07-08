@@ -43,6 +43,8 @@ let currentContext = null;
 let selectedFile = null;
 let allPredictions = [];
 let productMap = {};
+let releaseMap = {};
+let platformMap = {};
 
 // Chat icon click handler - FIXED
 chatIcon.addEventListener('click', () => {
@@ -285,31 +287,36 @@ function handleJsonDownload(payload) {
 
 async function populateDynamicDatalists() {
     try {
+        // Fetch Products
         const productRes = await fetch("http://localhost:5000/api/products");
         const products = await productRes.json();
         const productList = document.getElementById("productsList");
-		products.forEach(p => {
-			productMap[p.Name] = p.Id;
-			const opt = document.createElement("option");
-			opt.value = p.Name;
-			productList.appendChild(opt);
-		});
+        products.forEach(p => {
+            productMap[p.Name] = p.Id;
+            const opt = document.createElement("option");
+            opt.value = p.Name;
+            productList.appendChild(opt);
+        });
         console.log(`✅ Products fetched: ${products.length}`);
 
+        // Fetch Releases
         const releaseRes = await fetch("http://localhost:5000/api/releases");
         const releases = await releaseRes.json();
         const releaseList = document.getElementById("releasesList");
         releases.forEach(r => {
+            releaseMap[r.Name] = r.Id;
             const opt = document.createElement("option");
             opt.value = r.Name;
             releaseList.appendChild(opt);
         });
         console.log(`✅ Releases fetched: ${releases.length}`);
 
+        // Fetch Platforms
         const platformRes = await fetch("http://localhost:5000/api/platforms");
         const platforms = await platformRes.json();
         const platformList = document.getElementById("platformsList");
         platforms.forEach(pl => {
+            platformMap[pl.Name] = pl.Id;
             const opt = document.createElement("option");
             opt.value = pl.Name;
             platformList.appendChild(opt);
@@ -463,15 +470,33 @@ function fetchCDCARMJson() {
 
 
 // helper for test link
-function buildTestLink(testName, productName) {
+function buildTestLink(testName, productName, releaseName, platformName) {
+    // Resolve product
     if (!productName) {
         const input = document.getElementById('productsInput');
         productName = input ? input.value.trim() : "DISCO";
     }
+
+    // Resolve release
+    if (!releaseName) {
+        const input = document.getElementById('releasesInput');
+        releaseName = input ? input.value.trim() : "25.2";
+    }
+
+    // Resolve platform
+    if (!platformName) {
+        const input = document.getElementById('platformsInput');
+        platformName = input ? input.value.trim() : "Windows";
+    }
+
     const encoded = encodeURIComponent(testName);
-    const productId = productMap[productName] || 72; // fallback
-    return `https://cdcarm.win.ansys.com/Reports/Unified/ErrorReport/Product/${productId}?applicationId=-1&platformId=1&releaseId=289&allPackages=True&filterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Filters.TestNameFilter%2COperator%3ACONTAINS%2CValue%3A${encoded}&highlighterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Highlighters.RunAgeHighlighter%2COperator%3AGREATER_THAN_OR_EQUAL%2CValue%3A7&officialOnly=False&chronicFailureThreshold=0&noCache=False&showNonChronicFailures=true`;
+    const productId = productMap[productName] || 72;       // fallback: DISCO = 72
+    const releaseId = releaseMap[releaseName] || 289;      // fallback: 25.2 = 289
+    const platformId = platformMap[platformName] || 1;     // fallback: Windows = 1
+
+    return `https://cdcarm.win.ansys.com/Reports/Unified/ErrorReport/Product/${productId}?applicationId=-1&platformId=${platformId}&releaseId=${releaseId}&allPackages=True&filterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Filters.TestNameFilter%2COperator%3ACONTAINS%2CValue%3A${encoded}&highlighterCollection=MatchType%3DAll%26Filter0%3DType%3AARM.WebFilters.TestResults.Highlighters.RunAgeHighlighter%2COperator%3AGREATER_THAN_OR_EQUAL%2CValue%3A7&officialOnly=False&chronicFailureThreshold=0&noCache=False&showNonChronicFailures=true`;
 }
+
 
 
 // helper for investigation link
