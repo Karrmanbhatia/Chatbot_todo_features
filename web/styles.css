@@ -89,6 +89,52 @@ body {
   align-items: center;
   gap: 8px;
 }
+.status-with-progress {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #e0f2fe;
+  border: 1px solid #3b82f6;
+  padding: 16px;
+  border-radius: 10px;
+  margin-top: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.status-icon {
+  font-size: 28px;
+  line-height: 1;
+  margin-top: 4px;
+  color: #2563eb;
+}
+
+.status-info {
+  flex: 1;
+}
+
+.status-text {
+  font-weight: 600;
+  color: #1e3a8a;
+  margin: 0 0 10px 0;
+  font-size: 15px;
+}
+
+.progress-container {
+  width: 100%;
+  background-color: #f0f9ff;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 10px;
+  border: 1px solid #93c5fd;
+}
+
+.progress-bar {
+  height: 10px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  width: 0%;
+  border-radius: 8px;
+  transition: width 1.5s ease;
+}
 
 .owner-filter-container label {
   font-weight: 500;
@@ -333,7 +379,7 @@ body {
 }
 
 .send-button {
-    background-color: var(--ansys-gold);
+    background-color: var(--ansys-blue-light);
     color: #333;
     border: none;
     border-radius: 50%;
@@ -405,14 +451,20 @@ body {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
     outline: none;
 }
-
+.fetch-json-btn,
+.upload-btn,
+.generate-btn,
+.back-to-menu,
+.download-btn {
+  border-radius: 30px; /* pill shape */
+}
 .fetch-json-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     padding: 12px 20px;
-    background-color: var(--ansys-gold);
+    background-color: var(--ansys-blue-light);
     color: #333;
     font-weight: 500;
     border: none;
@@ -424,7 +476,7 @@ body {
 }
 
 .fetch-json-btn:hover {
-    background-color: var(--ansys-gold-hover);
+    background-color: var(--ansys-blue-light-hover);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -674,7 +726,17 @@ body {
     text-align: center;
     font-weight: bold;
 }
-
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+  font-size: 15px;
+}
+.message {
+  margin-bottom: 20px;
+}
+.chat-body {
+  padding: 24px 20px;
+  background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+}
 .error-type {
     font-size: 16px;
     margin-bottom: 8px;

@@ -1,19 +1,19 @@
 // Ensure chat starts closed, then auto-popup
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Force chat to be closed on page load
     const chatWindow = document.getElementById('chatWindow');
     const chatIcon = document.getElementById('chatIcon');
-    
+
     if (chatWindow) chatWindow.style.display = 'none';
     if (chatIcon) chatIcon.style.display = 'flex';
-    
+
     // Clear any existing chat content
     const chatBody = document.getElementById('chatBody');
     if (chatBody) chatBody.innerHTML = '';
-    
+
     // Then load your datalists
     populateDynamicDatalists();
-    
+
     // AUTO-POPUP: Open chat automatically after 1 second
     setTimeout(() => {
         if (chatIcon && chatWindow) {
@@ -51,7 +51,7 @@ chatIcon.addEventListener('click', () => {
     console.log('Chat icon clicked - opening chat');
     chatWindow.style.display = 'flex';
     chatIcon.style.display = 'none';
-    
+
     // Clear everything first, then show welcome
     clearAndShowWelcome();
 });
@@ -92,10 +92,10 @@ function clearAndShowWelcome() {
     optionPanel.innerHTML = '';
     optionPanel.style.display = 'none';
     chatFooter.style.display = 'none';
-    
+
     // Show chat body
     chatBody.style.display = 'block';
-    
+
     // Create welcome message
     const welcomeMessage = createBotMessage();
     welcomeMessage.innerHTML = `
@@ -107,7 +107,7 @@ function clearAndShowWelcome() {
     `;
     chatBody.appendChild(welcomeMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
-    
+
     // Wait a bit, then show buttons
     setTimeout(() => {
         showWelcomeButtons();
@@ -126,17 +126,17 @@ function showWelcomeButtons() {
             </button>
             <button id="cdcarmJsonBtn" class="option-btn">
                 <i class="fas fa-file-download"></i>
-                <span>Fetch ARM Error Reports </span>
+                <span>Start Test Failure Investigation </span>
             </button>
         </div>
     `;
-    
+
     chatBody.appendChild(buttonMessage); // Add to chatBody, not optionPanel
-    
+
     // Add event listeners - CDCARM URL button removed
     document.getElementById('helpBtn').addEventListener('click', showHelpInformation);
     document.getElementById('cdcarmJsonBtn').addEventListener('click', showCDCARMJsonOptions);
-    
+
     chatFooter.style.display = 'flex';
     chatBody.scrollTop = chatBody.scrollHeight;
 }
@@ -219,25 +219,25 @@ function processMessage(message) {
 
 function handleJsonDownload(payload) {
     console.log('Handling JSON download payload:', payload);
-    
+
     if (!payload) {
         replyWithBotMessage("Error: No download data received");
         return;
     }
-    
-    const isValidPayload = payload.data_type === "json_download" || 
-                          (payload.content && payload.filename);
-    
+
+    const isValidPayload = payload.data_type === "json_download" ||
+        (payload.content && payload.filename);
+
     if (!isValidPayload) {
         replyWithBotMessage("Error: Invalid download data format");
         console.log('Invalid payload format:', payload);
         return;
     }
-    
+
     const content = payload.content;
     const filename = payload.filename || 'cdcarm_data.json';
     const recordCount = payload.record_count || 'unknown number of';
-    
+
     const downloadMessage = createBotMessage();
     downloadMessage.innerHTML = `
         <div class="download-container">
@@ -253,7 +253,7 @@ function handleJsonDownload(payload) {
     `;
     chatBody.appendChild(downloadMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
-    
+
     document.getElementById('downloadJsonBtn').addEventListener('click', () => {
         try {
             let jsonData;
@@ -262,13 +262,13 @@ function handleJsonDownload(payload) {
             } catch (e) {
                 jsonData = content;
             }
-            
-            console.log('Decoded JSON data (first 100 chars):', 
-                        typeof jsonData === 'string' ? jsonData.substring(0, 100) : "Not a string");
-            
+
+            console.log('Decoded JSON data (first 100 chars):',
+                typeof jsonData === 'string' ? jsonData.substring(0, 100) : "Not a string");
+
             const blob = new Blob([jsonData], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
-            
+
             const a = document.createElement('a');
             a.href = url;
             a.download = filename;
@@ -276,14 +276,14 @@ function handleJsonDownload(payload) {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
+
             replyWithBotMessage("Download started. The file should be saved to your downloads folder.");
         } catch (error) {
             console.error('Download error:', error);
             replyWithBotMessage(`Error downloading file: ${error.message}. Please try again.`);
         }
     });
-    
+
     document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
 }
 
@@ -382,7 +382,7 @@ function showCDCARMJsonOptions() {
                 
                 <div class="option-group">
                     <label class="option-label">Releases:</label>
-                    <input type="text" class="option-input" id="releasesInput" list="releasesList" placeholder="25.2" value="25.2">
+                    <input type="text" class="option-input" id="releasesInput" list="releasesList" placeholder="26.1" value="26.1">
                 </div>
                 
                 <div class="option-group">
@@ -417,7 +417,7 @@ function showCDCARMJsonOptions() {
 
 function fetchCDCARMJson() {
     const products = document.getElementById('productsInput').value.trim() || "DISCO";
-    const releases = document.getElementById('releasesInput').value.trim() || "25.2";
+    const releases = document.getElementById('releasesInput').value.trim() || "26.1";
     const platforms = document.getElementById('platformsInput').value.trim() || "Windows";
     const minFailingBuilds = document.getElementById('minFailingInput').value.trim() || "2";
     const ownerFilter = document.getElementById('ownerJsonInput').value.trim() || "all";
@@ -428,10 +428,20 @@ function fetchCDCARMJson() {
 
     const progressMessage = createBotMessage();
     progressMessage.innerHTML = `
-        <p>Fetching and analyzing data...</p>
-        <div class="progress-container"><div class="progress-bar" id="jsonProgressBar"></div></div>
-    `;
+  <div class="status-with-progress">
+    <div class="status-icon">⏳</div>
+    <div class="status-info">
+      <p class="status-text">Running prediction... Please wait while we analyze the test failures.</p>
+      <div class="progress-container">
+        <div class="progress-bar" id="jsonProgressBar"></div>
+      </div>
+    </div>
+  </div>
+`;
+
     chatBody.appendChild(progressMessage);
+    // 🔽 Scroll to make sure progress bar is visible
+    chatBody.scrollTop = chatBody.scrollHeight;
     const progressBar = document.getElementById('jsonProgressBar');
     progressBar.style.width = '30%';
 
@@ -445,29 +455,29 @@ function fetchCDCARMJson() {
             min_failing_builds: minFailingBuilds
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        progressBar.style.width = '100%';
-        if (data.data_type === "prediction_table") {
-            // filter on owner if required
-            let filtered = data.merged_summary;
-            if (ownerFilter !== "all") {
-                filtered = filtered.filter(x => x.Owner.toLowerCase() === ownerFilter.toLowerCase());
+        .then(response => response.json())
+        .then(data => {
+            progressBar.style.width = '100%';
+            if (data.data_type === "prediction_table") {
+                // filter on owner if required
+                let filtered = data.merged_summary;
+                if (ownerFilter !== "all") {
+                    filtered = filtered.filter(x => x.Owner.toLowerCase() === ownerFilter.toLowerCase());
+                }
+                displayPredictionResults(filtered);
+                chatBody.removeChild(progressMessage);
+            } else {
+                throw new Error("Unexpected response type");
             }
-            displayPredictionResults(filtered);
-            chatBody.removeChild(progressMessage);
-        } else {
-            throw new Error("Unexpected response type");
-        }
-    })
-    .catch(error => {
-        console.error("Prediction flow error:", error);
-        progressBar.style.width = '100%';
-        setTimeout(() => {
-            chatBody.removeChild(progressMessage);
-            replyWithBotMessage(`⚠️ Error during prediction: ${error.message}`);
-        }, 500);
-    });
+        })
+        .catch(error => {
+            console.error("Prediction flow error:", error);
+            progressBar.style.width = '100%';
+            setTimeout(() => {
+                chatBody.removeChild(progressMessage);
+                replyWithBotMessage(`⚠️ Error during prediction: ${error.message}`);
+            }, 500);
+        });
 }
 
 
@@ -482,7 +492,7 @@ function buildTestLink(testName, productName, releaseName, platformName) {
     // Resolve release
     if (!releaseName) {
         const input = document.getElementById('releasesInput');
-        releaseName = input ? input.value.trim() : "25.2";
+        releaseName = input ? input.value.trim() : "26.1";
     }
 
     // Resolve platform
@@ -518,7 +528,7 @@ function displayPredictionResults(predictions, ownerFilter = "") {
     if (!allPredictions.length) allPredictions = predictions;
 
     const owners = [...new Set(allPredictions.map(p => p.Owner))];
-    const ownerOptions = owners.map(owner => 
+    const ownerOptions = owners.map(owner =>
         `<option value="${owner}" ${owner.toLowerCase() === ownerFilter.toLowerCase() ? 'selected' : ''}>${owner}</option>`
     ).join('');
 
@@ -575,9 +585,9 @@ function displayPredictionResults(predictions, ownerFilter = "") {
                 </td>
                 <td>${info.Owner}</td>
                 <td>
-                  ${[...info.WorkItems].map(wi => 
-                    `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
-                  ).join(", ") || "-"}
+                  ${[...info.WorkItems].map(wi =>
+        `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
+    ).join(", ") || "-"}
                 </td>
               </tr>
             `).join('')}
@@ -650,23 +660,23 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
             owner
         })
     })
-    .then(response => {
-        if (!response.ok) throw new Error("Network response was not OK");
-        return response.json();
-    })
-    .then(data => {
-        progressBar.style.width = '100%';
-        console.log('Received data:', data);
+        .then(response => {
+            if (!response.ok) throw new Error("Network response was not OK");
+            return response.json();
+        })
+        .then(data => {
+            progressBar.style.width = '100%';
+            console.log('Received data:', data);
 
-        setTimeout(() => {
-            chatBody.removeChild(progressMessage);
+            setTimeout(() => {
+                chatBody.removeChild(progressMessage);
 
-            const recordCount = data.record_count || 0;
-            const content = data.content || "";
-            const filename = data.filename || "cdcarm_data.json";
+                const recordCount = data.record_count || 0;
+                const content = data.content || "";
+                const filename = data.filename || "cdcarm_data.json";
 
-            const downloadMessage = createBotMessage();
-            downloadMessage.innerHTML = `
+                const downloadMessage = createBotMessage();
+                downloadMessage.innerHTML = `
                 <div class="download-container">
                     <p>✅ Successfully fetched ${recordCount} records.</p>
                     <button class="download-btn" id="downloadJsonBtn">
@@ -677,40 +687,40 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
                     </button>
                 </div>
             `;
-            chatBody.appendChild(downloadMessage);
-            chatBody.scrollTop = chatBody.scrollHeight;
+                chatBody.appendChild(downloadMessage);
+                chatBody.scrollTop = chatBody.scrollHeight;
 
-            document.getElementById('downloadJsonBtn').addEventListener('click', () => {
-                let jsonData;
-                try {
-                    jsonData = atob(content);
-                } catch (e) {
-                    jsonData = content;
-                }
+                document.getElementById('downloadJsonBtn').addEventListener('click', () => {
+                    let jsonData;
+                    try {
+                        jsonData = atob(content);
+                    } catch (e) {
+                        jsonData = content;
+                    }
 
-                const blob = new Blob([jsonData], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            });
+                    const blob = new Blob([jsonData], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
 
-            document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
-        }, 500);
-    })
-    .catch(error => {
-        console.error('Fetch failed, using dummy data fallback:', error);
-        progressBar.style.width = '100%';
-        setTimeout(() => {
-            chatBody.removeChild(progressMessage);
-            replyWithBotMessage(`⚠️ Error fetching from server: ${error.message}`);
-            createDummyData(products, releases, platforms, minFailingBuilds, owner);
-        }, 500);
-    });
+                document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
+            }, 500);
+        })
+        .catch(error => {
+            console.error('Fetch failed, using dummy data fallback:', error);
+            progressBar.style.width = '100%';
+            setTimeout(() => {
+                chatBody.removeChild(progressMessage);
+                replyWithBotMessage(`⚠️ Error fetching from server: ${error.message}`);
+                createDummyData(products, releases, platforms, minFailingBuilds, owner);
+            }, 500);
+        });
 }
 
 function createDummyData(products, releases, platforms, minFailingBuilds, owner) {
@@ -729,9 +739,9 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
             "FailureCount": parseInt(minFailingBuilds) + i
         });
     }
-    
+
     const jsonString = JSON.stringify(dummyData, null, 2);
-    
+
     const downloadMessage = createBotMessage();
     downloadMessage.innerHTML = `
         <div class="download-container">
@@ -746,7 +756,7 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
     `;
     chatBody.appendChild(downloadMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
-    
+
     document.getElementById('downloadDemoBtn').addEventListener('click', () => {
         const blob = new Blob([jsonString], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -758,7 +768,7 @@ function createDummyData(products, releases, platforms, minFailingBuilds, owner)
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     });
-    
+
     document.getElementById('backToMenuDemo').addEventListener('click', showMainMenu);
 }
 
