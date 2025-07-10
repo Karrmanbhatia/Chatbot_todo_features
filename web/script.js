@@ -165,7 +165,9 @@ function showHelpInformation() {
                 <li><strong>Fetch CDCARM JSON</strong> - Download test failure data as JSON for offline analysis</li>
             </ul>
             <p>To get started, select an option from the menu or type your question below.</p>
-            <button class="back-to-menu" id="backToMenuHelp"><i class="fas fa-home"></i> Home</button>
+           <button class="back-to-menu" id="backToMenuHelp"><i class="fas fa-home"></i><span style="margin-left: 6px;">Home</span>
+           </button>
+
         `;
         chatBody.appendChild(helpMessage);
         chatBody.scrollTop = chatBody.scrollHeight;
@@ -583,8 +585,8 @@ function displayPredictionResults(predictions, ownerFilter = "") {
         </table>
       </div>
       <button class="back-to-menu" id="backToMenuPred" style="margin-top:10px;">
-        <i class="fas fa-home"></i> Home
-      </button>
+  <i class="fas fa-home"></i><span style="margin-left: 6px;">Home</span>
+</button>
     `;
     chatBody.appendChild(botMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
