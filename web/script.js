@@ -416,31 +416,38 @@ function showCDCARMJsonOptions() {
 }
 
 function fetchCDCARMJson() {
-    const products = document.getElementById('productsInput').value.trim() || "DISCO";
-    const releases = document.getElementById('releasesInput').value.trim() || "26.1";
-    const platforms = document.getElementById('platformsInput').value.trim() || "Windows";
+    const products = (document.getElementById('productsInput').value.trim() || "DISCO")
+    .split(",")
+    .map(p => p.trim())
+    .filter(p => p);
+    const releases = (document.getElementById('releasesInput').value.trim() || "26.1")
+    .split(",")
+    .map(r => r.trim())
+    .filter(r => r);
+    const platforms = (document.getElementById('platformsInput').value.trim() || "Windows")
+    .split(",")
+    .map(p => p.trim())
+    .filter(p => p);
     const minFailingBuilds = document.getElementById('minFailingInput').value.trim() || "2";
     const ownerFilter = document.getElementById('ownerJsonInput').value.trim() || "all";
 
-    const userMsg = createUserMessage(`Running prediction for Products: ${products}, Releases: ${releases}, Platforms: ${platforms}, Min Failing Builds: ${minFailingBuilds}`);//Owner Filter: ${ownerFilter}
+    const userMsg = createUserMessage(`Running prediction for Products: ${products}, Releases: ${releases}, Platforms: ${platforms}, Min Failing Builds: ${minFailingBuilds}`);
     chatBody.appendChild(userMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
 
     const progressMessage = createBotMessage();
     progressMessage.innerHTML = `
-  <div class="status-with-progress">
-    <div class="status-icon">⏳</div>
-    <div class="status-info">
-      <p class="status-text">Running prediction... Please wait while we analyze the test failures.</p>
-      <div class="progress-container">
-        <div class="progress-bar" id="jsonProgressBar"></div>
-      </div>
-    </div>
-  </div>
-`;
-
+        <div class="status-with-progress">
+            <div class="status-icon">⏳</div>
+            <div class="status-info">
+                <p class="status-text">Running prediction... Please wait while we analyze the test failures.</p>
+                <div class="progress-container">
+                    <div class="progress-bar" id="jsonProgressBar"></div>
+                </div>
+            </div>
+        </div>
+    `;
     chatBody.appendChild(progressMessage);
-    // 🔽 Scroll to make sure progress bar is visible
     chatBody.scrollTop = chatBody.scrollHeight;
     const progressBar = document.getElementById('jsonProgressBar');
     progressBar.style.width = '30%';
@@ -455,30 +462,37 @@ function fetchCDCARMJson() {
             min_failing_builds: minFailingBuilds
         })
     })
-        .then(response => response.json())
-        .then(data => {
-            progressBar.style.width = '100%';
-            if (data.data_type === "prediction_table") {
-                // filter on owner if required
-                let filtered = data.merged_summary;
-                if (ownerFilter !== "all") {
-                    filtered = filtered.filter(x => x.Owner.toLowerCase() === ownerFilter.toLowerCase());
-                }
-                displayPredictionResults(filtered);
-                chatBody.removeChild(progressMessage);
-            } else {
-                throw new Error("Unexpected response type");
-            }
-        })
-        .catch(error => {
-            console.error("Prediction flow error:", error);
-            progressBar.style.width = '100%';
-            setTimeout(() => {
-                chatBody.removeChild(progressMessage);
-                replyWithBotMessage(`⚠️ Error during prediction: ${error.message}`);
-            }, 500);
-        });
+    .then(response => response.json())
+    .then(data => {
+        progressBar.style.width = '100%';
+        setTimeout(() => chatBody.removeChild(progressMessage), 500);
+
+        switch (data.data_type) {
+            case "prediction_table":
+                displayPredictionResults(data.merged_summary, ownerFilter);
+                break;
+            case "hybrid":
+                allPredictions = data.predicted;
+                displayPredictionResults(data.predicted, ownerFilter);
+                displayClusteredResults(data.clustered_summary);
+                break;
+            case "clustered_groups_only":
+                displayClusteredResults(data.clustered_summary);
+                break;
+            default:
+                throw new Error("Unexpected response type: " + data.data_type);
+        }
+    })
+    .catch(error => {
+        console.error("Prediction flow error:", error);
+        progressBar.style.width = '100%';
+        setTimeout(() => {
+            chatBody.removeChild(progressMessage);
+            replyWithBotMessage(`⚠️ Error during prediction: ${error.message}`);
+        }, 500);
+    });
 }
+
 
 
 // helper for test link
@@ -516,7 +530,64 @@ function buildInvestigationLink(workItemId) {
     return `https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${workItemId}`;
 }
 
-function displayPredictionResults(predictions, ownerFilter = "") {
+function displayClusteredResults(clusteredSummary) {
+    if (!clusteredSummary || !clusteredSummary.length) {
+        const botMsg = createBotMessage();
+        botMsg.innerHTML = `<p>No similar error clusters found.</p>`;
+        chatBody.appendChild(botMsg);
+        chatBody.scrollTop = chatBody.scrollHeight;
+        return;
+    }
+
+    // Get current inputs for fallback resolution inside buildTestLink
+    const productInput = document.getElementById('productsInput')?.value.trim() || "DISCO";
+    const releaseInput = document.getElementById('releasesInput')?.value.trim() || "26.1";
+    const platformInput = document.getElementById('platformsInput')?.value.trim() || "Windows";
+
+    const botMsg = createBotMessage();
+    botMsg.innerHTML = `
+      <h4>🧩 Clustered Failure Groups (Unanchored)</h4>
+      <div style="margin-bottom:8px; font-size: 0.9em; color: #555;">
+        <p>🔹 These groups were formed by clustering unpredicted test failures based on similar failure messages.</p>
+        <p>🔹 <strong>Test name links:</strong> open the ARM test page in a new tab.</p>
+      </div>
+      ${clusteredSummary.map((group, groupIndex) => `
+        <div class="cluster-block" style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:6px;">
+          <h5 style="margin-bottom:6px;">
+            🧠 Cluster ${groupIndex + 1}
+            <span style="background:#eee; font-size:0.8em; padding:2px 6px; border-radius:4px; margin-left:6px;">
+              ${group.length} test${group.length > 1 ? 's' : ''}
+            </span>
+          </h5>
+          <ul style="padding-left: 16px;">
+            ${group.map(test => `
+              <li style="margin-bottom:4px;">
+                <a href="${buildTestLink(test.TestName, test.Product || productInput, releaseInput, platformInput)}" target="_blank" style="text-decoration:underline; color:#007bff;">
+                  ${test.TestName}
+                </a>
+                <span style="margin-left: 10px; color: #888;">(${test.Owner})</span>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      `).join('')}
+      <button class="back-to-menu" id="backToMenuClustered" style="margin-top:10px;">
+        <i class="fas fa-home"></i><span style="margin-left: 6px;">Home</span>
+      </button>
+    `;
+    chatBody.appendChild(botMsg);
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    document.getElementById('backToMenuClustered').addEventListener('click', () => {
+        allPredictions = [];
+        showMainMenu();
+    });
+}
+
+
+
+
+function displayPredictionResults(predictions, ownerFilter = "", showAll = false) {
     if (!predictions.length) {
         const botMsg = createBotMessage();
         botMsg.innerHTML = `<p>No matching tests found for the selected owner.</p>`;
@@ -532,11 +603,20 @@ function displayPredictionResults(predictions, ownerFilter = "") {
         `<option value="${owner}" ${owner.toLowerCase() === ownerFilter.toLowerCase() ? 'selected' : ''}>${owner}</option>`
     ).join('');
 
-    const filtered = ownerFilter
-        ? predictions.filter(p => p.Owner.trim().toLowerCase() === ownerFilter.toLowerCase())
-        : predictions;
+    // 🔍 Initial filter
+    let filtered = showAll
+        ? predictions
+        : predictions.filter(p => p.IsPredicted === "Yes");
 
-    // group by TestName
+    // 🔍 Owner filtering
+    if (ownerFilter && ownerFilter.toLowerCase() !== "all") {
+        filtered = filtered.filter(p => p.Owner.trim().toLowerCase() === ownerFilter.toLowerCase());
+    }
+
+    // 🔽 Sort by confidence (nulls last)
+    filtered.sort((a, b) => (b.ConfidenceScore || -1) - (a.ConfidenceScore || -1));
+
+    // Group by TestName
     const grouped = {};
     filtered.forEach(p => {
         const test = p.TestName;
@@ -544,6 +624,7 @@ function displayPredictionResults(predictions, ownerFilter = "") {
             grouped[test] = {
                 Owner: p.Owner,
                 Product: p.Product,
+                IsPredicted: p.IsPredicted,
                 WorkItems: new Set()
             };
         }
@@ -561,12 +642,25 @@ function displayPredictionResults(predictions, ownerFilter = "") {
             <option value="">All</option>
             ${ownerOptions}
         </select>
-        <button id="applyOwnerFilterBtn" class="fetch-json-btn">
+
+        <label style="margin-left:15px;">
+          <input type="checkbox" id="showAllToggle" ${showAll ? "checked" : ""} />
+          Show All (including anchored results)
+        </label>
+
+        <button id="applyOwnerFilterBtn" class="fetch-json-btn" style="margin-left:10px;">
             <i class="fas fa-filter"></i> Apply
         </button>
+
         <button id="exportCSV" class="fetch-json-btn" style="margin-left:10px;">
             <i class="fas fa-download"></i> Export CSV
         </button>
+      </div>
+      <div style="margin-bottom:8px; font-size: 0.9em; color: #555;">
+        <p>🔹 <strong>Filtering:</strong> Showing ${showAll ? "all test results (predicted + anchored)" : "only predicted test failures"}.</p>
+        <p>🔹 <strong>Sorting:</strong> Tests are sorted by descending prediction confidence.</p>
+        <p>🔹 <strong>Test name link:</strong> opens the corresponding ARM test page.</p>
+        <p>🔹 <strong>Work Item link:</strong> opens the predicted TFS work item in a new tab.</p>
       </div>
       <div style="max-height:300px; overflow:auto;">
         <table class="prediction-table" id="predictionResultTable">
@@ -583,7 +677,12 @@ function displayPredictionResults(predictions, ownerFilter = "") {
                 <td>
                   <a href="${buildTestLink(testName, info.Product)}" target="_blank">${testName}</a>
                 </td>
-                <td>${info.Owner}</td>
+                <td>
+                  ${info.Owner}
+                  <span style="margin-left:8px; font-size: 0.75em; color: ${info.IsPredicted === "No" ? "#999" : "#2a9d8f"};">
+                    ${info.IsPredicted === "No" ? "(Anchored)" : "(Predicted)"}
+                  </span>
+                </td>
                 <td>
                   ${[...info.WorkItems].map(wi =>
         `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
@@ -595,16 +694,18 @@ function displayPredictionResults(predictions, ownerFilter = "") {
         </table>
       </div>
       <button class="back-to-menu" id="backToMenuPred" style="margin-top:10px;">
-  <i class="fas fa-home"></i><span style="margin-left: 6px;">Home</span>
-</button>
+        <i class="fas fa-home"></i><span style="margin-left: 6px;">Home</span>
+      </button>
     `;
     chatBody.appendChild(botMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
 
+    // Events
     document.getElementById('applyOwnerFilterBtn').addEventListener('click', () => {
         const owner = document.getElementById('ownerFilterSelect').value.trim();
+        const showAllChecked = document.getElementById('showAllToggle').checked;
         chatBody.removeChild(botMsg);
-        displayPredictionResults(allPredictions, owner);
+        displayPredictionResults(allPredictions, owner, showAllChecked);
     });
 
     document.getElementById('exportCSV').addEventListener('click', () => {

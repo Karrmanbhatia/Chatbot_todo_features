@@ -5,9 +5,10 @@ import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.cluster import DBSCAN
 
 # Load model once
-model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('all-MiniLM-L6-v2', local_files_only=True)
 
 
 def extract_error_messages(json_data):
@@ -51,8 +52,9 @@ def run_prediction(json_file_path, threshold=0.3):
     """
     Investigation-anchored prediction:
       - group errors with anchors based on cosine similarity
+      - label predicted vs. existing work items
+      - include confidence score for predictions
     """
-
 
     if not os.path.exists(json_file_path):
         raise FileNotFoundError(f"{json_file_path} not found")
@@ -75,6 +77,7 @@ def run_prediction(json_file_path, threshold=0.3):
             print(f"⚠️ JSON decode failed: {e}")
             return []
 
+    # Extract anchors and targets
     anchors = []
     targets = []
 
@@ -105,42 +108,88 @@ def run_prediction(json_file_path, threshold=0.3):
                         })
 
     if not anchors:
-        print("⚠️ No investigated anchors found. Cannot anchor prediction.")
-        return []
+        print("⚠️ No investigated anchors found. Attempting fallback clustering...")
+        fallback_clusters = group_similar_failures(targets)
+        return {
+            "mode": "clustered",
+            "clusters": fallback_clusters
+        }
 
-    # encode
+    # Encode anchor messages once
     anchor_texts = [a['Message'] for a in anchors]
     anchor_embeddings = model.encode(anchor_texts)
 
     results = []
 
-    for target in targets:
-        target_embedding = model.encode([target['Message']])[0]
-        similarities = cosine_similarity(
-            [target_embedding], anchor_embeddings
-        )[0]
-        # find best matching anchor
+    # Batch encode all target messages
+    target_texts = [t['Message'] for t in targets]
+    target_embeddings = model.encode(target_texts)
+
+    for idx, target in enumerate(targets):
+        target_embedding = target_embeddings[idx]
+        similarities = cosine_similarity([target_embedding], anchor_embeddings)[0]
+
         best_idx = np.argmax(similarities)
         best_score = similarities[best_idx]
-        if best_score < 1 - threshold:
+
+        if best_score < threshold:
             predicted_workitem = "-"
         else:
             predicted_workitem = anchors[best_idx]['Investigation']['WorkItemId']
+
         results.append({
             "TestName": target['TestName'],
             "Owner": target['Owner'],
-            "PredictedWorkItemId": predicted_workitem
+            "PredictedWorkItemId": predicted_workitem,
+            "IsPredicted": "Yes" if predicted_workitem != "-" else "No",
+            "ConfidenceScore": round(float(best_score), 3)
         })
 
-    # add anchors themselves
+    # Add known anchors directly
     for a in anchors:
         results.append({
             "TestName": a['TestName'],
             "Owner": a['Owner'],
-            "PredictedWorkItemId": a['Investigation']['WorkItemId']
+            "PredictedWorkItemId": a['Investigation']['WorkItemId'],
+            "IsPredicted": "No",
+            "ConfidenceScore": None  # Or 1.0 if you prefer
         })
+        # Group unpredicted targets (fallback)
+    unpredicted = [
+        t for i, t in enumerate(targets)
+        if results[i]["PredictedWorkItemId"] == "-"
+    ]
+    fallback_clusters = group_similar_failures(unpredicted)
+
+    return {
+        "mode": "predicted_with_clusters",
+        "predicted": results,
+        "clusters": fallback_clusters
+    }
 
     return results
+def group_similar_failures(targets, eps=0.3, min_samples=2):
+    """
+    Cluster similar failure messages when no anchors are available.
+    Returns list of clusters, each a list of test dicts.
+    """
+    if not targets:
+        return []
+
+    model = SentenceTransformer('all-MiniLM-L6-v2', local_files_only=True)
+    messages = [t['Message'] for t in targets]
+    embeddings = model.encode(messages)
+
+    clustering = DBSCAN(eps=eps, min_samples=min_samples, metric='cosine')
+    labels = clustering.fit_predict(embeddings)
+
+    clustered = {}
+    for i, label in enumerate(labels):
+        if label == -1:
+            continue  # noise / outliers
+        clustered.setdefault(label, []).append(targets[i])
+
+    return list(clustered.values())
 
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ def fetch_cdcarm():
         releases = data.get("releases", ["25.2"])
         platforms = data.get("platforms", ["Windows"])
         min_failing = int(data.get("min_failing_builds", 2))
-        owner = "all"  # always fetch ALL owners (detach owner)
+        owner = "all"  # Always fetch ALL owners
 
         # Generate unique output filename
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -32,6 +32,7 @@ def fetch_cdcarm():
         file_name = f"cdcarm_results_{timestamp}_{unique_id}.json"
         output_path = os.path.join(tempfile.gettempdir(), file_name)
 
+        # Log parameters
         print("📥 CDCARM API Request Parameters:")
         print(f"    Products: {products}")
         print(f"    Releases: {releases}")
@@ -54,20 +55,37 @@ def fetch_cdcarm():
 
         print(f"✅ Records fetched: {len(results)}")
 
-        # ⬇️ run prediction directly on saved JSON
+        # Run prediction on the saved JSON
         from pattern_matcher_level_1 import run_prediction
         merged_summary = run_prediction(output_path)
 
-        # Return JSON directly to frontend
+        if isinstance(merged_summary, dict):
+            mode = merged_summary.get("mode")
+            print(f"🔄 Prediction Mode: {mode}")
+
+            if mode in ("clustered_only", "clustered"):
+                return jsonify({
+                    "data_type": "clustered_groups_only",
+                    "clustered_summary": merged_summary["clusters"]
+                })
+
+            elif mode == "predicted_with_clusters":
+                return jsonify({
+                    "data_type": "hybrid",
+                    "predicted": merged_summary["predicted"],
+                    "clustered_summary": merged_summary["clusters"]
+                })
+
+        # If it's a plain list (legacy behavior)
         return jsonify({
             "data_type": "prediction_table",
-            "record_count": len(results),
             "merged_summary": merged_summary
         })
 
     except Exception as e:
         print(f"❌ Error occurred: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 # 🔥 Proxy endpoints for dynamic data lists
 @app.route("/api/products", methods=["GET"])
