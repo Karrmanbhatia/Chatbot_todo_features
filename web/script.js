@@ -86,36 +86,41 @@ chatInput.addEventListener('keypress', (e) => {
 });
 
 function clearAndShowWelcome() {
-    // Clear all content first
+    // Clear previous content
     chatBody.innerHTML = '';
     optionPanel.innerHTML = '';
     optionPanel.style.display = 'none';
     chatFooter.style.display = 'none';
-
-    // Show chat body
     chatBody.style.display = 'block';
 
-    // Create welcome message
-    const welcomeMessage = createBotMessage();
-    welcomeMessage.innerHTML = `
+    // Create welcome container
+    const welcomeContainer = createBotMessage();
+    welcomeContainer.innerHTML = `
         <div class="welcome-message">
             <p>👋 Welcome to Test Failure Analyzer! How can I help you today?</p>
             <p>You can select an option below or type your question here.</p>
             <p><strong>Here are quick suggestions to get you started:</strong></p>
         </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+            <button id="helpBtn" class="option-btn">
+                <i class="fas fa-question-circle"></i>
+                <span>Help & Information</span>
+            </button>
+            <button id="cdcarmJsonBtn" class="option-btn">
+                <i class="fas fa-file-download"></i>
+                <span>Start Test Failure Investigation</span>
+            </button>
+        </div>
     `;
-    chatBody.appendChild(welcomeMessage);
+    chatBody.appendChild(welcomeContainer);
+    chatBody.scrollTop = 0; // Ensure no scroll
 
-    // Scroll to top *immediately* after welcome message is added
-    chatBody.scrollTop = 0;
+    // Show footer
+    chatFooter.style.display = 'flex';
 
-    // Wait a bit, then show buttons
-    setTimeout(() => {
-        showWelcomeButtons();
-
-        // Optional: scroll again after buttons appear
-        chatBody.scrollTop = 0;
-    }, 500);
+    // Add listeners
+    document.getElementById('helpBtn').addEventListener('click', showHelpInformation);
+    document.getElementById('cdcarmJsonBtn').addEventListener('click', showCDCARMJsonOptions);
 }
 
 

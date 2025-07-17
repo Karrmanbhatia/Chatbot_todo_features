@@ -537,9 +537,10 @@ body {
 }
 
 .fetch-json-btn:hover {
-    background-color: var(--ansys-blue-light-hover);
+    background: linear-gradient(135deg, #a855f7, #ec4899); 
+    color: white;
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 16px rgba(236, 72, 153, 0.3);
 }
 
 .download-container {
