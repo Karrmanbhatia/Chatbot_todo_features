@@ -11,7 +11,9 @@ import requests  # 🔥 Add requests to fetch data from remote APIs
 
 from fetch_core import fetch_arm_json
 
-app = Flask(__name__)
+app = Flask(__name__,
+    template_folder="../web",     # Relative to flask_app.py
+    static_folder="../web" )
 CORS(app)  # Enable CORS for frontend access
 
 @app.route("/fetch_cdcarm", methods=["POST"])
@@ -123,6 +125,11 @@ def get_platforms():
     except Exception as e:
         print(f"❌ Error fetching platforms: {e}")
         return jsonify({"error": str(e)}), 500
+from flask import render_template
+
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 # Example for owners if needed
 # @app.route("/api/owners", methods=["GET"])

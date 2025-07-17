@@ -1,0 +1,851 @@
+📁 Folder Structure of: D:\AI_project\ARM_AI\TFIA_WEB\Chatbot_todo_features
+
+├── .config
+│   └── rasa
+│       └── global.yml
+├── .env
+├── .git
+│   ├── COMMITMESSAGE
+│   ├── COMMIT_EDITMSG
+│   ├── FETCH_HEAD
+│   ├── HEAD
+│   ├── ORIG_HEAD
+│   ├── config
+│   ├── description
+│   ├── hooks
+│   │   ├── applypatch-msg.sample
+│   │   ├── commit-msg.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── post-update.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-merge-commit.sample
+│   │   ├── pre-push.sample
+│   │   ├── pre-rebase.sample
+│   │   ├── pre-receive.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── push-to-checkout.sample
+│   │   ├── sendemail-validate.sample
+│   │   └── update.sample
+│   ├── index
+│   ├── info
+│   │   └── exclude
+│   ├── logs
+│   │   ├── HEAD
+│   │   └── refs
+│   │       ├── heads
+│   │       │   ├── Karrman's_changes
+│   │       │   ├── Rohhan
+│   │       │   │   └── Prediction_export
+│   │       │   ├── core
+│   │       │   │   └── ui_js_changes
+│   │       │   └── main
+│   │       ├── remotes
+│   │       │   └── origin
+│   │       │       ├── HEAD
+│   │       │       ├── Karrman's_changes
+│   │       │       ├── Rohhan
+│   │       │       │   └── Prediction_export
+│   │       │       └── main
+│   │       └── stash
+│   ├── objects
+│   │   ├── 00
+│   │   │   └── 055e3567e18029ff1f5e74bee2583fbac10c4c
+│   │   ├── 01
+│   │   │   ├── 3ebeb9ae53d300a7b26977bc4da7e88d5474d7
+│   │   │   └── 46215c5d415a17247b0a50a2d80521459df822
+│   │   ├── 02
+│   │   │   ├── 474a02337820b133a47bead3c9c18e1e86c212
+│   │   │   └── 69dbdda3d6cffe10b7c64a9c7fdd52a560810e
+│   │   ├── 03
+│   │   │   └── 15aa5c2f57ac0a46a61f1d138a49e9ca473b8b
+│   │   ├── 0b
+│   │   │   └── c53fa386571777d982f9d97ff50ff4c5c3afce
+│   │   ├── 0d
+│   │   │   └── 24a5aa9ef939e2f536a3bb13f3ab9505f374ba
+│   │   ├── 0f
+│   │   │   ├── 546a17cbe026c5024da9826e3f5fcb110a802b
+│   │   │   └── caaeb8effdb90fe9f9741a583118d3328fb820
+│   │   ├── 11
+│   │   │   └── 0ab321259dc1a612b8f4f5120225c49761fc27
+│   │   ├── 13
+│   │   │   ├── 63a4d16f558a6107c979a3daf915decda9c952
+│   │   │   ├── ba55ae4503df3898b018943792fbd53dd36d53
+│   │   │   └── fa32fbd7b4a6fb68831b6f49e50eafeffc70ba
+│   │   ├── 15
+│   │   │   └── 10fd7f5c4304662bbaf19b970f60d6fa0cf09a
+│   │   ├── 1d
+│   │   │   └── 8c56fa30d3af3cb15ba255a337d52ce6f415c4
+│   │   ├── 1e
+│   │   │   └── 1d5b65c5a11666749621b65c2f792b6d662859
+│   │   ├── 1f
+│   │   │   └── 4bc4014b53c0929fcac49702f6d7264204fa6a
+│   │   ├── 20
+│   │   │   └── ef23ecac66f42d242e6bc622c3161cd3d603a0
+│   │   ├── 21
+│   │   │   └── 7f073bdcfde7b6e6ef5bd8842d228601b2e7fb
+│   │   ├── 23
+│   │   │   ├── 1f568d62ac165c9ef6e66933399e86681d7bfe
+│   │   │   ├── 2b0ba8479418935e38b1fcb1491cc03779f0c1
+│   │   │   ├── 63a465205f8f4e90befd0c7d538e946bc2f732
+│   │   │   └── 8b0273fc675fe42af1699721eaddec005b98ac
+│   │   ├── 25
+│   │   │   └── b34699e9f45207658c5c412871b3efbf68827a
+│   │   ├── 27
+│   │   │   └── 20636985edbd41af74e8686c618f3bad2e09d9
+│   │   ├── 28
+│   │   │   ├── 1b9501f6cf590848f8c9a0957d5e9e5e2bdc05
+│   │   │   └── a5b7b7fdce84fb08a7f0ce9d721b74617674e9
+│   │   ├── 2a
+│   │   │   └── c2aaf119309fe9e2ca736bcc4271e934a044bf
+│   │   ├── 2c
+│   │   │   ├── 5cffc04f47f8143c3f6e1dc0becca7944df56e
+│   │   │   ├── 62b9dfffca18c25ea0635b5336c341aa589273
+│   │   │   └── ef05be6b62853b1e0ae3cb1e22165f8661b705
+│   │   ├── 2d
+│   │   │   └── fdd6134fe43967ce4427f84881686bb5d48ea4
+│   │   ├── 2e
+│   │   │   ├── 168d82327891098e79fec40809eafa1152daaf
+│   │   │   └── ca211f8e8ee5baae0f374a3c72941e61a30c67
+│   │   ├── 31
+│   │   │   ├── 530613ec6c653197b5b083075023b9279ee14c
+│   │   │   └── 71a6582fe06bd87e12aa23aa3850d72bd9a8dd
+│   │   ├── 33
+│   │   │   └── ab2516e52fb0ea6272e2234d36587d90cf57c5
+│   │   ├── 3a
+│   │   │   └── d4b31e5bf931a7fedc0900cf49e158489cbfd0
+│   │   ├── 3b
+│   │   │   ├── 75be4fc624f295798996c8f3ec2ebd6c40422b
+│   │   │   └── 9e1d113fb440e8573a6d3fc5562028331601d7
+│   │   ├── 3d
+│   │   │   └── dc8664d61d70c88e4ae6705858368e0aba0a52
+│   │   ├── 3f
+│   │   │   └── 4f5e821f0b105c54252c790719ec1fded4a370
+│   │   ├── 40
+│   │   │   └── 0fac7ce102da006d98c2d2768d1699b138ae6a
+│   │   ├── 43
+│   │   │   └── ae7e633583b2fd5f0bc733b2173fc7bc092e0c
+│   │   ├── 45
+│   │   │   └── daa5ee25079af2af28c2e2f00e7f620148c09e
+│   │   ├── 48
+│   │   │   └── 966502f26ed4da92ad0964e2262373cca45b67
+│   │   ├── 49
+│   │   │   └── 693b7ab84da083c7b3f21dd311fcd016b2e4c9
+│   │   ├── 4a
+│   │   │   └── bc396ee30f58ef4fb0ac91e165f81f2a14a611
+│   │   ├── 4b
+│   │   │   ├── ced13ee71b8bc0b2fdac6d00e92952289f521d
+│   │   │   └── dcbd4bc6035a847a7e17c6497ff94d774dfd15
+│   │   ├── 4d
+│   │   │   ├── 9275ebbb5b5f212149dfe7dfcf82e17f527196
+│   │   │   └── b2fe2c6c0523ef9950449cf6f1f33a89b0e850
+│   │   ├── 53
+│   │   │   └── 723d8aad31b3a697145a821caf6f69d9686f31
+│   │   ├── 54
+│   │   │   └── 825011c6951efc8e5075a7a3fd72d8824a12d6
+│   │   ├── 58
+│   │   │   └── 61d016e9195aa5afcd0241f9d3570863c2bbcf
+│   │   ├── 59
+│   │   │   └── 15ac6b54c2532f207627f9a8a106aa274007bf
+│   │   ├── 5c
+│   │   │   └── 6e686120a045bd22d391f544d8369eeefb28b1
+│   │   ├── 5e
+│   │   │   ├── 6ef6592253bb93adbb106652e3462ddf624bc1
+│   │   │   └── dcbd6c2059361e04604a66fb711085e21100db
+│   │   ├── 5f
+│   │   │   └── 050bc153c3b1f528357516b7459823b0297711
+│   │   ├── 61
+│   │   │   └── dbba87148a4cb6882d77142c4b3ed9d70f05dd
+│   │   ├── 62
+│   │   │   └── b1ceecaf631963a2f482df55a696bc4ed67726
+│   │   ├── 66
+│   │   │   └── 806fd10a2d65f6e8b449d367b39dd95862a44b
+│   │   ├── 6a
+│   │   │   └── 9d966e746d32379c8b1dbf77e38974074647a1
+│   │   ├── 6b
+│   │   │   ├── 166d6ad8ef821fedd74d350caa3d8b10978b8d
+│   │   │   └── 9f8ec8fb2527ce63c8bff7ab5c4cbec51ac0de
+│   │   ├── 6c
+│   │   │   └── 5ac43c53ff457f20daf519dc6863929b10cde9
+│   │   ├── 71
+│   │   │   └── cb6b58b83e60d264145bb907475bddebb3b09c
+│   │   ├── 73
+│   │   │   ├── 16217b84a450af2465f3bc781dc1c96808447b
+│   │   │   ├── 453543103b042977ef2f9729d039d160034080
+│   │   │   └── 506a0188352d7a8a433f1e0c1f055b87fb5b6d
+│   │   ├── 74
+│   │   │   ├── 73bd1327f7c3de9c6a84f46e555ef0bfceabbc
+│   │   │   └── de06a9ebf2cce5439e2811fe4c464176e87c5d
+│   │   ├── 77
+│   │   │   └── 6aa4cc19b3de07df90f4bf45adcac7c2a4d464
+│   │   ├── 78
+│   │   │   └── b97f61d587fd24520f497e77694e0b5ff1d3f9
+│   │   ├── 79
+│   │   │   ├── 491e1c5c275aaa6a1b47ebc2079f5daf324fad
+│   │   │   └── df79e686c62de5e47c1b8577401eec7047dbca
+│   │   ├── 7b
+│   │   │   └── 66bd51fbc9b0f229f8df763a20736073fece96
+│   │   ├── 7e
+│   │   │   ├── 2998ea63d5043263c231238cc129bb888f508c
+│   │   │   └── 63d8e4152422519b9ab0073704c61c6ff37e8f
+│   │   ├── 83
+│   │   │   └── f3bca2c320db788c89e124106c21cf9f1929a2
+│   │   ├── 86
+│   │   │   └── 0ab848f462f6d9f24fbfa4ee195b76a3b4eefe
+│   │   ├── 88
+│   │   │   └── d2626343763eac808562e0a9bea9a5b6b4112f
+│   │   ├── 8a
+│   │   │   └── 0c04a7d2fd324d172a185bc17f4553dc8cd678
+│   │   ├── 8b
+│   │   │   └── 04de8e4265988b7585bcfb6078298e32726011
+│   │   ├── 8c
+│   │   │   └── 6763cb640b8fa92f1e6fb9990f738ffb1d6b01
+│   │   ├── 8d
+│   │   │   ├── 5e42a10b20094bfe8379ac1ac284a270401a17
+│   │   │   └── 845ebb371c6d93f4b37feb5ce619b897e2e6c9
+│   │   ├── 8e
+│   │   │   └── a13d5e5b4fbf25f6d33a4b939cb7392a7e7a32
+│   │   ├── 8f
+│   │   │   ├── 19d2fc1ff8b3061575cb2076f701d646985571
+│   │   │   └── 8674a1b349decc0ceb5e01e24fc9b1161585fb
+│   │   ├── 92
+│   │   │   ├── 0baf8e6ed12c94b288e964b44dad5af403d396
+│   │   │   └── b63006824c264101f2987caf2b7136507a4e86
+│   │   ├── 94
+│   │   │   └── f6fca0c9749d7c3714816a43ad324393d7ec8a
+│   │   ├── 98
+│   │   │   ├── 9027cf5f2b803d33b333259133c4281ccd2264
+│   │   │   └── 9fdd8651230213ddbaf68acf9529297f76fd9f
+│   │   ├── 99
+│   │   │   └── 94b1db3c2077b181ae08393aab7a406c7a334e
+│   │   ├── 9c
+│   │   │   └── aa9a7c1afb1e455aab133386a91408a1ba9c48
+│   │   ├── 9d
+│   │   │   └── 426f75b8f9573258df923a05f5d9f7538cc1f7
+│   │   ├── 9e
+│   │   │   ├── 9c0881757293e3af525f419feb4426030053bd
+│   │   │   └── a5fcd54327fed9f51f2b2eb37a5a26d37ef97a
+│   │   ├── a5
+│   │   │   └── c13828d89bede0ad79a4b1a2d6ce4eb12729dd
+│   │   ├── a7
+│   │   │   └── 167cae125bdda03e79386a0bc286fbad9f1234
+│   │   ├── a9
+│   │   │   └── 7dc9d543d5befe3945806d28330ab65ace5e44
+│   │   ├── ad
+│   │   │   ├── 7a744d81b51d278b3f6ea40089459370a754f1
+│   │   │   └── f425e1e703333c429a691e3bd237da13647a3e
+│   │   ├── af
+│   │   │   └── 6dcb1169586164fc1dff40f61f82f5d19155c0
+│   │   ├── b0
+│   │   │   └── b3ad823e01d4e52062fccba993d5ffd3199c0e
+│   │   ├── b3
+│   │   │   └── f8796d8f2fe680174d2a5ed7b00c8cd083e2f8
+│   │   ├── b4
+│   │   │   ├── 2d234d561aa2a4ad420c35ac9f3a978c6f52ee
+│   │   │   └── 9973419f0e93163344d1c0e8450b5f220fbe22
+│   │   ├── b5
+│   │   │   └── 7fa2876f0804916507a801ba5abbaf08e20841
+│   │   ├── b6
+│   │   │   └── 25efcd61f6ec65c234b5b9457ebdf38e146934
+│   │   ├── b7
+│   │   │   ├── 08823836b8145b920e6f44650051017f60acc5
+│   │   │   ├── 0b8b9cb22c1543d7bc430d698b2be8ea0b70b7
+│   │   │   └── 3e6d7a4e21982fb240436eacae3cbb152509ce
+│   │   ├── b9
+│   │   │   └── 696364d281553ac41d8721af4761904a69133c
+│   │   ├── bb
+│   │   │   ├── 73b03a0dbd8c864669ba28d9fa5257dd89bcf5
+│   │   │   └── 82c91a97a7aa8d0392d732ebffb07892369ab5
+│   │   ├── bc
+│   │   │   └── d0cc6630748c998d0f55a1b4001cd96028f7c2
+│   │   ├── bd
+│   │   │   ├── 112eac159c249c1ed9c8d054a6158b288a60a2
+│   │   │   └── 6e9de959220ec9c6dc97aa965193bd82e4bebd
+│   │   ├── be
+│   │   │   └── 7ded30a28805aebfc1ab76663a6a8d195c9f82
+│   │   ├── bf
+│   │   │   └── bead776c6a8fad147579856cd7b5d01debb0ab
+│   │   ├── c0
+│   │   │   └── 43271db89f387b26607ba73bfb3a061c7cc6d1
+│   │   ├── c2
+│   │   │   └── e8368eb6ef75a53173f51201ec3ab600c498b9
+│   │   ├── c3
+│   │   │   └── dfac090fc87f03464f758161c43639bf12172f
+│   │   ├── c4
+│   │   │   └── 6fcf0cbb787c8e7ecfd7555679b1fd41da7651
+│   │   ├── c5
+│   │   │   ├── 020b168483043dbff8926f3ec90d8db8a2427d
+│   │   │   └── 47cbd75333c0cddad7742e361f49551e8792c2
+│   │   ├── c6
+│   │   │   └── 4a5cc281b48a87ecb9f6acf3d9c49a2450dcf8
+│   │   ├── c7
+│   │   │   ├── 95d742d69ed83133e9ee46c5dfd04f287826fe
+│   │   │   └── bfaa1cd2df280e23deba48b33bcdaddbf9b4a4
+│   │   ├── c8
+│   │   │   └── 074d08a82d20cf68167289952bfa6b8621405e
+│   │   ├── c9
+│   │   │   ├── 5945412a86c6837df3f9cbfe2ec1e6a1f136ab
+│   │   │   └── 75494de9076c938f10b123ce99201715c46e34
+│   │   ├── cc
+│   │   │   └── 7b0745764819e4122f754d6deb1d5477f9bbc5
+│   │   ├── cd
+│   │   │   └── dc0bd7d53f2662823a980367999e2a3eeafc2d
+│   │   ├── cf
+│   │   │   ├── 01073c9c324467c47017856b1c46457753a4ea
+│   │   │   └── cc49561a146a72040ac621df94ca0130e0f752
+│   │   ├── d2
+│   │   │   └── f1e8e5ec90f3ad26aa394f56596608a40ad945
+│   │   ├── d4
+│   │   │   ├── 182155d54420c242f068699bc4c7b4b34a2acf
+│   │   │   └── 4078e1e1ef43b039a9968b08756365ddd649e3
+│   │   ├── d5
+│   │   │   └── e6b2919c3718ddb99c79590e746ea39293cd36
+│   │   ├── d6
+│   │   │   └── bccc552643622d04e789072f5bd5453d395842
+│   │   ├── d7
+│   │   │   └── 6d95ec93f2c24687c30075cee2375af32d3904
+│   │   ├── db
+│   │   │   └── 6abac7fd065abcf68e4ce27110646850fb03a2
+│   │   ├── dc
+│   │   │   ├── 338de8032db4b0c0f3771ab7c4cd2a613e715e
+│   │   │   └── db77923baa681ec1a0b3b1988872105b86d6db
+│   │   ├── de
+│   │   │   └── 4ab8e0380d67a4af0eea1023016297e110a4b7
+│   │   ├── df
+│   │   │   └── aa02ef7294a54502ce0b629718e907c7dd0296
+│   │   ├── e0
+│   │   │   ├── 431ac649196cd0a31ee774c15a58d3043e6920
+│   │   │   └── 5253810f6f4a651782b0be1fdf7388f733f42f
+│   │   ├── e4
+│   │   │   └── 61cb239af2f9d4647f484baa08ed8baeb73385
+│   │   ├── e5
+│   │   │   └── d274946abe506070d8bedadc7ef608e85e0383
+│   │   ├── e6
+│   │   │   ├── 0dde61a7a85864a384b24cbe746d485c9de310
+│   │   │   ├── 3f4b14dfb52c5eb98f7ce437be70fbdfd1033c
+│   │   │   └── 88d7d3c340682edc6a5be8679c39935fa35321
+│   │   ├── ea
+│   │   │   ├── 2ac77ec901f73fd07e21b15e3e4a095709ff33
+│   │   │   └── f656743e72aa5bc434bbe1574d9b50438ba4fd
+│   │   ├── eb
+│   │   │   └── 4aa14c900df44d440b18afdc099a13eba35aa0
+│   │   ├── ed
+│   │   │   └── 46b368eb6e98b52b27ae039edf5e020b548e7e
+│   │   ├── f1
+│   │   │   └── 9dea4b05bf5d64d37501be68e0edb9d676244f
+│   │   ├── f2
+│   │   │   └── f56ca4ae93c29dbc398cd07a4adc9ac334d02f
+│   │   ├── f3
+│   │   │   └── f7f089c68c4d3662d1f2e51816b49cdeaa2afa
+│   │   ├── f4
+│   │   │   └── a58a8b5c47f0ff4cdb93bad07e331d0193742c
+│   │   ├── f7
+│   │   │   ├── a330a7f7899ce532bac2c2e4ba9d1c4a85043f
+│   │   │   ├── c2fa7bca1158ad086fbafcbdb0c73d6d122451
+│   │   │   └── ce9f6194bbeffd369c62727bbeee9022a8d09b
+│   │   ├── f9
+│   │   │   └── 620916c24d1499702e678c2a4289bb1ba84641
+│   │   ├── fc
+│   │   │   └── 2a1137d73fdd60bf95ba6cac994adfd6af3620
+│   │   ├── fe
+│   │   │   └── 5ebf6a69d282d15df66dfe4e6b8d4543374411
+│   │   ├── info
+│   │   └── pack
+│   │       ├── pack-aaf5c912f6035096ce88c6b3248294cf6e411bff.idx
+│   │       ├── pack-aaf5c912f6035096ce88c6b3248294cf6e411bff.pack
+│   │       └── pack-aaf5c912f6035096ce88c6b3248294cf6e411bff.rev
+│   ├── packed-refs
+│   └── refs
+│       ├── heads
+│       │   ├── Karrman's_changes
+│       │   ├── Rohhan
+│       │   │   └── Prediction_export
+│       │   ├── core
+│       │   │   └── ui_js_changes
+│       │   └── main
+│       ├── remotes
+│       │   └── origin
+│       │       ├── HEAD
+│       │       ├── Karrman's_changes
+│       │       ├── Rohhan
+│       │       │   └── Prediction_export
+│       │       └── main
+│       ├── stash
+│       └── tags
+├── .keras
+│   └── keras.json
+├── DIR_STRUCT.py
+├── Dockerfile
+├── __pycache__
+│   └── cdcarm_fetch_json.cpython-38.pyc
+├── actions
+│   ├── __pycache__
+│   │   ├── __init__.cpython-38.pyc
+│   │   ├── actions.cpython-312.pyc
+│   │   ├── actions.cpython-38.pyc
+│   │   ├── cdcarm_actions.cpython-38.pyc
+│   │   ├── cdcarm_fetch_actions.cpython-38.pyc
+│   │   ├── cdcarm_fetch_json.cpython-38.pyc
+│   │   ├── cdcarm_url_actions.cpython-38.pyc
+│   │   ├── fetch_core.cpython-312.pyc
+│   │   ├── pattern_matcher_level_1.cpython-312.pyc
+│   │   ├── test_cdcarm_function.cpython-38.pyc
+│   │   └── test_failure_analyzer.cpython-38.pyc
+│   ├── actions_rasa.py
+│   ├── cdcarm_fetch_actions.py
+│   ├── cdcarm_url_actions.py
+│   ├── fetch_core.py
+│   ├── filtered_errors.json
+│   ├── flask_app.py
+│   ├── investigation_summary.csv
+│   ├── investigation_summary_merged.csv
+│   ├── investigation_summary_unmerged.csv
+│   ├── pattern_matcher.py
+│   ├── pattern_matcher_level_1.py
+│   ├── pattern_matcher_standalone_json.py
+│   ├── test_data
+│   │   └── cdcarm_results_20250527_160213_177020.json
+│   └── test_output.json
+├── backup
+│   ├── .rasa
+│   │   └── cache
+│   │       ├── cache.db
+│   │       ├── tmp0kioul6a
+│   │       │   ├── DIETClassifier.data_example.pkl
+│   │       │   ├── DIETClassifier.entity_tag_specs.json
+│   │       │   ├── DIETClassifier.index_label_id_mapping.json
+│   │       │   ├── DIETClassifier.label_data.pkl
+│   │       │   ├── DIETClassifier.sparse_feature_sizes.pkl
+│   │       │   ├── DIETClassifier.tf_model.data-00000-of-00001
+│   │       │   ├── DIETClassifier.tf_model.index
+│   │       │   └── checkpoint
+│   │       ├── tmp0y4dv1w3
+│   │       │   ├── checkpoint
+│   │       │   ├── featurizer.json
+│   │       │   ├── ted_policy.data_example.pkl
+│   │       │   ├── ted_policy.entity_tag_specs.json
+│   │       │   ├── ted_policy.fake_features.pkl
+│   │       │   ├── ted_policy.label_data.pkl
+│   │       │   ├── ted_policy.meta.pkl
+│   │       │   ├── ted_policy.priority.pkl
+│   │       │   ├── ted_policy.tf_model.data-00000-of-00001
+│   │       │   └── ted_policy.tf_model.index
+│   │       ├── tmp1c226kil
+│   │       │   ├── featurizer.json
+│   │       │   ├── rule_only_data.json
+│   │       │   └── rule_policy.json
+│   │       ├── tmp9a7whgao
+│   │       │   ├── featurizer.json
+│   │       │   └── memorized_turns.json
+│   │       ├── tmp9dh73pm4
+│   │       │   ├── featurizer.json
+│   │       │   └── memorized_turns.json
+│   │       ├── tmp_lipnwxh
+│   │       │   ├── oov_words.json
+│   │       │   └── vocabularies.pkl
+│   │       ├── tmpd9o88q93
+│   │       │   ├── featurizer.json
+│   │       │   └── memorized_turns.json
+│   │       ├── tmpdno1by2y
+│   │       │   └── feature_to_idx_dict.pkl
+│   │       ├── tmpdrkhbcpf
+│   │       │   └── feature_to_idx_dict.pkl
+│   │       ├── tmpen01f5lq
+│   │       │   ├── oov_words.json
+│   │       │   └── vocabularies.pkl
+│   │       ├── tmpf_tiev7m
+│   │       │   ├── checkpoint
+│   │       │   ├── featurizer.json
+│   │       │   ├── ted_policy.data_example.pkl
+│   │       │   ├── ted_policy.entity_tag_specs.json
+│   │       │   ├── ted_policy.fake_features.pkl
+│   │       │   ├── ted_policy.label_data.pkl
+│   │       │   ├── ted_policy.meta.pkl
+│   │       │   ├── ted_policy.priority.pkl
+│   │       │   ├── ted_policy.tf_model.data-00000-of-00001
+│   │       │   └── ted_policy.tf_model.index
+│   │       ├── tmpfkiy958x
+│   │       │   ├── checkpoint
+│   │       │   ├── featurizer.json
+│   │       │   ├── ted_policy.data_example.pkl
+│   │       │   ├── ted_policy.entity_tag_specs.json
+│   │       │   ├── ted_policy.fake_features.pkl
+│   │       │   ├── ted_policy.label_data.pkl
+│   │       │   ├── ted_policy.meta.pkl
+│   │       │   ├── ted_policy.priority.pkl
+│   │       │   ├── ted_policy.tf_model.data-00000-of-00001
+│   │       │   └── ted_policy.tf_model.index
+│   │       ├── tmphu7mhwab
+│   │       │   ├── featurizer.json
+│   │       │   └── memorized_turns.json
+│   │       ├── tmpieg6gbg0
+│   │       │   ├── oov_words.json
+│   │       │   └── vocabularies.pkl
+│   │       ├── tmpiemmmou0
+│   │       │   └── patterns.pkl
+│   │       ├── tmpjccyjqjz
+│   │       │   ├── DIETClassifier.data_example.pkl
+│   │       │   ├── DIETClassifier.entity_tag_specs.json
+│   │       │   ├── DIETClassifier.index_label_id_mapping.json
+│   │       │   ├── DIETClassifier.label_data.pkl
+│   │       │   ├── DIETClassifier.sparse_feature_sizes.pkl
+│   │       │   ├── DIETClassifier.tf_model.data-00000-of-00001
+│   │       │   ├── DIETClassifier.tf_model.index
+│   │       │   └── checkpoint
+│   │       ├── tmpjio1jzde
+│   │       │   └── feature_to_idx_dict.pkl
+│   │       ├── tmpl2ttk10q
+│   │       │   ├── oov_words.json
+│   │       │   └── vocabularies.pkl
+│   │       ├── tmplo8zr0fa
+│   │       │   ├── DIETClassifier.data_example.pkl
+│   │       │   ├── DIETClassifier.entity_tag_specs.json
+│   │       │   ├── DIETClassifier.index_label_id_mapping.json
+│   │       │   ├── DIETClassifier.label_data.pkl
+│   │       │   ├── DIETClassifier.sparse_feature_sizes.pkl
+│   │       │   ├── DIETClassifier.tf_model.data-00000-of-00001
+│   │       │   ├── DIETClassifier.tf_model.index
+│   │       │   └── checkpoint
+│   │       ├── tmpltg11l33
+│   │       │   ├── featurizer.json
+│   │       │   ├── rule_only_data.json
+│   │       │   └── rule_policy.json
+│   │       ├── tmplzb521tf
+│   │       │   ├── DIETClassifier.data_example.pkl
+│   │       │   ├── DIETClassifier.entity_tag_specs.json
+│   │       │   ├── DIETClassifier.index_label_id_mapping.json
+│   │       │   ├── DIETClassifier.label_data.pkl
+│   │       │   ├── DIETClassifier.sparse_feature_sizes.pkl
+│   │       │   ├── DIETClassifier.tf_model.data-00000-of-00001
+│   │       │   ├── DIETClassifier.tf_model.index
+│   │       │   └── checkpoint
+│   │       ├── tmpm3na7fm6
+│   │       │   ├── oov_words.json
+│   │       │   └── vocabularies.pkl
+│   │       ├── tmpmnlponpk
+│   │       │   └── patterns.pkl
+│   │       ├── tmponuirifx
+│   │       │   ├── oov_words.json
+│   │       │   └── vocabularies.pkl
+│   │       ├── tmpotr3pa_b
+│   │       │   ├── oov_words.json
+│   │       │   └── vocabularies.pkl
+│   │       ├── tmpqckfj01z
+│   │       │   ├── oov_words.json
+│   │       │   └── vocabularies.pkl
+│   │       ├── tmprgl7of6e
+│   │       │   └── feature_to_idx_dict.pkl
+│   │       ├── tmprmfnqaq9
+│   │       │   ├── oov_words.json
+│   │       │   └── vocabularies.pkl
+│   │       ├── tmpt007hgj4
+│   │       │   └── patterns.pkl
+│   │       ├── tmptllq26c5
+│   │       │   └── patterns.pkl
+│   │       ├── tmpu_2di8sn
+│   │       │   ├── DIETClassifier.data_example.pkl
+│   │       │   ├── DIETClassifier.entity_tag_specs.json
+│   │       │   ├── DIETClassifier.index_label_id_mapping.json
+│   │       │   ├── DIETClassifier.label_data.pkl
+│   │       │   ├── DIETClassifier.sparse_feature_sizes.pkl
+│   │       │   ├── DIETClassifier.tf_model.data-00000-of-00001
+│   │       │   ├── DIETClassifier.tf_model.index
+│   │       │   └── checkpoint
+│   │       ├── tmpv5bes5t_
+│   │       │   └── patterns.pkl
+│   │       ├── tmpwgqqg8m9
+│   │       │   └── feature_to_idx_dict.pkl
+│   │       ├── tmpxgj4lnqa
+│   │       │   ├── oov_words.json
+│   │       │   └── vocabularies.pkl
+│   │       └── tmpxirwkylo
+│   │           ├── featurizer.json
+│   │           ├── rule_only_data.json
+│   │           └── rule_policy.json
+│   ├── Dockerfile
+│   ├── README for Ansys DiscoveryGPT.docx
+│   ├── Rasa_chatbot
+│   │   ├── .config
+│   │   │   └── rasa
+│   │   │       └── global.yml
+│   │   ├── .env
+│   │   ├── .keras
+│   │   │   └── keras.json
+│   │   ├── .rasa
+│   │   │   └── cache
+│   │   │       ├── cache.db
+│   │   │       ├── tmp0hypxr6c
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmp0lmnqmxe
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmp14afa10o
+│   │   │       │   ├── featurizer.json
+│   │   │       │   └── memorized_turns.json
+│   │   │       ├── tmp2tnzz7j7
+│   │   │       │   └── patterns.pkl
+│   │   │       ├── tmp34_6bk4c
+│   │   │       │   ├── featurizer.json
+│   │   │       │   ├── rule_only_data.json
+│   │   │       │   └── rule_policy.json
+│   │   │       ├── tmp3lrhyzsc
+│   │   │       │   ├── DIETClassifier.data_example.pkl
+│   │   │       │   ├── DIETClassifier.entity_tag_specs.json
+│   │   │       │   ├── DIETClassifier.index_label_id_mapping.json
+│   │   │       │   ├── DIETClassifier.label_data.pkl
+│   │   │       │   ├── DIETClassifier.sparse_feature_sizes.pkl
+│   │   │       │   ├── DIETClassifier.tf_model.data-00000-of-00001
+│   │   │       │   ├── DIETClassifier.tf_model.index
+│   │   │       │   └── checkpoint
+│   │   │       ├── tmp3s0mpkae
+│   │   │       │   └── feature_to_idx_dict.pkl
+│   │   │       ├── tmp3udvutnh
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmp3ybw6s7g
+│   │   │       │   ├── DIETClassifier.data_example.pkl
+│   │   │       │   ├── DIETClassifier.entity_tag_specs.json
+│   │   │       │   ├── DIETClassifier.index_label_id_mapping.json
+│   │   │       │   ├── DIETClassifier.label_data.pkl
+│   │   │       │   ├── DIETClassifier.sparse_feature_sizes.pkl
+│   │   │       │   ├── DIETClassifier.tf_model.data-00000-of-00001
+│   │   │       │   ├── DIETClassifier.tf_model.index
+│   │   │       │   └── checkpoint
+│   │   │       ├── tmp4lva4ika
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmp50323vfl
+│   │   │       │   ├── featurizer.json
+│   │   │       │   ├── rule_only_data.json
+│   │   │       │   └── rule_policy.json
+│   │   │       ├── tmp5kbov4t6
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmp6g9h0orr
+│   │   │       │   ├── checkpoint
+│   │   │       │   ├── featurizer.json
+│   │   │       │   ├── unexpected_intent_policy.data_example.pkl
+│   │   │       │   ├── unexpected_intent_policy.entity_tag_specs.json
+│   │   │       │   ├── unexpected_intent_policy.fake_features.pkl
+│   │   │       │   ├── unexpected_intent_policy.label_data.pkl
+│   │   │       │   ├── unexpected_intent_policy.label_quantiles.pkl
+│   │   │       │   ├── unexpected_intent_policy.meta.pkl
+│   │   │       │   ├── unexpected_intent_policy.priority.pkl
+│   │   │       │   ├── unexpected_intent_policy.tf_model.data-00000-of-00001
+│   │   │       │   └── unexpected_intent_policy.tf_model.index
+│   │   │       ├── tmp_1mxhcq3
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmp_kfhrug8
+│   │   │       │   └── patterns.pkl
+│   │   │       ├── tmp_liuu7wj
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmpaekig1kk
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmpb3g2qovw
+│   │   │       │   └── patterns.pkl
+│   │   │       ├── tmpb7nwn71r
+│   │   │       │   └── feature_to_idx_dict.pkl
+│   │   │       ├── tmpbce4mrm6
+│   │   │       │   ├── DIETClassifier.data_example.pkl
+│   │   │       │   ├── DIETClassifier.entity_tag_specs.json
+│   │   │       │   ├── DIETClassifier.index_label_id_mapping.json
+│   │   │       │   ├── DIETClassifier.label_data.pkl
+│   │   │       │   ├── DIETClassifier.sparse_feature_sizes.pkl
+│   │   │       │   ├── DIETClassifier.tf_model.data-00000-of-00001
+│   │   │       │   ├── DIETClassifier.tf_model.index
+│   │   │       │   └── checkpoint
+│   │   │       ├── tmpc2_pokqc
+│   │   │       │   ├── checkpoint
+│   │   │       │   ├── featurizer.json
+│   │   │       │   ├── ted_policy.data_example.pkl
+│   │   │       │   ├── ted_policy.entity_tag_specs.json
+│   │   │       │   ├── ted_policy.fake_features.pkl
+│   │   │       │   ├── ted_policy.label_data.pkl
+│   │   │       │   ├── ted_policy.meta.pkl
+│   │   │       │   ├── ted_policy.priority.pkl
+│   │   │       │   ├── ted_policy.tf_model.data-00000-of-00001
+│   │   │       │   └── ted_policy.tf_model.index
+│   │   │       ├── tmpdncqtave
+│   │   │       │   └── feature_to_idx_dict.pkl
+│   │   │       ├── tmpf5_9p44s
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmpfo1fn1zo
+│   │   │       │   ├── featurizer.json
+│   │   │       │   ├── rule_only_data.json
+│   │   │       │   └── rule_policy.json
+│   │   │       ├── tmph3ci_3fe
+│   │   │       │   ├── featurizer.json
+│   │   │       │   └── memorized_turns.json
+│   │   │       ├── tmph94afo76
+│   │   │       │   ├── featurizer.json
+│   │   │       │   └── memorized_turns.json
+│   │   │       ├── tmpi_q5sd5a
+│   │   │       │   ├── checkpoint
+│   │   │       │   ├── featurizer.json
+│   │   │       │   ├── ted_policy.data_example.pkl
+│   │   │       │   ├── ted_policy.entity_tag_specs.json
+│   │   │       │   ├── ted_policy.fake_features.pkl
+│   │   │       │   ├── ted_policy.label_data.pkl
+│   │   │       │   ├── ted_policy.meta.pkl
+│   │   │       │   ├── ted_policy.priority.pkl
+│   │   │       │   ├── ted_policy.tf_model.data-00000-of-00001
+│   │   │       │   └── ted_policy.tf_model.index
+│   │   │       ├── tmpj3q24ux8
+│   │   │       │   └── patterns.pkl
+│   │   │       ├── tmpk8xqhvh4
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmpkp17ex8b
+│   │   │       │   ├── DIETClassifier.data_example.pkl
+│   │   │       │   ├── DIETClassifier.entity_tag_specs.json
+│   │   │       │   ├── DIETClassifier.index_label_id_mapping.json
+│   │   │       │   ├── DIETClassifier.label_data.pkl
+│   │   │       │   ├── DIETClassifier.sparse_feature_sizes.pkl
+│   │   │       │   ├── DIETClassifier.tf_model.data-00000-of-00001
+│   │   │       │   ├── DIETClassifier.tf_model.index
+│   │   │       │   └── checkpoint
+│   │   │       ├── tmpkpc0418a
+│   │   │       │   ├── DIETClassifier.data_example.pkl
+│   │   │       │   ├── DIETClassifier.entity_tag_specs.json
+│   │   │       │   ├── DIETClassifier.index_label_id_mapping.json
+│   │   │       │   ├── DIETClassifier.label_data.pkl
+│   │   │       │   ├── DIETClassifier.sparse_feature_sizes.pkl
+│   │   │       │   ├── DIETClassifier.tf_model.data-00000-of-00001
+│   │   │       │   ├── DIETClassifier.tf_model.index
+│   │   │       │   └── checkpoint
+│   │   │       ├── tmpkza60dr8
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmplyp9jxg5
+│   │   │       │   └── feature_to_idx_dict.pkl
+│   │   │       ├── tmpma8eosar
+│   │   │       │   └── patterns.pkl
+│   │   │       ├── tmpmh8nr6ws
+│   │   │       │   ├── featurizer.json
+│   │   │       │   └── memorized_turns.json
+│   │   │       ├── tmpn06vocr4
+│   │   │       │   ├── featurizer.json
+│   │   │       │   └── memorized_turns.json
+│   │   │       ├── tmpnmj9rani
+│   │   │       │   ├── DIETClassifier.data_example.pkl
+│   │   │       │   ├── DIETClassifier.entity_tag_specs.json
+│   │   │       │   ├── DIETClassifier.index_label_id_mapping.json
+│   │   │       │   ├── DIETClassifier.label_data.pkl
+│   │   │       │   ├── DIETClassifier.sparse_feature_sizes.pkl
+│   │   │       │   ├── DIETClassifier.tf_model.data-00000-of-00001
+│   │   │       │   ├── DIETClassifier.tf_model.index
+│   │   │       │   └── checkpoint
+│   │   │       ├── tmpog7wkfn8
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmpopjej_6j
+│   │   │       │   └── feature_to_idx_dict.pkl
+│   │   │       ├── tmppvtacatn
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmpqksyyhxx
+│   │   │       │   ├── oov_words.json
+│   │   │       │   └── vocabularies.pkl
+│   │   │       ├── tmpr157pdp1
+│   │   │       │   └── feature_to_idx_dict.pkl
+│   │   │       ├── tmpslscuesq
+│   │   │       │   ├── checkpoint
+│   │   │       │   ├── featurizer.json
+│   │   │       │   ├── ted_policy.data_example.pkl
+│   │   │       │   ├── ted_policy.entity_tag_specs.json
+│   │   │       │   ├── ted_policy.fake_features.pkl
+│   │   │       │   ├── ted_policy.label_data.pkl
+│   │   │       │   ├── ted_policy.meta.pkl
+│   │   │       │   ├── ted_policy.priority.pkl
+│   │   │       │   ├── ted_policy.tf_model.data-00000-of-00001
+│   │   │       │   └── ted_policy.tf_model.index
+│   │   │       ├── tmpv0nx1_9g
+│   │   │       │   ├── featurizer.json
+│   │   │       │   └── memorized_turns.json
+│   │   │       ├── tmpvcrqje9_
+│   │   │       │   └── patterns.pkl
+│   │   │       ├── tmpvu69wvn9
+│   │   │       │   └── patterns.pkl
+│   │   │       ├── tmpz42v5jl1
+│   │   │       │   ├── featurizer.json
+│   │   │       │   └── memorized_turns.json
+│   │   │       └── tmpzmsoxci3
+│   │   │           └── feature_to_idx_dict.pkl
+│   │   ├── Dockerfile
+│   │   ├── README for Ansys DiscoveryGPT.docx
+│   │   ├── actions
+│   │   │   ├── __init__.py
+│   │   │   ├── __pycache__
+│   │   │   │   ├── __init__.cpython-38.pyc
+│   │   │   │   ├── actions.cpython-38.pyc
+│   │   │   │   ├── cdcarm_actions.cpython-38.pyc
+│   │   │   │   ├── test_cdcarm_function.cpython-38.pyc
+│   │   │   │   └── test_failure_analyzer.cpython-38.pyc
+│   │   │   ├── actions.py
+│   │   │   ├── cdcarm_actions.py
+│   │   │   └── test_cdcarm_function.py
+│   │   ├── config.yml
+│   │   ├── data
+│   │   │   ├── nlu.yml
+│   │   │   ├── rules.yml
+│   │   │   └── stories.yml
+│   │   ├── domain.yml
+│   │   ├── endpoints.yml
+│   │   ├── file_upload.py
+│   │   ├── gpt_neo_integration.py
+│   │   ├── models
+│   │   │   ├── 20250228-153554-grizzled-polytope.tar.gz
+│   │   │   ├── 20250403-113714-isobaric-acquisition.tar.gz
+│   │   │   └── 20250404-145834-brave-butter.tar.gz
+│   │   ├── rasa
+│   │   │   └── Dockerfile
+│   │   ├── requirements.txt
+│   │   ├── setup.sh
+│   │   ├── test_cdcarm_function.py
+│   │   ├── tests
+│   │   │   └── test_stories.yml
+│   │   ├── web
+│   │   │   ├── Dockerfile
+│   │   │   ├── index.html
+│   │   │   └── test_analyzer.html
+│   │   └── ~$ADME for Ansys DiscoveryGPT.docx
+│   ├── direct_script_runner.log
+│   ├── generate_structure.py
+│   ├── gpt_neo_integration.py
+│   └── test_cdcarm_function.py
+├── cdcarm_fetch_json.py
+├── clean_workspace.bat
+├── config.yml
+├── data
+│   ├── nlu.yml
+│   ├── rules.yml
+│   ├── stories.yml
+│   └── verify_nlu.py
+├── direct_script_runner.log
+├── docker-compose.yml
+├── domain.yml
+├── endpoints.yml
+├── file_upload.py
+├── models
+│   ├── 20250430-130007-poky-charge.tar.gz
+│   ├── 20250508-160133-lazy-pouch.tar.gz
+│   └── 20250515-142458-faded-user.tar.gz
+├── rasa
+├── requirements.txt
+├── run_script_directly.py
+├── setup.sh
+├── start_tfia_servers - Karrman.bat.bat
+├── start_tfia_servers.bat
+├── structure.txt
+├── tests
+│   └── test_stories.yml
+└── web
+    ├── Dockerfile
+    ├── index.html
+    ├── script.js
+    └── styles.css
