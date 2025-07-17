@@ -85,7 +85,6 @@ chatInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
 
-// FIXED: Clear everything and show welcome message only once
 function clearAndShowWelcome() {
     // Clear all content first
     chatBody.innerHTML = '';
@@ -106,13 +105,19 @@ function clearAndShowWelcome() {
         </div>
     `;
     chatBody.appendChild(welcomeMessage);
-    chatBody.scrollTop = chatBody.scrollHeight;
+
+    // Scroll to top *immediately* after welcome message is added
+    chatBody.scrollTop = 0;
 
     // Wait a bit, then show buttons
     setTimeout(() => {
         showWelcomeButtons();
+
+        // Optional: scroll again after buttons appear
+        chatBody.scrollTop = 0;
     }, 500);
 }
+
 
 // FIXED: Show buttons without creating another welcome message - CDCARM URL button removed
 function showWelcomeButtons() {
