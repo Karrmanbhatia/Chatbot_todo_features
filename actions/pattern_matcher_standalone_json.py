@@ -8,7 +8,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.cluster import DBSCAN
 
 # Load NLP embedding model
-model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('all-MiniLM-L6-v2', local_files_only=True)
 
 def extract_error_messages_from_json(json_data):
     error_msgs = []

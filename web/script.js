@@ -613,20 +613,16 @@ function displayPredictionResults(predictions, ownerFilter = "", showAll = false
         `<option value="${owner}" ${owner.toLowerCase() === ownerFilter.toLowerCase() ? 'selected' : ''}>${owner}</option>`
     ).join('');
 
-    // 🔍 Initial filter
     let filtered = showAll
         ? predictions
         : predictions.filter(p => p.IsPredicted === "Yes");
 
-    // 🔍 Owner filtering
     if (ownerFilter && ownerFilter.toLowerCase() !== "all") {
         filtered = filtered.filter(p => p.Owner.trim().toLowerCase() === ownerFilter.toLowerCase());
     }
 
-    // 🔽 Sort by confidence (nulls last)
     filtered.sort((a, b) => (b.ConfidenceScore || -1) - (a.ConfidenceScore || -1));
 
-    // Group by TestName
     const grouped = {};
     filtered.forEach(p => {
         const test = p.TestName;
@@ -646,32 +642,29 @@ function displayPredictionResults(predictions, ownerFilter = "", showAll = false
     const botMsg = createBotMessage();
     botMsg.innerHTML = `
       <h4>🔎 Prediction Results:</h4>
-      <div class="owner-filter-container" style="margin-bottom:10px;">
-        <label for="ownerFilterSelect"><strong>Owner Filter:</strong></label>
-        <select id="ownerFilterSelect" class="option-input" style="width:200px;">
+
+      <div class="prediction-controls">
+        <label for="ownerFilterSelect">Owner Filter:</label>
+        <select id="ownerFilterSelect" class="option-input">
             <option value="">All</option>
             ${ownerOptions}
         </select>
 
-        <label style="margin-left:15px;">
-          <input type="checkbox" id="showAllToggle" ${showAll ? "checked" : ""} />
-          Show All (including anchored results)
-        </label>
-
-        <button id="applyOwnerFilterBtn" class="fetch-json-btn" style="margin-left:10px;">
+        <button id="applyOwnerFilterBtn">
             <i class="fas fa-filter"></i> Apply
         </button>
 
-        <button id="exportCSV" class="fetch-json-btn" style="margin-left:10px;">
+        <button id="exportCSV">
             <i class="fas fa-download"></i> Export CSV
         </button>
       </div>
-      <div style="margin-bottom:8px; font-size: 0.9em; color: #555;">
-        <p>🔹 <strong>Filtering:</strong> Showing ${showAll ? "all test results (predicted + anchored)" : "only predicted test failures"}.</p>
-        <p>🔹 <strong>Sorting:</strong> Tests are sorted by descending prediction confidence.</p>
-        <p>🔹 <strong>Test name link:</strong> opens the corresponding ARM test page.</p>
-        <p>🔹 <strong>Work Item link:</strong> opens the predicted TFS work item in a new tab.</p>
+
+      <div class="prediction-notes">
+      <p><strong>🔹 Sorting:</strong> Tests are sorted by descending prediction confidence.</p>
+        <p><strong>🔹 Test name link:</strong> opens the corresponding ARM test page.</p>
+        <p><strong>🔹 Work Item link:</strong> opens the predicted TFS work item in a new tab.</p>
       </div>
+
       <div style="max-height:300px; overflow:auto;">
         <table class="prediction-table" id="predictionResultTable">
           <thead>
@@ -689,20 +682,18 @@ function displayPredictionResults(predictions, ownerFilter = "", showAll = false
                 </td>
                 <td>
                   ${info.Owner}
-                  <span style="margin-left:8px; font-size: 0.75em; color: ${info.IsPredicted === "No" ? "#999" : "#2a9d8f"};">
-                    ${info.IsPredicted === "No" ? "(Anchored)" : "(Predicted)"}
-                  </span>
                 </td>
                 <td>
                   ${[...info.WorkItems].map(wi =>
-        `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
-    ).join(", ") || "-"}
+                    `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
+                  ).join(", ") || "-"}
                 </td>
               </tr>
             `).join('')}
           </tbody>
         </table>
       </div>
+
       <button class="back-to-menu" id="backToMenuPred" style="margin-top:10px;">
         <i class="fas fa-home"></i><span style="margin-left: 6px;">Home</span>
       </button>
@@ -710,7 +701,7 @@ function displayPredictionResults(predictions, ownerFilter = "", showAll = false
     chatBody.appendChild(botMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
 
-    // Events
+    // Event listeners
     document.getElementById('applyOwnerFilterBtn').addEventListener('click', () => {
         const owner = document.getElementById('ownerFilterSelect').value.trim();
         const showAllChecked = document.getElementById('showAllToggle').checked;
