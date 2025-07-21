@@ -404,26 +404,24 @@ function showCDCARMJsonOptions() {
                     <label class="option-label">Min Failing Builds:</label>
                     <input type="number" class="option-input" id="minFailingInput" placeholder="2" value="2" min="1">
                 </div>
-				
                 
                 <button class="fetch-json-btn" id="fetchJsonBtn">
                     <i class="fas fa-download"></i> Run Predictions
                 </button>
             </div>
-            
         `;
-        // //<div class="option-group">
-        //             <label class="option-label">Owner (Case Sensitive):</label>
-        //             <input type="text" class="option-input" id="ownerJsonInput" list="ownersList" placeholder="all" value="all">
-        //         </div>
+
         chatBody.appendChild(message);
         chatBody.scrollTop = chatBody.scrollHeight;
 
-        document.getElementById('fetchJsonBtn').addEventListener('click', fetchCDCARMJson);
-        console.log("✅ Dynamic input fields with global datalists loaded.");
-        cleanupDuplicateButtons();
+        const fetchJsonBtn = document.getElementById('fetchJsonBtn');
+        if (fetchJsonBtn) {
+            fetchJsonBtn.addEventListener('click', fetchCDCARMJson);
+        }
     });
 }
+
+
 
 function fetchCDCARMJson() {
     const products = (document.getElementById('productsInput').value.trim() || "DISCO")
@@ -543,7 +541,23 @@ function buildInvestigationLink(workItemId) {
 function displayClusteredResults(clusteredSummary) {
     if (!clusteredSummary || !clusteredSummary.length) {
         const botMsg = createBotMessage();
-        botMsg.innerHTML = `<p>No similar error clusters found.</p>`;
+        botMsg.innerHTML = `
+            <div style="padding:10px; border:1px solid #ccc; border-radius:6px; background:#f8f9fa;">
+                <h4>❌ No Similar Error Clusters Found</h4>
+                <p>We couldn't group the test failures into meaningful clusters based on similarity of failure messages.</p>
+                <ul style="margin-left:18px; color:#555; font-size:0.9em;">
+                <li>The failure messages might be too unique or lack common patterns.</li>
+                <li>There may be insufficient test failures to form clusters.</li>
+                <li>Current filters (Product: <b>${productInput}</b>, Release: <b>${releaseInput}</b>, Platform: <b>${platformInput}</b>) might be too restrictive.</li>
+                </ul>
+                <p><b>Next Steps:</b></p>
+                <ul style="margin-left:18px; color:#555; font-size:0.9em;">
+                <li>Review individual failed test results manually.</li>
+                <li>Adjust the "Min Failing Builds" parameter and try again.</li>
+                <li>Verify if the error logs have enough similarity for clustering.</li>
+                </ul>
+            </div>
+            `;
         chatBody.appendChild(botMsg);
         chatBody.scrollTop = chatBody.scrollHeight;
         return;
@@ -561,26 +575,30 @@ function displayClusteredResults(clusteredSummary) {
         <p>🔹 These groups were formed by clustering unpredicted test failures based on similar failure messages.</p>
         <p>🔹 <strong>Test name links:</strong> open the ARM test page in a new tab.</p>
       </div>
-      ${clusteredSummary.map((group, groupIndex) => `
-        <div class="cluster-block" style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:6px;">
-          <h5 style="margin-bottom:6px;">
-            🧠 Cluster ${groupIndex + 1}
-            <span style="background:#eee; font-size:0.8em; padding:2px 6px; border-radius:4px; margin-left:6px;">
-              ${group.length} test${group.length > 1 ? 's' : ''}
-            </span>
-          </h5>
-          <ul style="padding-left: 16px;">
-            ${group.map(test => `
-              <li style="margin-bottom:4px;">
-                <a href="${buildTestLink(test.TestName, test.Product || productInput, releaseInput, platformInput)}" target="_blank" style="text-decoration:underline; color:#007bff;">
-                  ${test.TestName}
-                </a>
-                <span style="margin-left: 10px; color: #888;">(${test.Owner})</span>
-              </li>
-            `).join('')}
-          </ul>
-        </div>
-      `).join('')}
+      ${clusteredSummary.map((group, groupIndex) => {
+        // Deduplicate tests within each group
+        const uniqueTests = Array.from(new Map(group.map(t => [t.TestName + t.Owner, t])).values());
+        return `
+          <div class="cluster-block" style="border:1px solid #ccc; padding:10px; margin-bottom:10px; border-radius:6px;">
+            <h5 style="margin-bottom:6px;">
+              🧠 Cluster ${groupIndex + 1}
+              <span style="background:#eee; font-size:0.8em; padding:2px 6px; border-radius:4px; margin-left:6px;">
+                ${uniqueTests.length} test${uniqueTests.length > 1 ? 's' : ''}
+              </span>
+            </h5>
+            <ul style="padding-left: 16px;">
+              ${uniqueTests.map(test => `
+                <li style="margin-bottom:4px;">
+                  <a href="${buildTestLink(test.TestName, test.Product || productInput, releaseInput, platformInput)}" target="_blank" style="text-decoration:underline; color:#007bff;">
+                    ${test.TestName}
+                  </a>
+                  <span style="margin-left: 10px; color: #888;">(${test.Owner})</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+      }).join('')}
       <button class="back-to-menu" id="backToMenuClustered" style="margin-top:10px;">
         <i class="fas fa-home"></i><span style="margin-left: 6px;">Home</span>
       </button>
@@ -597,7 +615,8 @@ function displayClusteredResults(clusteredSummary) {
 
 
 
-function displayPredictionResults(predictions, ownerFilter = "", showAll = false) {
+
+function displayPredictionResults(predictions, ownerFilter = "") {
     if (!predictions.length) {
         const botMsg = createBotMessage();
         botMsg.innerHTML = `<p>No matching tests found for the selected owner.</p>`;
@@ -608,21 +627,27 @@ function displayPredictionResults(predictions, ownerFilter = "", showAll = false
 
     if (!allPredictions.length) allPredictions = predictions;
 
-    const owners = [...new Set(allPredictions.map(p => p.Owner))];
-    const ownerOptions = owners.map(owner =>
+    // Populate unique owners
+    const owners = [...new Set(allPredictions.map(p => p.Owner || "").filter(o => o.trim() !== ""))];
+    const ownerOptions = [
+        `<option value="">Select an owner</option>`,
+        `<option value="__all__"${ownerFilter === "__all__" ? " selected" : ""}>All</option>`
+    ].concat(owners.map(owner =>
         `<option value="${owner}" ${owner.toLowerCase() === ownerFilter.toLowerCase() ? 'selected' : ''}>${owner}</option>`
-    ).join('');
+    )).join('');
 
-    let filtered = showAll
-        ? predictions
-        : predictions.filter(p => p.IsPredicted === "Yes");
+    // Filter predicted only
+    let filtered = predictions.filter(p => p.IsPredicted === "Yes");
 
-    if (ownerFilter && ownerFilter.toLowerCase() !== "all") {
+    // Apply owner filter if provided
+    if (ownerFilter && ownerFilter.trim() !== "" && ownerFilter !== "__all__") {
         filtered = filtered.filter(p => p.Owner.trim().toLowerCase() === ownerFilter.toLowerCase());
     }
 
+    // Sort by confidence score
     filtered.sort((a, b) => (b.ConfidenceScore || -1) - (a.ConfidenceScore || -1));
 
+    // Group tests by TestName
     const grouped = {};
     filtered.forEach(p => {
         const test = p.TestName;
@@ -630,7 +655,6 @@ function displayPredictionResults(predictions, ownerFilter = "", showAll = false
             grouped[test] = {
                 Owner: p.Owner,
                 Product: p.Product,
-                IsPredicted: p.IsPredicted,
                 WorkItems: new Set()
             };
         }
@@ -646,7 +670,6 @@ function displayPredictionResults(predictions, ownerFilter = "", showAll = false
       <div class="prediction-controls">
         <label for="ownerFilterSelect">Owner Filter:</label>
         <select id="ownerFilterSelect" class="option-input">
-            <option value="">All</option>
             ${ownerOptions}
         </select>
 
@@ -660,7 +683,7 @@ function displayPredictionResults(predictions, ownerFilter = "", showAll = false
       </div>
 
       <div class="prediction-notes">
-      <p><strong>🔹 Sorting:</strong> Tests are sorted by descending prediction confidence.</p>
+        <p><strong>🔹 Sorting:</strong> Tests are sorted by descending prediction confidence.</p>
         <p><strong>🔹 Test name link:</strong> opens the corresponding ARM test page.</p>
         <p><strong>🔹 Work Item link:</strong> opens the predicted TFS work item in a new tab.</p>
       </div>
@@ -680,9 +703,7 @@ function displayPredictionResults(predictions, ownerFilter = "", showAll = false
                 <td>
                   <a href="${buildTestLink(testName, info.Product)}" target="_blank">${testName}</a>
                 </td>
-                <td>
-                  ${info.Owner}
-                </td>
+                <td>${info.Owner}</td>
                 <td>
                   ${[...info.WorkItems].map(wi =>
                     `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
@@ -704,14 +725,14 @@ function displayPredictionResults(predictions, ownerFilter = "", showAll = false
     // Event listeners
     document.getElementById('applyOwnerFilterBtn').addEventListener('click', () => {
         const owner = document.getElementById('ownerFilterSelect').value.trim();
-        const showAllChecked = document.getElementById('showAllToggle').checked;
         chatBody.removeChild(botMsg);
-        displayPredictionResults(allPredictions, owner, showAllChecked);
+        displayPredictionResults(allPredictions, owner);
     });
 
     document.getElementById('exportCSV').addEventListener('click', () => {
         exportTableToCSV("#predictionResultTable");
     });
+ 
 
     document.getElementById('backToMenuPred').addEventListener('click', () => {
         allPredictions = [];
