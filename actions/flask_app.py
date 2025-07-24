@@ -1,21 +1,34 @@
-#file: flask_app.py
-from flask import Flask, request, jsonify
+# actions/flask_app.py
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import tempfile
 import os
-import base64
 import json
 import uuid
 from datetime import datetime
-import requests  # 🔥 Add requests to fetch data from remote APIs
+import requests
 
 from fetch_core import fetch_arm_json
 
-app = Flask(__name__,
+app = Flask(
+    __name__,
     template_folder="../web",     # Relative to flask_app.py
-    static_folder="../web" )
+    static_folder="../web"
+)
 CORS(app)  # Enable CORS for frontend access
 
+BASE_API_URL = "https://cdcarm.win.ansys.com"
+
+# ===================== AUTH HANDLER ===================== #
+def get_basic_auth():
+    """Parses ARM_API env var (username:apiKey) and returns (username, apiKey) tuple."""
+    arm_api = os.environ.get("ARM_API", "")
+    if ":" not in arm_api:
+        raise ValueError("ARM_API must be set as username:apiKey")
+    username, api_key = arm_api.split(":", 1)
+    return (username, api_key)
+
+# ===================== FETCH CDCARM ===================== #
 @app.route("/fetch_cdcarm", methods=["POST"])
 def fetch_cdcarm():
     try:
@@ -89,60 +102,56 @@ def fetch_cdcarm():
         return jsonify({"error": str(e)}), 500
 
 
-# 🔥 Proxy endpoints for dynamic data lists
+# ===================== PROXY ENDPOINTS ===================== #
 @app.route("/api/products", methods=["GET"])
 def get_products():
     try:
-        response = requests.get("https://cdcarm.win.ansys.com/api/Product")
+        auth = get_basic_auth()
+        url = f"{BASE_API_URL}/api/Product"
+        response = requests.get(url, auth=auth, headers={"Content-Type": "application/json"}, timeout=15)
         response.raise_for_status()
         products = response.json()
-        print(f"✅ Products fetched: {len(products)}")  # 🔥 Log count
+        print(f"✅ Products fetched: {len(products)}")
         return jsonify(products)
     except Exception as e:
         print(f"❌ Error fetching products: {e}")
         return jsonify({"error": str(e)}), 500
 
+
 @app.route("/api/releases", methods=["GET"])
 def get_releases():
     try:
-        response = requests.get("https://cdcarm.win.ansys.com/api/Release")
+        auth = get_basic_auth()
+        url = f"{BASE_API_URL}/api/Release"
+        response = requests.get(url, auth=auth, headers={"Content-Type": "application/json"}, timeout=15)
         response.raise_for_status()
         releases = response.json()
-        print(f"✅ Releases fetched: {len(releases)}")  # 🔥 Log count
+        print(f"✅ Releases fetched: {len(releases)}")
         return jsonify(releases)
     except Exception as e:
         print(f"❌ Error fetching releases: {e}")
         return jsonify({"error": str(e)}), 500
 
+
 @app.route("/api/platforms", methods=["GET"])
 def get_platforms():
     try:
-        response = requests.get("https://cdcarm.win.ansys.com/api/Platform")
+        auth = get_basic_auth()
+        url = f"{BASE_API_URL}/api/Platform"
+        response = requests.get(url, auth=auth, headers={"Content-Type": "application/json"}, timeout=15)
         response.raise_for_status()
         platforms = response.json()
-        print(f"✅ Platforms fetched: {len(platforms)}")  # 🔥 Log count
+        print(f"✅ Platforms fetched: {len(platforms)}")
         return jsonify(platforms)
     except Exception as e:
         print(f"❌ Error fetching platforms: {e}")
         return jsonify({"error": str(e)}), 500
-from flask import render_template
+
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
-# Example for owners if needed
-# @app.route("/api/owners", methods=["GET"])
-# def get_owners():
-#     try:
-#         response = requests.get("https://cdcarm.win.ansys.com/api/Owners")
-#         response.raise_for_status()
-#         owners = response.json()
-#         print(f"✅ Owners fetched: {len(owners)}")  # 🔥 Log count
-#         return jsonify(owners)
-#     except Exception as e:
-#         print(f"❌ Error fetching owners: {e}")
-#         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Default to 5000 for local

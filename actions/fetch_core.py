@@ -1,8 +1,18 @@
+# actions/fetch_core.py
 import os
 import json
 import requests
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from requests.auth import HTTPBasicAuth
+
+# Read ARM_API (username:apiKey)
+ARM_API = os.environ.get("ARM_API", "")
+if ":" not in ARM_API:
+    raise ValueError("❌ ARM_API must be set as 'username:apiKey' in environment variables.")
+
+USERNAME, API_KEY = ARM_API.split(":", 1)
+AUTH = HTTPBasicAuth(USERNAME, API_KEY)
 
 def fetch_arm_json(server, products, releases, platforms,
                    min_failing_builds, owner, output_path=None,
@@ -14,10 +24,16 @@ def fetch_arm_json(server, products, releases, platforms,
 
     base = server.rstrip('/') + '/api'
 
+    # Helper: perform authenticated GET requests
+    def auth_get(url):
+        resp = requests.get(url, auth=AUTH, timeout=30)
+        resp.raise_for_status()
+        return resp.json()
+
     # Fetch metadata
-    products_data = requests.get(f"{base}/Product", timeout=30).json()
-    releases_data = requests.get(f"{base}/Release", timeout=30).json()
-    platforms_data = requests.get(f"{base}/Platform", timeout=30).json()
+    products_data = auth_get(f"{base}/Product")
+    releases_data = auth_get(f"{base}/Release")
+    platforms_data = auth_get(f"{base}/Platform")
 
     # Filter by input
     prods = [p for p in products_data if p['Name'] in products]
@@ -27,12 +43,12 @@ def fetch_arm_json(server, products, releases, platforms,
     # Helper to process a single error record
     def process_error(e, p, r, pl):
         msg_url = f"{base}/TestResultXML/{e['TestResultId']}"
-        raw_msg = requests.get(msg_url, timeout=30).json()
+        raw_msg = auth_get(msg_url)
         raw = raw_msg.get('message', '') if isinstance(raw_msg, dict) else str(raw_msg)
         cleaned = re.sub(r"[\r\n]+", ' ', raw).strip()
 
         inv_url = f"{base}/Investigation/Test/{e['TestId']}/Release/{r['Id']}/Platform/{pl['Id']}"
-        inv_list = requests.get(inv_url, timeout=30).json() or []
+        inv_list = auth_get(inv_url) or []
 
         record = {
             'Product': p['Name'],
@@ -59,7 +75,7 @@ def fetch_arm_json(server, products, releases, platforms,
         for r in rels:
             for pl in plats:
                 url = f"{base}/ErrorSummary/Product/{p['Id']}/Release/{r['Id']}/Platform/{pl['Id']}"
-                errors = requests.get(url, timeout=30).json() or []
+                errors = auth_get(url) or []
 
                 for e in errors:
                     if e.get('Result') == 'PASS':

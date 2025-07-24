@@ -300,7 +300,7 @@ function handleJsonDownload(payload) {
 async function populateDynamicDatalists() {
     try {
         // Fetch Products
-        const productRes = await fetch("http://localhost:5000/api/products");
+        const productRes = await fetch("/api/products");
         const products = await productRes.json();
         const productList = document.getElementById("productsList");
         products.forEach(p => {
@@ -312,7 +312,7 @@ async function populateDynamicDatalists() {
         console.log(`✅ Products fetched: ${products.length}`);
 
         // Fetch Releases
-        const releaseRes = await fetch("http://localhost:5000/api/releases");
+        const releaseRes = await fetch("/api/releases");
         const releases = await releaseRes.json();
         const releaseList = document.getElementById("releasesList");
         releases.forEach(r => {
@@ -324,7 +324,7 @@ async function populateDynamicDatalists() {
         console.log(`✅ Releases fetched: ${releases.length}`);
 
         // Fetch Platforms
-        const platformRes = await fetch("http://localhost:5000/api/platforms");
+        const platformRes = await fetch("/api/platforms");
         const platforms = await platformRes.json();
         const platformList = document.getElementById("platformsList");
         platforms.forEach(pl => {
@@ -460,7 +460,7 @@ function fetchCDCARMJson() {
     const progressBar = document.getElementById('jsonProgressBar');
     progressBar.style.width = '30%';
 
-    fetch("http://localhost:5000/fetch_cdcarm", {
+    fetch("/fetch_cdcarm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -772,7 +772,7 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
 
     progressBar.style.width = '30%';
 
-    fetch("http://localhost:5000/fetch_cdcarm", {
+    fetch("fetch_cdcarm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
