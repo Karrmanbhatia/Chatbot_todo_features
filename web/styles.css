@@ -265,8 +265,8 @@ body {
 /* Chat Window */
 .chat-window {
     display: none;
-    width: 380px;
-    height: 550px;
+    width: 450px;     /* Previously 380px */
+    height: 600px;    /* Previously 550px */
     background-color: white;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
