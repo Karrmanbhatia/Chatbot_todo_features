@@ -292,7 +292,8 @@ body {
     overflow: hidden;
     flex-direction: column;
     transition: var(--transition-normal);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    
+  
 }
 
 .chat-window.expanded {
@@ -997,7 +998,7 @@ body {
     border-radius: 8px;
     margin-top: 8px;
     line-height: 1.6;
-    border-left: 4px solid #6366f1;
+    /* border-left: 4px solid #6366f1; */
 }
 
 .prediction-notes p {
