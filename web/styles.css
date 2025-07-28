@@ -261,6 +261,25 @@ body {
     font-size: 24px;
     animation: pulse 2s infinite;
 }
+.startInvestigationBtn {
+    background-color: var(--ansys-blue);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.3s ease;
+    margin-top: 12px;
+}
+
+.startInvestigationBtn:hover {
+    background-color: #004a8f; /* Darker blue for hover */
+}
 
 /* Chat Window */
 .chat-window {
