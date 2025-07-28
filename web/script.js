@@ -256,9 +256,10 @@ function handleJsonDownload(payload) {
                 <i class="fas fa-download"></i> Download results
 
             </button>
-            <button class="back-to-menu" id="backToMenuJson">
-                <i class="fas fa-home"></i> Home
+            <button class="back-to-menu" id="startInvestigationBtn">
+                <i class="fas fa-redo"></i> Start Test Failure Investigation
             </button>
+
         </div>
     `;
     chatBody.appendChild(downloadMessage);
@@ -294,7 +295,8 @@ function handleJsonDownload(payload) {
         }
     });
 
-    document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
+    document.getElementById('startInvestigationBtn').addEventListener('click', showCDCARMJsonOptions);
+
 }
 
 async function populateDynamicDatalists() {
@@ -380,8 +382,15 @@ function showCDCARMJsonOptions() {
     chatFooter.style.display = 'flex';
     currentContext = 'cdcarm_json';
 
+    // Remove any existing form before creating a new one
+    const existingForm = document.getElementById('cdcarmFormContainer');
+    if (existingForm) {
+        existingForm.remove();
+    }
+
     showTypingIndicator().then(() => {
         const message = createBotMessage();
+        message.id = "cdcarmFormContainer"; // Assign ID to detect duplicates
         message.innerHTML = `
             <p>Let's fetch ARM Error report data for investigation. Please provide the following information:</p>
             <div class="cdcarm-json-options active">
@@ -389,22 +398,18 @@ function showCDCARMJsonOptions() {
                     <label class="option-label">Products:</label>
                     <input type="text" class="option-input" id="productsInput" list="productsList" placeholder="DISCO" value="DISCO">
                 </div>
-                
                 <div class="option-group">
                     <label class="option-label">Releases:</label>
                     <input type="text" class="option-input" id="releasesInput" list="releasesList" placeholder="26.1" value="26.1">
                 </div>
-                
                 <div class="option-group">
                     <label class="option-label">Platforms:</label>
                     <input type="text" class="option-input" id="platformsInput" list="platformsList" placeholder="Windows" value="Windows">
                 </div>
-                
                 <div class="option-group">
                     <label class="option-label">Min Failing Builds:</label>
                     <input type="number" class="option-input" id="minFailingInput" placeholder="2" value="2" min="1">
                 </div>
-                
                 <button class="fetch-json-btn" id="fetchJsonBtn">
                     <i class="fas fa-download"></i> Run Predictions
                 </button>
@@ -414,6 +419,7 @@ function showCDCARMJsonOptions() {
         chatBody.appendChild(message);
         chatBody.scrollTop = chatBody.scrollHeight;
 
+        // Attach new event listener to the fresh button
         const fetchJsonBtn = document.getElementById('fetchJsonBtn');
         if (fetchJsonBtn) {
             fetchJsonBtn.addEventListener('click', fetchCDCARMJson);
@@ -425,21 +431,30 @@ function showCDCARMJsonOptions() {
 
 function fetchCDCARMJson() {
     const products = (document.getElementById('productsInput').value.trim() || "DISCO")
-    .split(",")
-    .map(p => p.trim())
-    .filter(p => p);
+        .split(",")
+        .map(p => p.trim())
+        .filter(p => p);
     const releases = (document.getElementById('releasesInput').value.trim() || "26.1")
-    .split(",")
-    .map(r => r.trim())
-    .filter(r => r);
+        .split(",")
+        .map(r => r.trim())
+        .filter(r => r);
     const platforms = (document.getElementById('platformsInput').value.trim() || "Windows")
-    .split(",")
-    .map(p => p.trim())
-    .filter(p => p);
+        .split(",")
+        .map(p => p.trim())
+        .filter(p => p);
     const minFailingBuilds = document.getElementById('minFailingInput').value.trim() || "2";
-    const ownerFilter = document.getElementById('ownerJsonInput').value.trim() || "all";
+    const ownerFilter = document.getElementById('ownerJsonInput')?.value.trim() || "all";
 
-    const userMsg = createUserMessage(`Running prediction for Products: ${products}, Releases: ${releases}, Platforms: ${platforms}, Min Failing Builds: ${minFailingBuilds}`);
+    // Disable the form to prevent new inputs
+    const formElement = document.querySelector(".cdcarm-json-options");
+    if (formElement) {
+        formElement.style.opacity = "0.5";
+        formElement.style.pointerEvents = "none"; // disable interaction
+    }
+
+    const userMsg = createUserMessage(
+        `Running prediction for Products: ${products}, Releases: ${releases}, Platforms: ${platforms}, Min Failing Builds: ${minFailingBuilds}`
+    );
     chatBody.appendChild(userMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
 
@@ -470,36 +485,37 @@ function fetchCDCARMJson() {
             min_failing_builds: minFailingBuilds
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        progressBar.style.width = '100%';
-        setTimeout(() => chatBody.removeChild(progressMessage), 500);
+        .then(response => response.json())
+        .then(data => {
+            progressBar.style.width = '100%';
+            setTimeout(() => chatBody.removeChild(progressMessage), 500);
 
-        switch (data.data_type) {
-            case "prediction_table":
-                displayPredictionResults(data.merged_summary, ownerFilter);
-                break;
-            case "hybrid":
-                allPredictions = data.predicted;
-                displayPredictionResults(data.predicted, ownerFilter);
-                displayClusteredResults(data.clustered_summary);
-                break;
-            case "clustered_groups_only":
-                displayClusteredResults(data.clustered_summary);
-                break;
-            default:
-                throw new Error("Unexpected response type: " + data.data_type);
-        }
-    })
-    .catch(error => {
-        console.error("Prediction flow error:", error);
-        progressBar.style.width = '100%';
-        setTimeout(() => {
-            chatBody.removeChild(progressMessage);
-            replyWithBotMessage(`⚠️ Error during prediction: ${error.message}`);
-        }, 500);
-    });
+            switch (data.data_type) {
+                case "prediction_table":
+                    displayPredictionResults(data.merged_summary, ownerFilter);
+                    break;
+                case "hybrid":
+                    allPredictions = data.predicted;
+                    displayPredictionResults(data.predicted, ownerFilter);
+                    displayClusteredResults(data.clustered_summary);
+                    break;
+                case "clustered_groups_only":
+                    displayClusteredResults(data.clustered_summary);
+                    break;
+                default:
+                    throw new Error("Unexpected response type: " + data.data_type);
+            }
+        })
+        .catch(error => {
+            console.error("Prediction flow error:", error);
+            progressBar.style.width = '100%';
+            setTimeout(() => {
+                chatBody.removeChild(progressMessage);
+                replyWithBotMessage(`⚠️ Error during prediction: ${error.message}`);
+            }, 500);
+        });
 }
+
 
 
 
@@ -612,10 +628,11 @@ function displayClusteredResults(clusteredSummary) {
     });
 }
 
-
-
-
-
+/**
+ * Displays prediction results in the chat window, allowing filtering by owner and exporting to CSV.
+ * @param {Array} predictions - Array of prediction result objects to display.
+ * @param {string} [ownerFilter=""] - Optional owner filter to restrict displayed results.
+ */
 function displayPredictionResults(predictions, ownerFilter = "") {
     if (!predictions.length) {
         const botMsg = createBotMessage();
@@ -625,29 +642,38 @@ function displayPredictionResults(predictions, ownerFilter = "") {
         return;
     }
 
-    if (!allPredictions.length) allPredictions = predictions;
+    // Filter only predicted items
+    let predictedItems = predictions.filter(p => p.IsPredicted === "Yes");
+    allPredictions = predictedItems;
 
-    // Populate unique owners
-    const owners = [...new Set(allPredictions.map(p => p.Owner || "").filter(o => o.trim() !== ""))];
+    // Build unique owner list with counts
+    const ownerTestMap = {};
+    predictedItems.forEach(p => {
+        const owner = (p.Owner || "Unknown").trim();
+        if (!ownerTestMap[owner]) ownerTestMap[owner] = new Set();
+        ownerTestMap[owner].add(p.TestName);
+    });
+
     const ownerOptions = [
         `<option value="">Select an owner</option>`,
-        `<option value="__all__"${ownerFilter === "__all__" ? " selected" : ""}>All</option>`
-    ].concat(owners.map(owner =>
-        `<option value="${owner}" ${owner.toLowerCase() === ownerFilter.toLowerCase() ? 'selected' : ''}>${owner}</option>`
-    )).join('');
+        `<option value="__all__"${ownerFilter === "__all__" ? " selected" : ""}>All (${predictedItems.length})</option>`
+    ].concat(
+        Object.entries(ownerTestMap).map(([owner, tests]) =>
+            `<option value="${owner}" ${owner.toLowerCase() === ownerFilter.toLowerCase() ? 'selected' : ''}>
+                ${owner} (${tests.size})
+            </option>`
+        )
+    ).join('');
 
-    // Filter predicted only
-    let filtered = predictions.filter(p => p.IsPredicted === "Yes");
-
-    // Apply owner filter if provided
+    // Apply owner filter if selected
+    let filtered = [...predictedItems];
     if (ownerFilter && ownerFilter.trim() !== "" && ownerFilter !== "__all__") {
-        filtered = filtered.filter(p => p.Owner.trim().toLowerCase() === ownerFilter.toLowerCase());
+        filtered = filtered.filter(p => (p.Owner || "").trim().toLowerCase() === ownerFilter.toLowerCase());
     }
 
-    // Sort by confidence score
     filtered.sort((a, b) => (b.ConfidenceScore || -1) - (a.ConfidenceScore || -1));
 
-    // Group tests by TestName
+    // Group results by test name
     const grouped = {};
     filtered.forEach(p => {
         const test = p.TestName;
@@ -655,6 +681,8 @@ function displayPredictionResults(predictions, ownerFilter = "") {
             grouped[test] = {
                 Owner: p.Owner,
                 Product: p.Product,
+                Release: p.Release,
+                Platform: p.Platform,
                 WorkItems: new Set()
             };
         }
@@ -663,81 +691,66 @@ function displayPredictionResults(predictions, ownerFilter = "") {
         }
     });
 
+    // Find existing prediction block
+    let existingBlock = chatBody.querySelector('.prediction-results-container');
+    if (existingBlock) {
+        existingBlock.remove(); // Remove previous block when filtering
+    }
+
     const botMsg = createBotMessage();
+    botMsg.classList.add('prediction-results-container');
     botMsg.innerHTML = `
       <h4>🔎 Prediction Results:</h4>
-
       <div class="prediction-controls">
         <label for="ownerFilterSelect">Owner Filter:</label>
-        <select id="ownerFilterSelect" class="option-input">
-            ${ownerOptions}
-        </select>
-
-        <button id="applyOwnerFilterBtn">
-            <i class="fas fa-filter"></i> Apply
-        </button>
-
-        <button id="exportCSV">
-            <i class="fas fa-download"></i> Export CSV
-        </button>
+        <select class="option-input ownerFilterSelect">${ownerOptions}</select>
+        <button class="applyOwnerFilterBtn"><i class="fas fa-filter"></i> Apply</button>
+        <button class="exportCSV"><i class="fas fa-download"></i> Export CSV</button>
       </div>
-
       <div class="prediction-notes">
         <p><strong>🔹 Sorting:</strong> Tests are sorted by descending prediction confidence.</p>
         <p><strong>🔹 Test name link:</strong> opens the corresponding ARM test page.</p>
         <p><strong>🔹 Work Item link:</strong> opens the predicted TFS work item in a new tab.</p>
       </div>
-
       <div style="max-height:300px; overflow:auto;">
-        <table class="prediction-table" id="predictionResultTable">
-          <thead>
-            <tr>
-              <th>Test Name</th>
-              <th>Owner</th>
-              <th>Predicted Work Item IDs</th>
-            </tr>
-          </thead>
+        <table class="prediction-table predictionResultTable">
+          <thead><tr><th>Test Name</th><th>Owner</th><th>Predicted Work Item IDs</th></tr></thead>
           <tbody>
             ${Object.entries(grouped).map(([testName, info]) => `
               <tr>
-                <td>
-                  <a href="${buildTestLink(testName, info.Product)}" target="_blank">${testName}</a>
-                </td>
+                <td><a href="${buildTestLink(testName, info.Product, info.Release, info.Platform)}" target="_blank">${testName}</a></td>
                 <td>${info.Owner}</td>
-                <td>
-                  ${[...info.WorkItems].map(wi =>
+                <td>${[...info.WorkItems].map(wi =>
                     `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
-                  ).join(", ") || "-"}
-                </td>
+                  ).join(", ") || "-"}</td>
               </tr>
             `).join('')}
           </tbody>
         </table>
       </div>
-
-      <button class="back-to-menu" id="backToMenuPred" style="margin-top:10px;">
-        <i class="fas fa-home"></i><span style="margin-left: 6px;">Home</span>
+      <button class="applyOwnerFilterBtn startInvestigationBtn" style="margin-top:10px;">
+       <i class="fas fa-redo"></i> Start Test Failure Investigation
       </button>
+
+
     `;
     chatBody.appendChild(botMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
 
     // Event listeners
-    document.getElementById('applyOwnerFilterBtn').addEventListener('click', () => {
-        const owner = document.getElementById('ownerFilterSelect').value.trim();
-        chatBody.removeChild(botMsg);
+    botMsg.querySelector('.applyOwnerFilterBtn').addEventListener('click', () => {
+        const owner = botMsg.querySelector('.ownerFilterSelect').value.trim();
         displayPredictionResults(allPredictions, owner);
     });
 
-    document.getElementById('exportCSV').addEventListener('click', () => {
-        exportTableToCSV("#predictionResultTable");
+    botMsg.querySelector('.exportCSV').addEventListener('click', () => {
+        exportTableToCSV(botMsg.querySelector('.predictionResultTable'));
     });
- 
 
-    document.getElementById('backToMenuPred').addEventListener('click', () => {
-        allPredictions = [];
-        showMainMenu();
-    });
+    // Start Investigation Button
+    const startButton = botMsg.querySelector('.startInvestigationBtn');
+    startButton.disabled = false;
+    startButton.addEventListener('click', showCDCARMJsonOptions);
 }
 
 
@@ -805,9 +818,10 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
                     <button class="download-btn" id="downloadJsonBtn">
                         <i class="fas fa-download"></i> Download JSON File
                     </button>
-                    <button class="back-to-menu" id="backToMenuJson">
-                        <i class="fas fa-home"></i> Home
+                    <button class="back-to-menu" id="startInvestigationBtn">
+                        <i class="fas fa-redo"></i> Start Test Failure Investigation
                     </button>
+
                 </div>
             `;
                 chatBody.appendChild(downloadMessage);
@@ -832,7 +846,8 @@ function tryFetchData(products, releases, platforms, minFailingBuilds, owner, pr
                     URL.revokeObjectURL(url);
                 });
 
-                document.getElementById('backToMenuJson').addEventListener('click', showMainMenu);
+                document.getElementById('startInvestigationBtn').addEventListener('click', showCDCARMJsonOptions);
+
             }, 500);
         })
         .catch(error => {
