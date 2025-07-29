@@ -14,13 +14,44 @@
 
 <body>
   <header class="header">
-    <h1>Test Failure Analyzer</h1>
+    <h1>Test Failures Investigation Assistant(TFIA)</h1>
   </header>
 
-  <div class="container">
-    <h2>Welcome to the Test Failure Analyzer</h2>
-    <p>This tool helps you to investigate your test failures smartly. Use the chat assistant in the bottom right corner to get started.</p>
+  <div class="hero-section">
+  <div class="hero-content">
+	  <h2>Welcome to TFIA</h2>
+	  <p>
+	  This tool helps you to investigate your test failures smartly.
+	  Use the chat assistant in the bottom right corner to get started.
+	  </p>
+	  <img src="{{ url_for('static', filename='images/tfia_banner.png') }}" 
+		  alt="TFIA Banner" 
+		  class="hero-banner">
   </div>
+  </div>
+  
+  <!-- Features Section -->
+  <div class="features-section">
+  <div class="feature-card">
+	  <i class="fas fa-robot"></i>
+	  <h3>AI-Powered Analysis</h3>
+	  <p>Quickly analyze test failures using advanced AI predictions and recommendations.</p>
+  </div>
+  
+  <div class="feature-card">
+	  <i class="fas fa-bug"></i>
+	  <h3>Bug Tracking</h3>
+	  <p>Automatically link test failures to relevant TFS work items for faster debugging.</p>
+  </div>
+  
+  <div class="feature-card">
+	  <i class="fas fa-chart-line"></i>
+	  <h3>Insights & Reports</h3>
+	  <p>Generate real-time insights and reports to monitor test health and failure trends.</p>
+  </div>
+  </div>
+
+
 
   <div class="chat-widget" id="chatWidget">
     <div class="chat-icon" id="chatIcon">

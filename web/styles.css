@@ -229,6 +229,84 @@ body {
     font-weight: 600;
 }
 
+/* Hero Section */
+.hero-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.hero-content h2 {
+  color: var(--ansys-blue);
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.hero-content p {
+  font-size: 16px;
+  max-width: 700px;
+  margin: 0 auto 20px;
+  color: #444;
+}
+
+.hero-banner {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+}
+
+/* Features Section */
+.features-section {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 50px auto;
+  max-width: 1100px;
+  padding: 20px;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  flex: 1 1 300px;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card i {
+  font-size: 36px;
+  color: var(--ansys-blue);
+  margin-bottom: 10px;
+}
+
+.feature-card h3 {
+  font-size: 18px;
+  color: #222;
+  margin: 10px 0;
+}
+
+.feature-card p {
+  color: #555;
+  font-size: 14px;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+
 /* Chat Widget */
 .chat-widget {
     position: fixed;

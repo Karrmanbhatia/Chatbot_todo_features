@@ -70,36 +70,47 @@ def fetch_cdcarm():
 
         print(f"✅ Records fetched: {len(results)}")
 
-        # Run prediction on the saved JSON
+        # Run prediction
         from pattern_matcher_level_1 import run_prediction
         merged_summary = run_prediction(output_path)
+
+        # Prepare output
+        predicted = []
+        unpredicted = []
 
         if isinstance(merged_summary, dict):
             mode = merged_summary.get("mode")
             print(f"🔄 Prediction Mode: {mode}")
 
-            if mode in ("clustered_only", "clustered"):
-                return jsonify({
-                    "data_type": "clustered_groups_only",
-                    "clustered_summary": merged_summary["clusters"]
-                })
+            if mode == "predicted_with_clusters":
+                predicted = merged_summary.get("predicted", [])
+                unpredicted = merged_summary.get("clusters", [])
 
-            elif mode == "predicted_with_clusters":
-                return jsonify({
-                    "data_type": "hybrid",
-                    "predicted": merged_summary["predicted"],
-                    "clustered_summary": merged_summary["clusters"]
-                })
+            elif mode in ("clustered_only", "clustered"):
+                print("⚠ No predictions found. Returning all tests as 'unpredicted'.")
+                unpredicted = results
 
-        # If it's a plain list (legacy behavior)
+        elif isinstance(merged_summary, list):
+            # Legacy case: treat everything as predicted
+            predicted = merged_summary
+
+        # Ensure HasInvestigation is present for every test
+        for test in predicted + unpredicted:
+            if "HasInvestigation" not in test:
+                test["HasInvestigation"] = False
+
         return jsonify({
             "data_type": "prediction_table",
-            "merged_summary": merged_summary
+            "predicted": predicted,
+            "unpredicted": unpredicted
         })
 
     except Exception as e:
         print(f"❌ Error occurred: {e}")
         return jsonify({"error": str(e)}), 500
+
+
+
 
 
 # ===================== PROXY ENDPOINTS ===================== #

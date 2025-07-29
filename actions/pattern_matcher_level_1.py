@@ -142,8 +142,10 @@ def run_prediction(json_file_path, threshold=0.3):
             "Owner": target['Owner'],
             "PredictedWorkItemId": predicted_workitem,
             "IsPredicted": "Yes" if predicted_workitem != "-" else "No",
-            "ConfidenceScore": round(float(best_score), 3)
+            "ConfidenceScore": round(float(best_score), 3),
+            "HasInvestigation": False
         })
+
 
     # Add known anchors directly
     for a in anchors:
@@ -152,8 +154,10 @@ def run_prediction(json_file_path, threshold=0.3):
             "Owner": a['Owner'],
             "PredictedWorkItemId": a['Investigation']['WorkItemId'],
             "IsPredicted": "No",
-            "ConfidenceScore": None  # Or 1.0 if you prefer
+            "ConfidenceScore": None,
+            "HasInvestigation": True
         })
+
         # Group unpredicted targets (fallback)
     unpredicted = [
         t for i, t in enumerate(targets)
@@ -187,7 +191,10 @@ def group_similar_failures(targets, eps=0.3, min_samples=2):
     for i, label in enumerate(labels):
         if label == -1:
             continue  # noise / outliers
-        clustered.setdefault(label, []).append(targets[i])
+        target_with_flag = dict(targets[i])  # copy to avoid mutating original
+        target_with_flag["HasInvestigation"] = False
+        clustered.setdefault(label, []).append(target_with_flag)
+        
 
     return list(clustered.values())
 
