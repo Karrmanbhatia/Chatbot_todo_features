@@ -66,12 +66,18 @@ minimizeBtn.addEventListener('click', () => {
     }
 });
 
-expandBtn.addEventListener('click', () => {
-    isExpanded = !isExpanded;
-    chatWindow.classList.toggle('expanded');
-    expandBtn.innerHTML = isExpanded
-        ? '<i class="fas fa-compress"></i>'
-        : '<i class="fas fa-expand"></i>';
+expandBtn.addEventListener("click", function () {
+  chatWindow.classList.toggle("expanded");
+
+  if (chatWindow.classList.contains("expanded")) {
+    // Change icon to "contract"
+    expandBtn.innerHTML = '<i class="fas fa-compress"></i>';
+    expandBtn.title = "Contract";
+  } else {
+    // Change icon back to "expand"
+    expandBtn.innerHTML = '<i class="fas fa-expand"></i>';
+    expandBtn.title = "Expand";
+  }
 });
 
 closeBtn.addEventListener('click', () => {
