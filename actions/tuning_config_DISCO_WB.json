@@ -1,0 +1,6 @@
+{
+  "threshold": 0.212,
+  "eps": 0.239,
+  "min_samples": 5,
+  "model_name": "bge-small-en-v1.5"
+}

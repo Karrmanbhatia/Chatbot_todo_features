@@ -638,7 +638,11 @@ function displayPredictionResults(predictions, ownerFilter = "") {
         return;
     }
 
-    console.log("Raw predictions received:", predictions);
+    console.log("🔍 Raw predictions with Test Names:");
+	predictions.forEach((p, i) => {
+		console.log(`${i + 1}: TestName = ${p.TestName || "N/A"}, IsPredicted = ${p.IsPredicted}, HasInvestigation = ${p.HasInvestigation}, Owner = ${p.Owner}, PredictedWorkItemId = ${p.PredictedWorkItemId}`);
+	});
+
 
     // Separate predicted and unpredicted tests
     const predictedTests = predictions.filter(p => p.IsPredicted === "Yes");

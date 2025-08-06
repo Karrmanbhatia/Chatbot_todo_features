@@ -1109,3 +1109,14 @@ body {
 .option-panel-inline .option-btn span {
     font-weight: 500;
 }
+
+.disclaimer-icon {
+  color: yellow;                 /* Yellow color */
+  font-size: 2rem;               /* Make it a bit larger (optional) */
+  animation: blink 1s infinite;  /* Blink animation */
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
