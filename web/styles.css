@@ -1166,11 +1166,7 @@ body {
 @keyframes blink {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.6; transform: scale(1.1); }
-<<<<<<< Updated upstream
 }
-=======
-}
-
 .spinner {
   border: 6px solid #f3f3f3;        /* Light grey */
   border-top: 6px solid #3b82f6;     /* Blue */
@@ -1184,4 +1180,3 @@ body {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
->>>>>>> Stashed changes
