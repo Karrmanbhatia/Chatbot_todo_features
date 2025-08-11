@@ -458,21 +458,18 @@ function fetchCDCARMJson() {
     chatBody.scrollTop = chatBody.scrollHeight;
 
     const progressMessage = createBotMessage();
-    progressMessage.innerHTML = `
-        <div class="status-with-progress">
-            <div class="status-icon">⏳</div>
-            <div class="status-info">
-                <p class="status-text">Running prediction... Please wait while we analyze the test failures.</p>
-                <div class="progress-container">
-                    <div class="progress-bar" id="jsonProgressBar"></div>
-                </div>
-            </div>
+  progressMessage.innerHTML = `
+    <div class="status-with-progress">
+        <div class="spinner"></div>
+        <div class="status-info">
+            <p class="status-text">Running prediction... Please wait while we analyze the test failures.</p>
         </div>
-    `;
+    </div>
+`;
+
     chatBody.appendChild(progressMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
-    const progressBar = document.getElementById('jsonProgressBar');
-    progressBar.style.width = '30%';
+    
 
     fetch("/fetch_cdcarm", {
         method: "POST",
@@ -486,7 +483,7 @@ function fetchCDCARMJson() {
     })
     .then(response => response.json())
     .then(data => {
-        progressBar.style.width = '100%';
+       
         setTimeout(() => chatBody.removeChild(progressMessage), 500);
 
         console.log("Backend response:", data);
