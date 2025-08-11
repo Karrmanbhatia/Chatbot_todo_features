@@ -1168,15 +1168,38 @@ body {
   50% { opacity: 0.6; transform: scale(1.1); }
 }
 .spinner {
-  border: 6px solid #f3f3f3;        /* Light grey */
-  border-top: 6px solid #3b82f6;     /* Blue */
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  border: 4px solid transparent;
+  border-top: 4px solid #6366f1; /* indigo */
+  border-right: 4px solid #a855f7; /* purple */
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
   animation: spin 1s linear infinite;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5),
+              0 0 20px rgba(168, 85, 247, 0.4);
 }
 
 @keyframes spin {
   0%   { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Optional pulse effect for inner ring */
+.spinner::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: 8px;
+  border: 3px solid transparent;
+  border-bottom: 3px solid #f59e0b; /* amber */
+  border-left: 3px solid #ef4444;   /* red */
+  border-radius: 50%;
+  animation: spinReverse 0.8s linear infinite;
+}
+
+@keyframes spinReverse {
+  0%   { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
 }
