@@ -435,7 +435,7 @@ function showCDCARMJsonOptions() {
 
 
 
-function fetchCDCARMJson() {
+/* function fetchCDCARMJson() {
     const products = (document.getElementById('productsInput').value.trim() || "DISCO")
         .split(",").map(p => p.trim()).filter(p => p);
     const releases = (document.getElementById('releasesInput').value.trim() || "26.1")
@@ -458,18 +458,21 @@ function fetchCDCARMJson() {
     chatBody.scrollTop = chatBody.scrollHeight;
 
     const progressMessage = createBotMessage();
-  progressMessage.innerHTML = `
-    <div class="status-with-progress">
-        <div class="spinner"></div>
-        <div class="status-info">
-            <p class="status-text">Running prediction... Please wait while we analyze the test failures.</p>
+    progressMessage.innerHTML = `
+        <div class="status-with-progress">
+            <div class="status-icon">⏳</div>
+            <div class="status-info">
+                <p class="status-text">Running prediction... Please wait while we analyze the test failures.</p>
+                <div class="progress-container">
+                    <div class="progress-bar" id="jsonProgressBar"></div>
+                </div>
+            </div>
         </div>
-    </div>
-`;
-
+    `;
     chatBody.appendChild(progressMessage);
     chatBody.scrollTop = chatBody.scrollHeight;
-    
+    const progressBar = document.getElementById('jsonProgressBar');
+    progressBar.style.width = '30%';
 
     fetch("/fetch_cdcarm", {
         method: "POST",
@@ -483,7 +486,7 @@ function fetchCDCARMJson() {
     })
     .then(response => response.json())
     .then(data => {
-       
+        progressBar.style.width = '100%';
         setTimeout(() => chatBody.removeChild(progressMessage), 500);
 
         console.log("Backend response:", data);
@@ -507,8 +510,342 @@ function fetchCDCARMJson() {
             replyWithBotMessage(`⚠️ Error during prediction: ${error.message}`);
         }, 500);
     });
+} */
+
+async function fetchCDCARMJson() {
+    const products = (document.getElementById('productsInput').value.trim() || "DISCO")
+        .split(",").map(p => p.trim()).filter(p => p);
+    const releases = (document.getElementById('releasesInput').value.trim() || "26.1")
+        .split(",").map(r => r.trim()).filter(r => r);
+    const platforms = (document.getElementById('platformsInput').value.trim() || "Windows")
+        .split(",").map(p => p.trim()).filter(p => p);
+    const minFailingBuilds = document.getElementById('minFailingInput').value.trim() || "2";
+    const ownerFilter = document.getElementById('ownerJsonInput')?.value.trim() || "__all__";
+
+    // Disable form while running
+    const formElement = document.querySelector(".cdcarm-json-options");
+    if (formElement) {
+        formElement.style.opacity = "0.5";
+        formElement.style.pointerEvents = "none";
+    }
+
+    // User message
+    const userMsg = createUserMessage(
+        `Running prediction for Products: ${products}, Releases: ${releases}, Platforms: ${platforms}, Min Failing Builds: ${minFailingBuilds}`
+    );
+    chatBody.appendChild(userMsg);
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+  const prog = showPredictionProgress(chatBody, /* taskId: */ `pred_${Date.now()}`);
+
+  try {
+    // STEP 1: Fetch from ARM
+    prog.setActive(1);
+    // If you can’t measure network progress, mark as indeterminate:
+    prog.setIndeterminate(1, true);
+    const response = await fetch("/fetch_cdcarm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ products, releases, platforms, min_failing_builds: minFailingBuilds })
+    });
+    prog.setIndeterminate(1, false);
+    prog.setProgress(1, 100);
+    prog.setDone(1);
+
+    // STEP 2: Extract patterns from ARM (client-side parse/filter)
+    prog.setActive(2);
+    const data = await response.json();
+
+    // If you loop N items, update % as you go:
+    const items = [...(data.predicted || []), ...(data.unpredicted || [])];
+    if (items.length === 0) {
+      prog.setProgress(2, 100);
+    } else {
+      let processed = 0;
+      for (const item of items) {
+        // your real extraction logic here ...
+        processed++;
+        prog.setProgress(2, Math.round((processed / items.length) * 100));
+      }
+    }
+    prog.setDone(2);
+
+    // STEP 3: Match in Azure DevOps
+    prog.setActive(3);
+    // If server already did matching, show quick completion:
+    prog.setIndeterminate(3, true);
+    await Promise.resolve(); // or a small await call if you actually do work here
+    prog.setIndeterminate(3, false);
+    prog.setProgress(3, 100);
+    prog.setDone(3);
+
+    // STEP 4: Rendering to table
+    prog.setActive(4);
+    const allTests = items.filter(i => !i.HasInvestigation);
+
+    // If rendering many rows, update by chunk:
+    const chunk = 50;
+    let rendered = 0;
+    const toRender = allTests.length;
+
+    // If your renderer runs in one call, you can still fake a responsive bar:
+    if (toRender > 0) {
+      for (let i = 0; i < toRender; i += chunk) {
+        const slice = allTests.slice(i, i + chunk);
+        // Option A: incremental render (append slice rows) and yield:
+        // appendRows(slice);
+        // await new Promise(r => requestAnimationFrame(r));
+
+        rendered = Math.min(toRender, i + chunk);
+        prog.setProgress(4, Math.round((rendered / toRender) * 100));
+      }
+    } else {
+      prog.setProgress(4, 100);
+    }
+
+    // Now call your existing renderer once:
+    displayPredictionResults(allTests, "__choose__");
+
+    prog.setDone(4);
+    prog.finish();
+
+  } catch (e) {
+    console.error(e);
+    prog.setError(e?.message || String(e));
+  }
 }
 
+function showPredictionProgress(parentEl = chatBody) {
+  // Remove any old card
+  parentEl.querySelector(".prediction-progress-card")?.remove();
+
+  // Create message container (reuse your bubble style)
+  const msg = createBotMessage();
+  const card = document.createElement("div");
+  card.className = "prediction-progress-card";
+  card.innerHTML = `
+    <div class="prediction-progress-header">
+      <span class="hourglass">⏳</span>
+      <span>Running prediction… Please wait while we analyze the test failures.</span>
+    </div>
+    <ul class="progress-steps">
+      <li class="step active" data-step="1">
+        <span class="icon">📡</span>
+        <span class="label">Fetching data from ARM</span>
+        <span class="state spinner"></span>
+      </li>
+      <li class="step pending" data-step="2">
+        <span class="icon">🧩</span>
+        <span class="label">Extracting patterns from ARM</span>
+        <span class="state"></span>
+      </li>
+      <li class="step pending" data-step="3">
+        <span class="icon">🔍</span>
+        <span class="label">Matching patterns in Azure DevOps</span>
+        <span class="state"></span>
+      </li>
+      <li class="step pending" data-step="4">
+        <span class="icon">📊</span>
+        <span class="label">Rendering results</span>
+        <span class="state"></span>
+      </li>
+    </ul>
+    <div class="progress-footer-note">Tip: this may take a minute depending on build size.</div>
+    <div class="progress-error" style="display:none;"></div>
+  `;
+  msg.appendChild(card);
+  parentEl.appendChild(msg);
+  parentEl.scrollTop = parentEl.scrollHeight;
+
+  const steps = Array.from(card.querySelectorAll(".step"));
+  const getStepEl = (n) => steps.find(s => Number(s.dataset.step) === n);
+
+  function setActive(n) {
+    steps.forEach(s => {
+      const st = s.querySelector(".state");
+      s.classList.remove("active");
+      if (!s.classList.contains("done")) {
+        s.classList.add("pending");
+        st.className = "state"; // clear
+      }
+    });
+    const el = getStepEl(n);
+    if (!el) return;
+    el.classList.remove("pending");
+    el.classList.add("active");
+    el.querySelector(".state").className = "state spinner";
+  }
+
+  function setDone(n) {
+    const el = getStepEl(n);
+    if (!el) return;
+    el.classList.remove("pending", "active");
+    el.classList.add("done");
+    el.querySelector(".state").className = "state checkmark";
+  }
+
+  function setError(message) {
+    const err = card.querySelector(".progress-error");
+    err.textContent = message || "Something went wrong during prediction.";
+    err.style.display = "block";
+  }
+
+  function finish() {
+    // Mark any remaining active as done
+    steps.forEach(s => { if (s.classList.contains("active")) s.classList.replace("active","done"); s.querySelector(".state").className = "state checkmark"; });
+    card.querySelector(".progress-footer-note").textContent = "Completed.";
+  }
+
+  // Optional: simple auto-advance for demos
+  function autoAdvance(msPerStep = 1500) {
+    let n = 1;
+    const timer = setInterval(() => {
+      setDone(n);
+      n++;
+      if (n <= 4) setActive(n);
+      if (n > 4) { clearInterval(timer); finish(); }
+    }, msPerStep);
+    return () => clearInterval(timer);
+  }
+
+  // controller API
+  return { root: card, setActive, setDone, setError, finish, autoAdvance };
+}
+
+// Map of taskId -> controller (optional, if you may run multiple concurrently)
+const predictionProgressRegistry = new Map();
+
+/**
+ * Show a 4-step prediction progress card with per-step meters.
+ * @param {HTMLElement} parentEl
+ * @param {string} taskId - unique id for this run (e.g. timestamp, uuid)
+ */
+function showPredictionProgress(parentEl = chatBody, taskId = `task_${Date.now()}`) {
+  // Remove old card of same taskId if it exists
+  predictionProgressRegistry.get(taskId)?.root?.remove();
+
+  const msg  = createBotMessage();
+  const card = document.createElement("div");
+  card.className = "prediction-progress-card";
+  card.innerHTML = `
+    <div class="prediction-progress-header">
+      <span class="hourglass">⏳</span>
+      <span>Running prediction… Please wait while we analyze the test failures.</span>
+    </div>
+    <ul class="progress-steps">
+      <li class="step active" data-step="1">
+        <span class="icon">📡</span>
+        <span class="label">Fetching data from ARM</span>
+        <span class="state spinner"></span>
+        <div class="meter"><div class="bar"></div></div>
+      </li>
+      <li class="step pending" data-step="2">
+        <span class="icon">🧩</span>
+        <span class="label">Extracting patterns from ARM</span>
+        <span class="state"></span>
+        <div class="meter"><div class="bar"></div></div>
+      </li>
+      <li class="step pending" data-step="3">
+        <span class="icon">🔍</span>
+        <span class="label">Matching patterns in Azure DevOps</span>
+        <span class="state"></span>
+        <div class="meter"><div class="bar"></div></div>
+      </li>
+      <li class="step pending" data-step="4">
+        <span class="icon">📊</span>
+        <span class="label">Rendering results</span>
+        <span class="state"></span>
+        <div class="meter"><div class="bar"></div></div>
+      </li>
+    </ul>
+    <div class="progress-footer-note">Tip: this may take a minute depending on build size.</div>
+    <div class="progress-error" style="display:none;"></div>
+  `;
+  msg.appendChild(card);
+  parentEl.appendChild(msg);
+  parentEl.scrollTop = parentEl.scrollHeight;
+
+  const steps = Array.from(card.querySelectorAll(".step"));
+  const getStepEl = (n) => steps.find(s => Number(s.dataset.step) === n);
+  const getBar    = (n) => getStepEl(n)?.querySelector(".bar");
+  const getState  = (n) => getStepEl(n)?.querySelector(".state");
+
+  function setActive(n) {
+    steps.forEach(s => {
+      const st = s.querySelector(".state");
+      if (!s.classList.contains("done")) {
+        s.classList.remove("active");
+        s.classList.add("pending");
+        st.className = "state";
+      }
+      s.classList.remove("indeterminate");
+    });
+    const el = getStepEl(n);
+    if (!el) return;
+    el.classList.remove("pending");
+    el.classList.add("active");
+    getState(n).className = "state spinner";
+  }
+
+  function setDone(n) {
+    const el = getStepEl(n);
+    if (!el) return;
+    el.classList.remove("pending","active","indeterminate");
+    el.classList.add("done");
+    getState(n).className = "state checkmark";
+    const bar = getBar(n);
+    if (bar) bar.style.width = "100%";
+  }
+
+  // 0–100 numeric progress; switches off indeterminate
+  function setProgress(n, pct) {
+    const el = getStepEl(n);
+    if (!el) return;
+    el.classList.remove("indeterminate");
+    const bar = getBar(n);
+    if (bar) bar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+  }
+
+  // Turn on/off indeterminate shimmer for a step’s bar
+  function setIndeterminate(n, on = true) {
+    const el = getStepEl(n);
+    if (!el) return;
+    if (on) {
+      el.classList.add("indeterminate");
+      const bar = getBar(n);
+      if (bar) bar.style.width = "40%"; // width used by animation
+    } else {
+      el.classList.remove("indeterminate");
+    }
+  }
+
+  function setLabel(n, text) {
+    const el = getStepEl(n);
+    if (!el) return;
+    const lbl = el.querySelector(".label");
+    if (lbl) lbl.textContent = text;
+  }
+
+  function setError(message) {
+    const err = card.querySelector(".progress-error");
+    err.textContent = message || "Something went wrong during prediction.";
+    err.style.display = "block";
+  }
+
+  function finish() {
+    steps.forEach((s, idx) => {
+      const n = idx + 1;
+      if (!s.classList.contains("done")) {
+        setDone(n);
+      }
+    });
+    card.querySelector(".progress-footer-note").textContent = "Completed.";
+  }
+
+  const controller = { taskId, root: card, setActive, setDone, setProgress, setIndeterminate, setLabel, setError, finish };
+  predictionProgressRegistry.set(taskId, controller);
+  return controller;
+}
 
 
 // helper for test link
@@ -626,8 +963,9 @@ function buildInvestigationLink(workItemId) {
  * @param {Array} predictions - Array of prediction result objects to display.
  * @param {string} [ownerFilter=""] - Optional owner filter to restrict displayed results.
  */
-function displayPredictionResults(predictions, ownerFilter = "") {
-    if (!predictions.length) {
+/* function displayPredictionResults(predictions, ownerFilter) {
+    // Guard
+    if (!Array.isArray(predictions) || predictions.length === 0) {
         const botMsg = createBotMessage();
         botMsg.innerHTML = `<p>No matching tests found for the selected owner.</p>`;
         chatBody.appendChild(botMsg);
@@ -635,157 +973,475 @@ function displayPredictionResults(predictions, ownerFilter = "") {
         return;
     }
 
-    console.log("🔍 Raw predictions with Test Names:");
-	predictions.forEach((p, i) => {
-		console.log(`${i + 1}: TestName = ${p.TestName || "N/A"}, IsPredicted = ${p.IsPredicted}, HasInvestigation = ${p.HasInvestigation}, Owner = ${p.Owner}, PredictedWorkItemId = ${p.PredictedWorkItemId}`);
-	});
+    // --- First-instance logic: show placeholder until user chooses ---
+    const isInitial = ownerFilter === "" || ownerFilter == null || ownerFilter === "__choose__";
+    const normalizedOwner = isInitial ? "__choose__" : String(ownerFilter || "__all__").trim().toLowerCase();
 
-
-    // Separate predicted and unpredicted tests
-    const predictedTests = predictions.filter(p => p.IsPredicted === "Yes");
-    const unpredictedTests = predictions.filter(p => p.IsPredicted !== "Yes");
-
-    allPredictions = predictions;
-
-    // Build unique owner list (including both predicted and unpredicted)
+    // Build owner -> unique tests and overall unique test count
     const ownerTestMap = {};
-    predictions.forEach(p => {
+    const allUniqueTests = new Set();
+    for (const p of predictions) {
         const owner = (p.Owner || "Unknown").trim();
-        if (!ownerTestMap[owner]) ownerTestMap[owner] = new Set();
-        ownerTestMap[owner].add(p.TestName);
-    });
+        const test  = p.TestName || "Unnamed Test";
+        allUniqueTests.add(test);
+        (ownerTestMap[owner] ||= new Set()).add(test);
+    }
+    const totalUniqueCount = allUniqueTests.size;
 
-    const totalCount = Object.values(ownerTestMap).reduce((acc, set) => acc + set.size, 0);
-
+    // Owner options: placeholder (selected) on first instance
     const ownerOptions = [
-        `<option value="__all__"${!ownerFilter || ownerFilter === "__all__" ? " selected" : ""}>All (${totalCount})</option>`
+        `<option value="__choose__"${isInitial ? " selected" : ""} hidden>— Select All or an owner —</option>`,
+        `<option value="__all__"${(!isInitial && normalizedOwner === "__all__") ? " selected" : ""}>All (${totalUniqueCount})</option>`
     ].concat(
-        Object.entries(ownerTestMap).map(([owner, tests]) =>
-            `<option value="${owner}" ${owner.toLowerCase() === ownerFilter.toLowerCase() ? 'selected' : ''}>
-                ${owner} (${tests.size})
-            </option>`
-        )
-    ).join('');
+        Object.entries(ownerTestMap)
+            .sort((a,b) => a[0].localeCompare(b[0]))
+            .map(([owner, tests]) =>
+                `<option value="${owner}" ${(!isInitial && owner.toLowerCase() === normalizedOwner) ? "selected" : ""}>
+                    ${owner} (${tests.size})
+                 </option>`
+            )
+    ).join("");
 
-    // Apply owner filter if selected
-    let filteredPredicted = [...predictedTests];
-    let filteredUnpredicted = [...unpredictedTests];
-    if (ownerFilter && ownerFilter !== "__all__") {
-        filteredPredicted = filteredPredicted.filter(p => (p.Owner || "").trim().toLowerCase() === ownerFilter.toLowerCase());
-        filteredUnpredicted = filteredUnpredicted.filter(p => (p.Owner || "").trim().toLowerCase() === ownerFilter.toLowerCase());
+    // Split predicted/unpredicted (robust yes-check)
+    const isYes = (v) => {
+        if (v === true) return true;
+        const s = String(v ?? "").trim().toLowerCase();
+        return s === "yes";
+    };
+    let predictedTests   = predictions.filter(p => isYes(p.IsPredicted));
+    let unpredictedTests = predictions.filter(p => !isYes(p.IsPredicted));
+
+    // Apply owner filter only if not initial and not All
+    if (!isInitial && normalizedOwner !== "__all__") {
+        const matchOwner = (p) => String(p.Owner || "Unknown").trim().toLowerCase() === normalizedOwner;
+        predictedTests   = predictedTests.filter(matchOwner);
+        unpredictedTests = unpredictedTests.filter(matchOwner);
     }
 
-    // Sort predicted by confidence score
-    filteredPredicted.sort((a, b) => (b.ConfidenceScore || 0) - (a.ConfidenceScore || 0));
+    // Sort predicted by confidence score (desc)
+    predictedTests.sort((a, b) => (b.ConfidenceScore || 0) - (a.ConfidenceScore || 0));
 
+    // Row builder (group by test)
     const createTableRows = (tests) => {
         const grouped = {};
-        tests.forEach(p => {
+        for (const p of tests) {
             const test = p.TestName || "Unnamed Test";
-            if (!grouped[test]) {
-                grouped[test] = {
-                    Owner: p.Owner || "Unknown",
-                    Product: p.Product,
-                    Release: p.Release,
-                    Platform: p.Platform,
-                    WorkItems: new Set(),
-                    IsPredicted: p.IsPredicted === "Yes"
-                };
-            }
-            if (p.PredictedWorkItemId && p.PredictedWorkItemId !== "-") {
-                p.PredictedWorkItemId.split(";").forEach(wi => grouped[test].WorkItems.add(wi.trim()));
-            }
-        });
+            (grouped[test] ||= {
+                Owner: p.Owner || "Unknown",
+                Product: p.Product,
+                Release: p.Release,
+                Platform: p.Platform,
+                WorkItems: new Set(),
+                IsPredicted: isYes(p.IsPredicted)
+            });
+            const ids = String(p.PredictedWorkItemId || "")
+                .split(";").map(s => s.trim()).filter(Boolean);
+            ids.forEach(id => grouped[test].WorkItems.add(id));
+        }
         return Object.entries(grouped).map(([testName, info]) => `
             <tr>
-                <td><a href="${buildTestLink(testName, info.Product, info.Release, info.Platform)}" target="_blank">${testName}</a></td>
-                <td>${info.Owner}</td>
-                <td>${info.IsPredicted && info.WorkItems.size > 0
-                    ? [...info.WorkItems].map(wi =>
-                        `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
-                      ).join(", ")
-                    : "No Prediction"}</td>
+              <td><a href="${buildTestLink(testName, info.Product, info.Release, info.Platform)}" target="_blank">${testName}</a></td>
+              <td>${info.Owner}</td>
+              <td>${
+                info.IsPredicted && info.WorkItems.size
+                  ? [...info.WorkItems].map(wi =>
+                      `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
+                    ).join(", ")
+                  : "No Prediction"
+              }</td>
             </tr>
-        `).join('');
+        `).join("");
     };
 
-    // Clear previous block
-    chatBody.querySelector('.prediction-results-container')?.remove();
+    // Clear previous and render
+    chatBody.querySelector(".prediction-results-container")?.remove();
 
     const botMsg = createBotMessage();
-    botMsg.classList.add('prediction-results-container');
+    botMsg.classList.add("prediction-results-container");
     botMsg.innerHTML = `
       <h4>🔎 Test Failure Results:</h4>
       <div class="prediction-controls">
         <label for="ownerFilterSelect">Owner Filter:</label>
-        <select class="option-input ownerFilterSelect">${ownerOptions}</select>
-        <button class="applyOwnerFilterBtn"><i class="fas fa-filter"></i> Apply</button>
-        <button class="exportCSV"><i class="fas fa-download"></i> Export CSV</button>
+        <select class="option-input ownerFilterSelect" aria-label="Owner Filter">${ownerOptions}</select>
+        <button class="exportCSV"${isInitial ? " disabled" : ""}><i class="fas fa-download"></i> Export CSV</button>
       </div>
+
       <div class="prediction-notes">
         <p><strong>🔹 Sorting:</strong> Tests are sorted by descending confidence score.</p>
-        <p><strong>🔹 Test Names:</strong> Clicking a test name will open the corresponding ARM report.</p>
-        <p><strong>🔹 Predicted Work Item IDs:</strong> Clicking an ID will open the TFS bug page for that work item.</p>
+        <p><strong>🔹 Tip:</strong> Changing the owner updates the tables immediately.</p>
+        <p><strong>🔹 Test Names:</strong> Click to open the corresponding ARM report.</p>
+        <p><strong>🔹 Predicted Work Item IDs:</strong> Click to open the TFS bug page.</p>
       </div>
-      ${filteredPredicted.length ? `
-      <h5>✅ Predicted Tests</h5>
-      <div style="max-height:200px; overflow:auto;">
-        <table class="prediction-table predictionResultTable">
-          <thead><tr><th>Test Name</th><th>Owner</th><th>Predicted Work Item IDs</th></tr></thead>
-          <tbody>${createTableRows(filteredPredicted)}</tbody>
-        </table>
-      </div>` : `<p>No predicted tests available.</p>`}
-      ${filteredUnpredicted.length ? `
-      <h5>⚠ Unpredicted Tests</h5>
-      <div style="max-height:200px; overflow:auto;">
-        <table class="prediction-table predictionResultTable">
-          <thead><tr><th>Test Name</th><th>Owner</th><th>Status</th></tr></thead>
-          <tbody>${createTableRows(filteredUnpredicted)}</tbody>
-        </table>
-      </div>` : `<p>No unpredicted tests available.</p>`}
-      <button class="applyOwnerFilterBtn startInvestigationBtn" style="margin-top:10px;">
-       <i class="fas fa-redo"></i> Start Test Failure Investigation
+
+      ${
+        isInitial
+          ? `<div class="placeholder" style="padding:10px 12px; border-radius:8px; background:#f6f7fb; color:#4a4f63; margin:4px 0 12px;">
+                <strong>👉 Choose “All” or one of the owners</strong> to load the results.
+             </div>`
+          : (predictedTests.length
+              ? `
+                <h5>✅ Predicted Tests</h5>
+                <div style="max-height:200px; overflow:auto;">
+                  <table class="prediction-table predictionResultTable predictedTable">
+                    <thead><tr><th>Test Name</th><th>Owner</th><th>Predicted Work Item IDs</th></tr></thead>
+                    <tbody>${createTableRows(predictedTests)}</tbody>
+                  </table>
+                </div>`
+              : `<p>No predicted tests available.</p>`
+            )
+      }
+
+      ${
+        !isInitial
+          ? (unpredictedTests.length
+              ? `
+                <h5>⚠ Unpredicted Tests</h5>
+                <div style="max-height:200px; overflow:auto;">
+                  <table class="prediction-table predictionResultTable unpredictedTable">
+                    <thead><tr><th>Test Name</th><th>Owner</th><th>Status</th></tr></thead>
+                    <tbody>${createTableRows(unpredictedTests)}</tbody>
+                  </table>
+                </div>`
+              : `<p>No unpredicted tests available.</p>`
+            )
+          : ``
+      }
+
+      <button class="startInvestigationBtn" style="margin-top:10px;">
+        <i class="fas fa-redo"></i> Start Test Failure Investigation
       </button>
     `;
     chatBody.appendChild(botMsg);
     chatBody.scrollTop = chatBody.scrollHeight;
 
-    botMsg.querySelector('.applyOwnerFilterBtn').addEventListener('click', () => {
-        const owner = botMsg.querySelector('.ownerFilterSelect').value.trim();
-        displayPredictionResults(predictions, owner);
+    // Wire controls
+    const ownerSelectEl = botMsg.querySelector(".ownerFilterSelect");
+    ownerSelectEl.addEventListener("change", (e) => {
+        const v = (e.target.value || "__all__").trim();
+        if (v === "__choose__") return;          // ignore placeholder
+        displayPredictionResults(predictions, v); // instant re-render
     });
 
-    botMsg.querySelector('.exportCSV').addEventListener('click', () => {
-        exportTableToCSV(botMsg.querySelector('.predictionResultTable'));
+    // CSV/Investigation handlers
+    const exportBtn = botMsg.querySelector(".exportCSV");
+    exportBtn.addEventListener("click", () => {
+        if (exportBtn.disabled) return;
+        const table = botMsg.querySelector(".predictedTable") || botMsg.querySelector(".predictionResultTable");
+        exportTableToCSV(table);
     });
 
-    botMsg.querySelector('.startInvestigationBtn').addEventListener('click', showCDCARMJsonOptions);
+    botMsg.querySelector(".startInvestigationBtn").addEventListener("click", showCDCARMJsonOptions);
+}
+ */
+
+function displayPredictionResults(predictions, ownerFilter) {
+    // Guard
+    if (!Array.isArray(predictions) || predictions.length === 0) {
+        const botMsg = createBotMessage();
+        botMsg.innerHTML = `<p>No matching tests found for the selected owner.</p>`;
+        chatBody.appendChild(botMsg);
+        chatBody.scrollTop = chatBody.scrollHeight;
+        return;
+    }
+
+    // Helpers
+    const norm = (v) => (v == null ? "" : String(v)).trim().toLowerCase();
+    const isYes = (v) => v === true || norm(v) === "yes";
+
+    // First-instance (placeholder) rules
+    // ownerFilter accepted forms: undefined/null/"__choose__" (initial), "__all__", string (one owner), array<string> (multiple)
+    const isInitial = ownerFilter == null || ownerFilter === "__choose__" ||
+                      (Array.isArray(ownerFilter) && ownerFilter.length === 0);
+
+    let selectedAll = false;
+    let selectedSet = null; // Set of normalized owners if any chosen
+
+    if (!isInitial) {
+        if (ownerFilter === "__all__") {
+            selectedAll = true;
+        } else if (Array.isArray(ownerFilter)) {
+            selectedAll = ownerFilter.includes("__all__");
+            selectedSet  = new Set(ownerFilter.map(o => norm(o)));
+        } else {
+            selectedSet = new Set([norm(ownerFilter)]);
+        }
+    }
+
+    // Build owner -> unique tests and global unique test count
+    const ownerTestMap = {};
+    const allUniqueTests = new Set();
+    for (const p of predictions) {
+        const owner = (p.Owner || "Unknown").trim();
+        const test  = p.TestName || "Unnamed Test";
+        allUniqueTests.add(test);
+        (ownerTestMap[owner] ||= new Set()).add(test);
+    }
+    const totalUniqueCount = allUniqueTests.size;
+
+    // Split predicted/unpredicted
+    let predictedTests   = predictions.filter(p => isYes(p.IsPredicted));
+    let unpredictedTests = predictions.filter(p => !isYes(p.IsPredicted));
+
+    // Apply owner filtering only after Apply (i.e., not in initial placeholder state)
+    if (!isInitial && !selectedAll && selectedSet && selectedSet.size > 0) {
+        const matchOwner = (p) => selectedSet.has(norm(p.Owner || "Unknown"));
+        predictedTests   = predictedTests.filter(matchOwner);
+        unpredictedTests = unpredictedTests.filter(matchOwner);
+    }
+    // selectedAll -> no filtering
+
+    // Sort predicted by confidence score
+    predictedTests.sort((a, b) => (b.ConfidenceScore || 0) - (a.ConfidenceScore || 0));
+
+    // Row builder (group by TestName)
+    const createTableRows = (tests) => {
+        const grouped = {};
+        for (const p of tests) {
+            const test = p.TestName || "Unnamed Test";
+            (grouped[test] ||= {
+                Owner: p.Owner || "Unknown",
+                Product: p.Product,
+                Release: p.Release,
+                Platform: p.Platform,
+                WorkItems: new Set(),
+                IsPredicted: isYes(p.IsPredicted)
+            });
+            const ids = String(p.PredictedWorkItemId || "")
+                .split(";").map(s => s.trim()).filter(Boolean);
+            ids.forEach(id => grouped[test].WorkItems.add(id));
+        }
+        return Object.entries(grouped).map(([testName, info]) => `
+            <tr>
+              <td><a href="${buildTestLink(testName, info.Product, info.Release, info.Platform)}" target="_blank">${testName}</a></td>
+              <td>${info.Owner}</td>
+              <td>${
+                info.IsPredicted && info.WorkItems.size
+                  ? [...info.WorkItems].map(wi =>
+                      `<a href="https://tfs.ansys.com:8443/tfs/ANSYS_Development/Portfolio/_workitems/edit/${wi}" target="_blank">${wi}</a>`
+                    ).join(", ")
+                  : "No Prediction"
+              }</td>
+            </tr>
+        `).join("");
+    };
+
+    // Clear previous block and render container
+    chatBody.querySelector(".prediction-results-container")?.remove();
+
+    const botMsg = createBotMessage();
+    botMsg.classList.add("prediction-results-container");
+    botMsg.innerHTML = `
+      <h4>🔎 Test Failure Results:</h4>
+
+      <div class="prediction-controls">
+        <label>Owner Filter:</label>
+
+        <!-- Chips Summary + Collapsible List -->
+        <div class="owner-chipbox">
+          <details class="owner-collapsible" ${isInitial ? "" : "open"}>
+            <summary class="owner-summary">
+              <span class="owner-chips"></span>
+              <span class="owner-caret">▾</span>
+            </summary>
+            <div class="owner-list"></div>
+          </details>
+        </div>
+
+        <button class="applyOwnerFilterBtn"><i class="fas fa-filter"></i> Apply</button>
+        <button class="exportCSV"${isInitial ? " disabled" : ""}><i class="fas fa-download"></i> Export CSV</button>
+      </div>
+
+      <div class="prediction-notes">
+        <p><strong>🔹 Sorting:</strong> Tests are sorted by descending confidence score.</p>
+        <p><strong>🔹 Tip:</strong> Choose <em>All</em> or one/more owners, then click <em>Apply</em>.</p>
+        <p><strong>🔹 Test Names:</strong> Click to open the corresponding ARM report.</p>
+        <p><strong>🔹 Predicted Work Item IDs:</strong> Click to open the TFS bug page.</p>
+      </div>
+
+      ${
+        isInitial
+          ? `<div class="placeholder" style="padding:10px 12px; border-radius:8px; background:#f6f7fb; color:#4a4f63; margin:4px 0 12px;">
+                <strong>👉 Please select “All” or choose one/more owners</strong>, then click <em>Apply</em> to load results.
+             </div>`
+          : (predictedTests.length
+              ? `
+                <h5>✅ Predicted Tests</h5>
+                <div style="max-height:200px; overflow:auto;">
+                  <table class="prediction-table predictionResultTable predictedTable">
+                    <thead><tr><th>Test Name</th><th>Owner</th><th>Predicted Work Item IDs</th></tr></thead>
+                    <tbody>${createTableRows(predictedTests)}</tbody>
+                  </table>
+                </div>`
+              : `<p>No predicted tests available.</p>`
+            )
+      }
+
+      ${
+        !isInitial
+          ? (unpredictedTests.length
+              ? `
+                <h5>⚠ Unpredicted Tests</h5>
+                <div style="max-height:200px; overflow:auto;">
+                  <table class="prediction-table predictionResultTable unpredictedTable">
+                    <thead><tr><th>Test Name</th><th>Owner</th><th>Status</th></tr></thead>
+                    <tbody>${createTableRows(unpredictedTests)}</tbody>
+                  </table>
+                </div>`
+              : `<p>No unpredicted tests available.</p>`
+            )
+          : ``
+      }
+
+      <button class="startInvestigationBtn" style="margin-top:10px;">
+        <i class="fas fa-redo"></i> Start Test Failure Investigation
+      </button>
+    `;
+    chatBody.appendChild(botMsg);
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    // ==== Build the collapsible checklist + chips ====
+    const listHost  = botMsg.querySelector(".owner-list");
+    const chipsHost = botMsg.querySelector(".owner-chips");
+    const applyBtn  = botMsg.querySelector(".applyOwnerFilterBtn");
+    const exportBtn = botMsg.querySelector(".exportCSV");
+
+    const ownerEntries = Object.entries(ownerTestMap).sort((a,b)=>a[0].localeCompare(b[0]));
+    const checklistHTML = `
+      <label class="owner-item">
+        <input type="checkbox" value="__all__" class="owner-checkbox">
+        <span class="owner-label"><strong>All</strong> (${totalUniqueCount})</span>
+      </label>
+      <div class="owner-divider"></div>
+      ${ownerEntries.map(([owner, tests]) => `
+        <label class="owner-item">
+          <input type="checkbox" value="${owner}" class="owner-checkbox">
+          <span class="owner-label">${owner} (${tests.size})</span>
+        </label>
+      `).join("")}
+    `;
+    listHost.innerHTML = checklistHTML;
+
+    // Hydrate from ownerFilter
+    (function hydrateSelectionFromParam() {
+      const boxes = listHost.querySelectorAll(".owner-checkbox");
+      if (isInitial) return;
+      if (ownerFilter === "__all__") {
+        boxes.forEach(b => b.checked = (b.value === "__all__"));
+        return;
+      }
+      if (Array.isArray(ownerFilter)) {
+        const set = new Set(ownerFilter.map(o => norm(o)));
+        boxes.forEach(b => { b.checked = set.has(norm(b.value)); });
+      } else {
+        boxes.forEach(b => { b.checked = (norm(b.value) === norm(ownerFilter)); });
+      }
+    })();
+
+    // Selected values
+    function getSelectedValues() {
+      return Array.from(listHost.querySelectorAll(".owner-checkbox:checked")).map(b => b.value);
+    }
+
+    // Chips render
+    function renderChips() {
+      const vals = getSelectedValues();
+      if (vals.length === 0 || vals.includes("__all__")) {
+        chipsHost.innerHTML = `<span class="chip chip-all">All owners</span>`;
+        return;
+      }
+      chipsHost.innerHTML = vals.slice(0, 6).map(v => `<span class="chip">${v}</span>`).join("")
+        + (vals.length > 6 ? `<span class="chip chip-more">+${vals.length-6}</span>` : "");
+    }
+
+    // Select-all exclusivity
+    listHost.addEventListener("change", (e) => {
+      const t = e.target;
+      if (!(t instanceof HTMLInputElement) || t.className !== "owner-checkbox") return;
+
+      if (t.value === "__all__") {
+        if (t.checked) {
+          listHost.querySelectorAll('.owner-checkbox:not([value="__all__"])').forEach(b => b.checked = false);
+        }
+      } else if (t.checked) {
+        const allBox = listHost.querySelector('.owner-checkbox[value="__all__"]');
+        if (allBox) allBox.checked = false;
+      }
+      renderChips();
+    });
+
+    // Initial chips
+    renderChips();
+
+    // === Buttons ===
+    applyBtn.addEventListener("click", () => {
+      const selected = getSelectedValues();
+      if (selected.length === 0) {
+        displayPredictionResults(predictions, "__choose__"); // placeholder state
+        return;
+      }
+      if (selected.includes("__all__")) {
+        displayPredictionResults(predictions, "__all__");
+      } else {
+        displayPredictionResults(predictions, selected); // array of owners
+      }
+    });
+
+    exportBtn.addEventListener("click", () => {
+      if (exportBtn.disabled) return;
+      const table = botMsg.querySelector(".predictedTable") || botMsg.querySelector(".predictionResultTable");
+      if (!table) {
+        alert("No table to export. Select owners and click Apply first.");
+        return;
+      }
+      exportTableToCSV(table, "prediction_results.csv");
+    });
+
+    botMsg.querySelector(".startInvestigationBtn").addEventListener("click", showCDCARMJsonOptions);
 }
 
 
-function exportTableToCSV(tableSelector, filename = "prediction_results.csv") {
-    const rows = document.querySelectorAll(`${tableSelector} tr`);
-    let csv = [];
+function exportTableToCSV(tableOrSelector, filename = "prediction_results.csv") {
+  // Resolve table element
+  const table = (typeof tableOrSelector === "string")
+    ? document.querySelector(tableOrSelector)
+    : tableOrSelector;
 
-    rows.forEach(row => {
-        const cols = row.querySelectorAll('td, th');
-        const rowData = [];
-        cols.forEach(col => {
-            rowData.push(`"${col.textContent.trim().replace(/"/g, '""')}"`);
-        });
-        csv.push(rowData.join(","));
-    });
+  if (!table) {
+    console.warn("exportTableToCSV: table not found.", tableOrSelector);
+    return;
+  }
 
-    const csvString = csv.join("\n");
-    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // Collect rows from this table only
+  const rows = Array.from(table.querySelectorAll("tr"));
+  if (!rows.length) {
+    console.warn("exportTableToCSV: no rows to export.");
+    return;
+  }
+
+  // Build CSV
+  const csv = rows.map(row => {
+    const cols = Array.from(row.querySelectorAll("th, td"));
+    return cols.map(col => {
+      // text content with quotes escaped
+      return `"${col.textContent.trim().replace(/"/g, '""')}"`;
+    }).join(",");
+  }).join("\n");
+
+  // Blob + download (with BOM so Excel opens UTF-8)
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.style.display = "none";
+  document.body.appendChild(link);
+
+  // Safari compatibility: programmatic click event
+  link.dispatchEvent(new MouseEvent("click"));
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
+
 
 
 

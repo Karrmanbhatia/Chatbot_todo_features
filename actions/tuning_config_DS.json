@@ -1,0 +1,6 @@
+{
+  "threshold": 0.427,
+  "eps": 0.169,
+  "min_samples": 5,
+  "model_name": "e5-small-v2"
+}

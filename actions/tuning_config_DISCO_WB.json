@@ -1,6 +1,6 @@
 {
-  "threshold": 0.212,
-  "eps": 0.239,
-  "min_samples": 5,
-  "model_name": "bge-small-en-v1.5"
+  "threshold": 0.348,
+  "eps": 0.141,
+  "min_samples": 3,
+  "model_name": "multi-qa-MiniLM-L6-cos-v1"
 }

@@ -1,6 +1,6 @@
 {
-  "threshold": 0.367,
-  "eps": 0.292,
-  "min_samples": 3,
+  "threshold": 0.429,
+  "eps": 0.177,
+  "min_samples": 2,
   "model_name": "all-MiniLM-L12-v2"
 }
