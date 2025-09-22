@@ -136,7 +136,7 @@ def main():
     os.makedirs(dir_path, exist_ok=True)
 
     query_id = "0064473e-7889-463f-83b3-056b66904d0d"
-    #pat_token = "PAT_TOKEN"
+    pat_token = os.getenv("TFS_PAT_TOKEN")
     organization_url = "https://tfs.ansys.com:8443/tfs/ANSYS_Development"
     project_name = "Portfolio"
 

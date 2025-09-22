@@ -14,8 +14,8 @@ from sklearn.metrics import f1_score
 # Config
 # -------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-BUG_INDEX_PATH = os.path.join(BASE_DIR, "bug_index/tfs_bugs.index")
-BUG_META_PATH = os.path.join(BASE_DIR, "bug_index/tfs_bugs_meta.json")
+BUG_INDEX_PATH = os.path.join(BASE_DIR, "tune_parameter/tfs_bugs.index")
+BUG_META_PATH = os.path.join(BASE_DIR, "tune_parameter/tfs_bugs_meta.json")
 MODEL_CANDIDATES = [
     "bge-small-en-v1.5",
     "all-MiniLM-L12-v2",
@@ -172,8 +172,13 @@ def match_against_bugs(unmatched_tests, model_name, threshold):
 # Flask Entry
 # -------------------------------
 def run_bug_fallback(unmatched_tests, product_name="default"):
+    # Normalize if someone passes list-of-lists by mistake
+    if unmatched_tests and isinstance(unmatched_tests[0], list):
+        unmatched_tests = [x for group in unmatched_tests for x in group]
+
     if not unmatched_tests:
         return []
+
 
     print(f"🔄 Matching {len(unmatched_tests)} unpredicted tests to TFS bugs...")
     params = get_best_params(unmatched_tests, product_name)

@@ -147,7 +147,7 @@ def main():
     log = logging.getLogger()
 
     query_id = "0064473e-7889-463f-83b3-056b66904d0d"
-    #pat_token = "PAT TOKEN"
+    pat_token = os.getenv("TFS_PAT_TOKEN")
     org_url = "https://tfs.ansys.com:8443/tfs/ANSYS_Development"
     project = "Portfolio"
     os.makedirs(TUNE_DIR, exist_ok=True)
